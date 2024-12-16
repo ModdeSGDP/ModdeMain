@@ -1,0 +1,100 @@
+AMAZON services overview for fututre reference
+
+To ensure that you stay within AWS’s **free tier** while using their services, follow these best practices and guidelines. Each AWS service has specific free tier limits, so understanding and monitoring usage is key.
+
+---
+
+### **Steps to Stay Within the Free Tier on AWS**
+
+#### **1. Use the Free Tier Calculator**
+- **AWS Pricing Calculator**:
+  - Use the [AWS Pricing Calculator](https://calculator.aws) to estimate costs and check whether the free tier covers your expected usage.
+  - Input the details of the services you plan to use (e.g., instance types, storage size) to confirm they fit within free limits.
+
+---
+
+#### **2. Monitor Usage**
+- **AWS Billing Dashboard**:
+  - Regularly check your **Billing & Cost Management Dashboard** in the AWS Console to track usage.
+  - Set up **free tier usage alerts**:
+    - Go to the AWS Budgets section and create a budget for free tier usage.
+    - Configure email notifications when your usage nears or exceeds free limits.
+
+---
+
+#### **3. Service-Specific Tips**
+
+##### **Amazon SageMaker Free Tier**
+- Ensure your training and deployment jobs use the eligible instance types:
+  - Training: Use `ml.m5.large` or `ml.c5.large` (up to 50 hours/month).
+  - Notebook Instances: Use `t2.medium` (250 hours/month).
+  - Inference: Use `ml.m5.large` (125 hours/month).
+- Stick to these quotas and terminate idle resources after use to avoid unnecessary charges.
+
+##### **Amazon EC2 Free Tier**
+- Use the free-tier-eligible `t2.micro` or `t3.micro` instances for running TensorFlow, PyTorch, or other deep learning frameworks.
+- Make sure to:
+  - **Stop the instance** when not in use (the free tier provides 750 hours/month, which covers one instance running 24/7).
+  - Use the **AWS Deep Learning AMI**, which is free to use with eligible EC2 instances.
+
+##### **Amazon S3 Free Tier**
+- Keep your storage under 5GB, and only store essential files (datasets, model checkpoints, etc.).
+- Delete unused data periodically to free up space.
+- Use **lifecycle policies** to automatically clean up older or unused objects in your bucket.
+
+##### **AWS Lambda Free Tier**
+- Use the free 1 million requests/month and 400,000 GB-seconds compute time wisely.
+- Avoid excessive retries in Lambda workflows by setting a reasonable retry policy.
+- Use it for lightweight tasks, such as preprocessing images or triggering workflows, to avoid exceeding limits.
+
+---
+
+#### **4. Automate Resource Cleanup**
+- Use **AWS Instance Scheduler**:
+  - Automatically stop or terminate idle SageMaker, EC2, or other compute instances when not in use.
+  - This prevents running up charges accidentally.
+
+- Use **CloudWatch Alarms**:
+  - Set alarms to alert you if resource usage exceeds predefined thresholds.
+
+---
+
+#### **5. Keep an Eye on Additional Costs**
+- **Egress Data**:
+  - AWS free tier covers **1GB/month** of outbound data transfer. Avoid exceeding this by using AWS services that keep data within the AWS ecosystem (e.g., storing data in S3 and processing it in SageMaker).
+
+- **Premium Features**:
+  - Be cautious when enabling additional features in services like SageMaker, EC2, or S3. For example:
+    - Avoid enabling **real-time endpoints** in SageMaker if you're not actively using them.
+    - Stick to standard S3 storage classes (avoid Glacier or Intelligent Tiering unless needed).
+
+---
+
+#### **6. Enable Cost Control Features**
+- **AWS Budgets**:
+  - Set a monthly budget for free-tier usage (even if it’s $0).
+  - AWS will send email alerts when you approach the limits.
+
+- **Cost Explorer**:
+  - Use AWS **Cost Explorer** to analyze trends and identify unnecessary spending.
+
+---
+
+#### **7. Test Your Workflow Before Scaling**
+- Use AWS’s **free tier credits** to test your workflow on smaller datasets or with shorter training cycles.
+- Validate your workflow locally using **AWS CLI** or a local environment before deploying it to the cloud.
+
+---
+
+### **Free Tier Checklist**
+| **Service**      | **Limits**                                       | **Action**                                                                                         |
+|-------------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| **SageMaker**     | 50 hours training/month, 250 hours notebook     | Use `t2.medium` for notebooks, `ml.m5.large` for training, and terminate unused resources.        |
+| **EC2**           | 750 hours/month for `t2.micro` or `t3.micro`    | Use free-tier-eligible instance types and stop instances when idle.                              |
+| **S3**            | 5GB of free storage                             | Monitor storage size and delete unused files periodically.                                        |
+| **Lambda**        | 1 million requests/month, 400,000 GB-seconds    | Optimize workflows to avoid excessive retries.                                                   |
+| **CloudWatch**    | Free tier included                              | Use for monitoring and setting up alarms to avoid exceeding limits.                              |
+
+---
+
+By following these practices and monitoring your usage closely, you can effectively use AWS for your AI/ML needs without incurring unexpected costs. Let me know if you need help setting up any of these services!
