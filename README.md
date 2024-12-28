@@ -10,17 +10,13 @@ Imagine scrolling through social media, spotting a stunning outfit, and wishing 
 
 ### **Key Features**  
 - **📸 Upload and Identify**  
-  Snap or upload a picture of any fashionable look. Our app intelligently analyzes the image and identifies individual items:  
-  - Dresses  
-  - Sunglasses  
-  - Shoes  
-  - Chic hats  
-
+  Snap or upload a picture of any fashionable look. Our app intelligently analyzes the image and identifies individual items
+  
 - **🎯 Smart Product Matching**  
   Leveraging advanced AI and computer vision, **Modde** matches items from a curated network of retailers in Colombo.  
 
 - **🛍 Filter, Discover, Purchase**  
-  - Filter by price, color, or brand.  
+  - Filter by price, color, or brand etc...
   - Seamlessly purchase your favorites, all within the app.  
 
 - **📢 Empowering Local Retailers**  
