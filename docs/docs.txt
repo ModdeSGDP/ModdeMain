@@ -138,7 +138,7 @@ Use YOLOv8 for real-time inference.
 Deploy Object Detection Service:
 
 
-Expose an endpoint (/detect) for detecting clothing items.
+Expose an endpoint (/detect) for detecting clothing items
 
 Step 2: Embedding and Similarity Search
 Embedding Generation:
