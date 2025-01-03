@@ -1,0 +1,160 @@
+
+Tech Stack and Libraries
+Backend (NestJS + MongoDB + FAISS + AWS S3)
+Framework: NestJS
+Why NestJS?
+A modular, scalable architecture suitable for complex applications.
+Strong support for TypeScript.
+Built-in support for Dependency Injection (DI), which helps manage services and modules.
+Key Libraries:
+@nestjs/common, @nestjs/core: Core NestJS modules for controllers, services, and DI.
+@nestjs/mongoose: MongoDB integration.
+@nestjs/jwt: For authentication.
+@nestjs/platform-express: Handles file uploads and HTTP requests.
+Database: MongoDB
+Why MongoDB?
+NoSQL database with flexibility for storing unstructured data like product metadata.
+Supports large-scale queries efficiently.
+Change streams allow real-time updates when new products are added.
+Key Libraries:
+mongoose: ODM for MongoDB; simplifies schema definition and CRUD operations.
+mongodb: Direct MongoDB interaction for advanced operations like change streams.
+Search: FAISS
+Why FAISS?
+High-performance similarity search.
+Essential for retrieving products that are visually similar to the uploaded image.
+Key Libraries:
+faiss-cpu or faiss-gpu: For indexing and querying embeddings.
+File Storage: AWS S3
+Why AWS S3?
+Reliable storage for images uploaded by users and retailers.
+Scalable, with fast retrieval speeds.
+Key Libraries:
+aws-sdk: To interact with AWS services for uploading and retrieving files.
+Caching: Redis
+Why Redis?
+In-memory caching for fast retrieval of frequently queried products.
+Used for session management if needed.
+Key Libraries:
+ioredis: Advanced Redis client with support for clustering.
+Message Queue: RabbitMQ
+Why RabbitMQ?
+Decouples AI embedding generation from other backend processes.
+Ensures real-time product updates don’t block user requests.
+Key Libraries:
+amqp-connection-manager: Handles RabbitMQ connections and queues.
+
+AI Service (YOLOv8 + FAISS)
+Model: YOLOv8
+Why YOLOv8?
+State-of-the-art object detection.
+Pretrained models are available for general clothing detection.
+Fast inference, suitable for real-time use cases.
+Key Libraries:
+ultralytics: Official YOLOv8 library.
+torch, torchvision: Core PyTorch libraries for running the model.
+Embedding Generation
+Why Use Embeddings?
+Transforms images into fixed-length vectors that encode visual features.
+Necessary for comparing similarity between images.
+Key Libraries:
+torch: For PyTorch-based embedding models.
+numpy: For processing embeddings.
+Search: FAISS
+Why FAISS Again?
+Stores embeddings for both retailer and user images.
+Supports fast approximate nearest neighbor searches.
+API Framework: FastAPI
+Why FastAPI?
+Lightweight, high-performance backend for the AI service.
+Easy to deploy alongside other microservices.
+Key Libraries:
+fastapi: Core API framework.
+uvicorn: ASGI server to serve the API.
+
+Frontend (React Native)
+Framework: React Native
+Why React Native?
+Cross-platform app development.
+Fast development cycle with Expo.
+Key Libraries:
+expo: Simplifies mobile development.
+react-navigation: Handles app navigation.
+react-query or axios: For making API calls.
+Image Handling
+Why Image Handling?
+Users and retailers upload images that need preprocessing before uploading.
+Key Libraries:
+react-native-image-picker: For capturing and selecting images.
+sharp or react-native-image-resizer: To resize or preprocess images before upload.
+
+Authentication (JWT + NestJS)
+JWT Authentication
+Why JWT?
+Lightweight, stateless authentication method.
+Suitable for both users and retailers.
+Key Libraries:
+@nestjs/jwt: Handles token creation and verification.
+bcrypt: For password hashing.
+
+Backend Build Plan
+Step 1: Setting Up the Backend Environment
+Install Dependencies:
+
+
+npm install @nestjs/core @nestjs/common mongoose @nestjs/mongoose @nestjs/platform-express @nestjs/jwt bcrypt aws-sdk ioredis amqp-connection-manager
+Set Up Basic Structure:
+
+
+Create modules for:
+Users: Handle authentication and user profiles.
+Retailers: Manage retailer uploads and CRUD operations.
+Products: Manage product retrieval and metadata.
+
+Step 2: Retailer and Product Management
+Retailer Upload Endpoint:
+
+
+Accept:
+Image (processed to S3).
+Metadata (saved in MongoDB).
+Trigger embedding generation via RabbitMQ.
+Update FAISS for immediate searchability.
+Real-Time Product Retrieval:
+
+
+When a user uploads an image:
+Forward to the AI service for embedding generation.
+Query FAISS for similar embeddings.
+Return product details from MongoDB.
+
+AI Build Plan
+Step 1: Object Detection
+Train/Use YOLOv8:
+
+
+If retraining is required, collect labeled clothing datasets (e.g., DeepFashion).
+Use YOLOv8 for real-time inference.
+Deploy Object Detection Service:
+
+
+Expose an endpoint (/detect) for detecting clothing items.
+
+Step 2: Embedding and Similarity Search
+Embedding Generation:
+
+
+Use a pretrained ResNet50 model for feature extraction.
+Store embeddings in FAISS.
+FAISS Integration:
+
+
+Add new embeddings to FAISS dynamically upon retailer uploads.
+Query FAISS for similar products during user uploads.
+
+Deployment
+Use Docker to containerize the backend and AI services.
+Deploy MongoDB on MongoDB Atlas and Redis on AWS Elasticache.
+Use AWS Lambda for real-time image preprocessing (if necessary).
+This plan provides a step-by-step breakdown of tools and libraries tailored to achieve the required functionality efficiently within the 2-3 week timeframe.
+
