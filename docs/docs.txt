@@ -144,7 +144,7 @@ Step 2: Embedding and Similarity Search
 Embedding Generation:
 
 
-Use a pretrained ResNet50 model for feature extraction.
+Use a pretrained ResNet50 model for feature extraction
 Store embeddings in FAISS.
 FAISS Integration:
 
