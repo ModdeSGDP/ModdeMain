@@ -24,9 +24,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body>
+       {/* Navbar */}
+       <nav className="bg-white shadow">
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div className="flex justify-between items-center h-16">
+           <div className="flex items-center">
+             <h1 className="text-2xl font-bold text-gray-800">Fashion Inventory</h1>
+           </div>
+           <div>
+             <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+               Logout
+             </button>
+           </div>
+         </div>
+       </div>
+     </nav>
         {children}
       </body>
     </html>
