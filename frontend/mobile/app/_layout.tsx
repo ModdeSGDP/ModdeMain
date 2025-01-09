@@ -12,6 +12,7 @@ import OnboardingPage from './screens/onboardingpage';
 import LoginPage from './screens/loginPage';
 import RegistrationComplete from './screens/registration';
 import HomePage from './screens/homepage';
+import ShopPage from './screens/shoppage';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +28,7 @@ export default function MyStack() {
       <Stack.Screen name="Login" component={LoginPage}/>
       <Stack.Screen name="registration"component={RegistrationComplete}/>
       <Stack.Screen name="HomePage"component={HomePage}/>
+      <Stack.Screen name="ShopPage"component={ShopPage}/>
       
     </Stack.Navigator>
   );

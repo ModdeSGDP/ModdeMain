@@ -84,7 +84,7 @@ const ShopsPageInfinityScroll = () => {
           <Image
             style={styles.angleDownIcon}
             resizeMode="cover"
-            source={require("../assets/angle -down.png")}
+            source={require("../assets/angle-down.png")}
           />
           <Text style={styles.mostPopularText}>Most Popular</Text>
         </View>
