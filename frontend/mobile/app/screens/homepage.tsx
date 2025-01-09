@@ -13,17 +13,17 @@ const HomePage = () => {
       saveToPhotos: true,
     };
 
-    launchCamera(options, response => {
-      if (response.didCancel) {
-        Alert.alert('Action canceled', 'You canceled the photo capture.');
-      } else if (response.errorCode) {
-        Alert.alert('Error', `Camera error: ${response.errorMessage}`);
-      } else {
-        const photo = response.assets[0];
-        console.log('Photo captured:', photo);
-        // Navigate to another screen or use the photo
-      }
-    });
+    // launchCamera(options, response => {
+    //   if (response.didCancel) {
+    //     Alert.alert('Action canceled', 'You canceled the photo capture.');
+    //   } else if (response.errorCode) {
+    //     Alert.alert('Error', Camera error: ${response.errorMessage});
+    //   } else {
+    //     const photo = response.assets[0];
+    //     console.log('Photo captured:', photo);
+    //     // Navigate to another screen or use the photo
+    //   }
+    // });
   };
   return (
     <View style={styles.homePage}>
@@ -73,7 +73,7 @@ const HomePage = () => {
           <Pressable onPress={() => {}}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/smart_home.png")} />
           </Pressable>
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() =>navigation.navigate("ShopPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/shirt.png")} />
           </Pressable>
           <Pressable onPress={() => {}}>
@@ -327,4 +327,3 @@ const styles = StyleSheet.create({
 });
 
 export default HomePage;
-
