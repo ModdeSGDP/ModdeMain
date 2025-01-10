@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Inject, forwardRef } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -6,6 +6,7 @@ import { AuthService } from '../auth/auth.service';
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
 

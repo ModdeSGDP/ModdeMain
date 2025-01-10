@@ -1,19 +1,20 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
-    UserModule,
+    forwardRef(() =>  UserModule),
     PassportModule,
     JwtModule.register({
       secret: 'MODDE_SECRET_KEY', // Use an environment variable for production
       signOptions: { expiresIn: '1h' }, // Token expiry
     }),
   ],
-  providers: [AuthService],
+  providers: [AuthService],  
   exports: [AuthService],
 })
 export class AuthModule {}
