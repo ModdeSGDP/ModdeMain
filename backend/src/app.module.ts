@@ -12,7 +12,9 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal:true,envFilePath:".env",cache:true
     }),
-    MongooseModule.forRootAsync(mongooseModuleAsyncOptions), ],
+    MongooseModule.forRootAsync(mongooseModuleAsyncOptions),
+    UserModule,
+    AuthModule,],
   controllers: [AppController],
   providers: [AppService],
 })
