@@ -47,7 +47,7 @@ const HomePage = () => {
           <Image style={styles.uploadIcon} resizeMode="cover" source={require("../assets/upload.png")} />
           <Text style={styles.uploadText}>Upload File</Text>
         </Pressable>
-        <Pressable style={styles.photoButton} onPress={() => {}}>
+        <Pressable style={styles.photoButton} onPress={() =>navigation.navigate("ImageSearch")}>
           <Image style={styles.buttonBg} resizeMode="cover" source={require("../assets/ellipse17.png")} />
           <Image style={styles.cameraIcon} resizeMode="cover" source={require("../assets/camera.png")} />
           <Text style={styles.photoText}>Take Photo</Text>
