@@ -20,6 +20,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
   }
+
+  async verifyToken(token: string): Promise<any> {
+    try {
+      return this.jwtService.verify(token); // Decode and validate token
+    } catch (err) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
 }
+
 
 
