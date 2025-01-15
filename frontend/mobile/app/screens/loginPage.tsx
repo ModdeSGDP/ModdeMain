@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 const LoginPage = () => {
   const navigation = useNavigation<any>();
   const [rememberMe, setRememberMe] = useState(false);
+
   return (
     <View style={styles.loginPage}>
       <Image style={styles.loginPageChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
@@ -26,7 +27,6 @@ const LoginPage = () => {
             />
           </View>
         </View>
-        
         <View style={styles.groupParent}>
           <View style={styles.passwordWrapper}>
             <Text style={[styles.password, styles.passwordPosition]}>Password</Text>
@@ -144,7 +144,15 @@ const styles = StyleSheet.create({
     marginLeft: -86.5,
     top: 89,
     width: 174,
-    height: 100
+    height: 100,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   login: {
     fontSize: 32,
@@ -190,12 +198,12 @@ const styles = StyleSheet.create({
     left: -2
   },
   passwordWrapper: {
-    width: 48,
+    width: 58,
     height: 18
   },
   passwordEntryChild: {
     height: 40,
-    width: 331
+    width: 331,
   },
   eyeIcon: {
     height: "60%",
@@ -245,7 +253,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fba3a3",
     width: 327,
     left: 0,
-    position: "absolute"
+    position: "absolute",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   login1: {
     marginLeft: -24.5,
@@ -268,7 +284,15 @@ const styles = StyleSheet.create({
     borderColor: "#fba3a3",
     width: 327,
     height: 40,
-    left: "50%"
+    left: "50%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   googleIcon: {
     height: "100%",

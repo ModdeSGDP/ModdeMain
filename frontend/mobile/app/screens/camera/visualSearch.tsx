@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Camera, CameraType } from 'expo-camera'; // Correct import
+import { Camera, CameraType } from 'expo-camera';
+import { StatusBar } from 'expo-status-bar';
 
-const VisualSearch = () => {
+type VisualSearchProps = {
+  // Add any props if needed
+};
+
+const VisualSearch: React.FC<VisualSearchProps> = () => {
   const navigation = useNavigation();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
-  const [type, setType] = useState(CameraType.back);  // Use CameraType correctly as a value
-  const cameraRef = useRef<Camera>(null);
+  const [type, setType] = useState<CameraType>(CameraType.back);
+  const cameraRef = useRef<CameraType | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -17,76 +22,89 @@ const VisualSearch = () => {
     })();
   }, []);
 
-  const toggleCamera = () => {
-    setCameraActive(!cameraActive);
-  };
+  const toggleCamera = useCallback(() => {
+    setCameraActive((prev) => !prev);
+  }, []);
 
-  const flipCamera = () => {
-    setType((prevType) => (prevType === CameraType.back ? CameraType.front : CameraType.back)); // Correct way to use CameraType
-  };
+  const flipCamera = useCallback(() => {
+    setType((prevType) => 
+      prevType === CameraType.back ? CameraType.front : CameraType.back
+    );
+  }, []);
+
+  const CameraUI = () => (
+    <View style={styles.cameraContainer}>
+      <Camera
+        style={styles.camera}
+        type={type}
+        ref={cameraRef}
+      >
+        <View style={styles.cameraControls}>
+          <Pressable onPress={toggleCamera} style={styles.button} accessibilityLabel="Close camera">
+            <Text style={styles.buttonText}>Close</Text>
+          </Pressable>
+          <Pressable onPress={flipCamera} style={styles.button} accessibilityLabel="Flip camera">
+            <Text style={styles.buttonText}>Flip</Text>
+          </Pressable>
+        </View>
+      </Camera>
+    </View>
+  );
+
+  const SearchUI = () => (
+    <>
+      <View style={[styles.headerParent, styles.headerPosition]}>
+        <Text style={[styles.visualSearchTitle, styles.titleTypo]}>Visual Search</Text>
+        <Pressable onPress={() => navigation.goBack()} accessibilityLabel="Go back">
+          <Image
+            style={styles.closeIcon}
+            resizeMode="cover"
+            source={require('../../assets/close.png')}
+            accessibilityLabel="Close icon"
+          />
+        </Pressable>
+      </View>
+      <View style={[styles.instructionContainer, styles.instructionPosition]}>
+        <Text style={styles.instructionText}>
+          Aim at the product to identify automatically
+        </Text>
+      </View>
+      <Pressable style={styles.cameraButton} onPress={toggleCamera} accessibilityLabel="Open camera">
+        <Image
+          style={styles.cameraIcon}
+          resizeMode="cover"
+          source={require('../../assets/cameraIcon.png')}
+          accessibilityLabel="Camera icon"
+        />
+      </Pressable>
+    </>
+  );
 
   if (hasPermission === null) {
     return (
-      <View style={styles.visualSearch}>
+      <View style={styles.container}>
         <Text>Requesting camera permission...</Text>
       </View>
     );
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return (
+      <View style={styles.container}>
+        <Text>No access to camera. Please grant permission in your device settings.</Text>
+      </View>
+    );
   }
 
   return (
-    <View style={styles.visualSearch}>
-      {cameraActive ? (
-        <View style={styles.cameraContainer}>
-          <Camera
-            style={styles.camera}
-            type={type}  // Ensure type is passed correctly
-            ref={cameraRef}
-          >
-            <View style={styles.cameraControls}>
-              <Pressable onPress={toggleCamera} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </Pressable>
-              <Pressable onPress={flipCamera} style={styles.flipButton}>
-                <Text style={styles.flipButtonText}>Flip</Text>
-              </Pressable>
-            </View>
-          </Camera>
-        </View>
-      ) : (
-        <>
-          <View style={[styles.headerParent, styles.headerPosition]}>
-            <Text style={[styles.visualSearchTitle, styles.titleTypo]}>Visual Search</Text>
-            <Pressable onPress={() => navigation.goBack()}>
-              <Image
-                style={styles.closeIcon}
-                resizeMode="cover"
-                source={require('../../assets/close.png')}
-              />
-            </Pressable>
-          </View>
-          <View style={[styles.instructionContainer, styles.instructionPosition]}>
-            <Text style={styles.instructionText}>
-              Aim at the product to identify automatically
-            </Text>
-          </View>
-          <Pressable style={styles.cameraButton} onPress={toggleCamera}>
-            <Image
-              style={styles.cameraIcon}
-              resizeMode="cover"
-              source={require('../../assets/cameraIcon.png')}
-            />
-          </Pressable>
-        </>
-      )}
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      {cameraActive ? <CameraUI /> : <SearchUI />}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  visualSearch: {
+  container: {
     flex: 1,
     backgroundColor: '#fff',
     borderRadius: 0,
@@ -111,12 +129,10 @@ const styles = StyleSheet.create({
   },
   visualSearchTitle: {
     fontSize: 18,
-    bottom: 50,
     color: '#321919',
   },
   closeIcon: {
     width: 24,
-    bottom: 50,
     height: 24,
   },
   instructionPosition: {
@@ -157,25 +173,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     margin: 20,
   },
-  closeButton: {
+  button: {
     alignSelf: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
     padding: 10,
     borderRadius: 5,
   },
-  closeButtonText: {
-    fontSize: 18,
-    color: 'white',
-  },
-  flipButton: {
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 10,
-    borderRadius: 5,
-  },
-  flipButtonText: {
+  buttonText: {
     fontSize: 18,
     color: 'white',
   },

@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 
 const OnboardingPage = () => {
   const navigation = useNavigation(); // Use the navigation hook
-
   return (
     <View style={styles.onboardingPage}>
       <Image
@@ -12,18 +11,14 @@ const OnboardingPage = () => {
         resizeMode="cover"
         source={require("../assets/Ellipse1.png")}
       />
-      <Image
-        style={[styles.onboardingPageItem, styles.buttonPosition]}
-        resizeMode="cover"
-        source={require("../assets/chevron_left.png")}
-      />
+      
       <Text style={[styles.getStartedWith, styles.logoIconPosition]}>
         Get Started with Modde
       </Text>
       <Image
         style={[styles.logoIcon, styles.logoIconPosition]}
         resizeMode="cover"
-        source={require("../assets/logo.png")}
+        source={require("../assets/logo5.png")}
       />
       <Pressable
         style={[styles.button, styles.buttonPosition]}
