@@ -17,8 +17,7 @@ const IntroScreen3 = () => {
             </Pressable>
             <Text style={[styles.xploreThe2024s, styles.itBringsYouClr]}>{`xplore the 2024’s hottest fashion,
 `}</Text>
-            <Text style={[styles.itBringsYou, styles.itBringsYouClr]}>{`It brings you the latest trends and
-      			products from all island...`}</Text>
+            <Text style={[styles.itBringsYou, styles.itBringsYouClr]}>{`It brings you the latest trends and products from all island...`}</Text>
             <Pressable style={styles.wrapper} onPress={() => navigation.navigate("Intro2")}>
                 <Image style={styles.icon} resizeMode="cover" source= {require("../assets/chevron_left.png")} />
             </Pressable>
@@ -88,18 +87,18 @@ const styles = StyleSheet.create({
         width: 187,
         height: 34,
         textAlign: "center",
-        left: "50%",
+        left: "52%",
         position: "absolute"
     },
     introScreen3Item: {
         top: 559,
-        left: 172,
-        width: 32,
-        height: 6,
+        left: 180,
+        width: 24,
+        height: 4,
         position: "absolute"
     },
     skip1: {
-        fontSize: 13,
+        fontSize: 15,
         lineHeight: 16,
         color: "#321919",
         fontFamily: "JejuGothic",
@@ -107,7 +106,7 @@ const styles = StyleSheet.create({
     },
     skip: {
         left: 321,
-        top: 57,
+        top: 67,
         position: "absolute"
     },
     xploreThe2024s: {
@@ -122,7 +121,7 @@ const styles = StyleSheet.create({
     },
     itBringsYou: {
         top: 613,
-        left: 41,
+        left: 61,
         lineHeight: 24,
         fontWeight: "500",
         fontFamily: "Rosario-Medium",
@@ -131,10 +130,10 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     icon: {
-        height: "100%",
-        width: "100%",
-        top:10,
-        left:20
+        height: "80%",
+        width: "80%",
+        top:20,
+        left:17
     },
     wrapper: {
         left: 23,

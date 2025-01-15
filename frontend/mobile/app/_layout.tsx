@@ -12,8 +12,9 @@ import OnboardingPage from './screens/onboardingpage';
 import LoginPage from './screens/loginPage';
 import RegistrationComplete from './screens/registration';
 import HomePage from './screens/homepage';
-import ShopPage from './screens/shoppage';
+import ShopPage from './screens/shopPage/shoppage';
 import VisualSearch from './screens/camera/visualSearch';
+import ProductDetailPage from './screens/shopPage/ProductDetailPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,8 +31,8 @@ export default function MyStack() {
       <Stack.Screen name="registration"component={RegistrationComplete}/>
       <Stack.Screen name="HomePage"component={HomePage}/>
       <Stack.Screen name="ShopPage"component={ShopPage}/>
+      <Stack.Screen name="ProductDetail"component={ProductDetailPage}/>
       <Stack.Screen name="ImageSearch"component={VisualSearch}/>
-      
     </Stack.Navigator>
   );
 }
