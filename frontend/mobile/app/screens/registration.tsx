@@ -8,7 +8,7 @@ const RegistrationComplete = () => {
   return (
     <View style={styles.registrationComplete}>
       <Image style={styles.registrationCompleteChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
-      <Image style={styles.registrationCompleteItem} resizeMode="cover" source={require("../assets/Ellipse2.png")} />
+      
       <Image style={[styles.confettiIcon, styles.iconPosition]} resizeMode="cover" source={require("../assets/Confetti.png")} />
       
       <View style={[styles.contentParent, styles.contentPosition]}>
@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   registrationCompleteChild: {
-    top: -106,
-    left: -139,
+    top: -16,
+    left: -119,
     width: 449,
     height: 353,
     position: "absolute",
@@ -154,10 +154,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     top: "30%",
+    
   },
   button: {
     width: 327,
     height: 40,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonParent: {
     bottom: 59,

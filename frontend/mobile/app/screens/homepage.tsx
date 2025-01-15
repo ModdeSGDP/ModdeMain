@@ -12,12 +12,12 @@ const HomePage = () => {
       cameraType: 'back',
       saveToPhotos: true,
     };
-
+    // Commented out for now as per original code
     // launchCamera(options, response => {
     //   if (response.didCancel) {
     //     Alert.alert('Action canceled', 'You canceled the photo capture.');
     //   } else if (response.errorCode) {
-    //     Alert.alert('Error', Camera error: ${response.errorMessage});
+    //     Alert.alert('Error', `Camera error: ${response.errorMessage}`);
     //   } else {
     //     const photo = response.assets[0];
     //     console.log('Photo captured:', photo);
@@ -25,6 +25,7 @@ const HomePage = () => {
     //   }
     // });
   };
+
   return (
     <View style={styles.homePage}>
       <View style={[styles.headerParent, styles.headerPosition]}>
@@ -33,11 +34,8 @@ const HomePage = () => {
           <Image style={styles.menuIcon} resizeMode="cover" source={require("../assets/bars-from-left.png")} />
         </Pressable>
         <Pressable onPress={() => {}}>
-            <Image
-                style={styles.bell}
-                source={require("../assets/bell.png")}
-            />
-            </Pressable>
+          <Image style={styles.bell} source={require("../assets/bell.png")} />
+        </Pressable>
       </View>
       <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/Rectangle23.png")} />
       
@@ -47,7 +45,7 @@ const HomePage = () => {
           <Image style={styles.uploadIcon} resizeMode="cover" source={require("../assets/upload.png")} />
           <Text style={styles.uploadText}>Upload File</Text>
         </Pressable>
-        <Pressable style={styles.photoButton} onPress={() =>navigation.navigate("ImageSearch")}>
+        <Pressable style={styles.photoButton} onPress={() => navigation.navigate("ImageSearch")}>
           <Image style={styles.buttonBg} resizeMode="cover" source={require("../assets/ellipse17.png")} />
           <Image style={styles.cameraIcon} resizeMode="cover" source={require("../assets/camera.png")} />
           <Text style={styles.photoText}>Take Photo</Text>
@@ -55,10 +53,9 @@ const HomePage = () => {
         <Pressable style={styles.nextButton} onPress={() => {}}>
           <View style={styles.nextButtonBg} />
           <Text style={styles.nextText}>Next</Text>
-          <Image style={styles.arrowIcon} resizeMode="cover" source={require("../assets/chevron-left.png")} />
+          <Image style={styles.arrowIcon} resizeMode="cover" source={require("../assets/chevron-left1.png")} />
         </Pressable>
       </View>
-
       <View style={styles.uploadingBar}>
         <View style={styles.uploadingBarBg} />
         <View style={styles.uploadingBarFill} />
@@ -71,9 +68,10 @@ const HomePage = () => {
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
           <Pressable onPress={() => {}}>
+            <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/smart_home.png")} />
           </Pressable>
-          <Pressable onPress={() =>navigation.navigate("ShopPage")}>
+          <Pressable onPress={() => navigation.navigate("ShopPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/shirt.png")} />
           </Pressable>
           <Pressable onPress={() => {}}>
@@ -99,6 +97,15 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     overflow: 'hidden',
   },
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    flex: 1,
+    width: "100%",
+    height: 1,
+    top: -20
+  },
   headerPosition: {
     position: 'absolute',
     top: 59,
@@ -114,20 +121,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 30,
   },
-  homePageChild: {
-    top: -10,
-    left: -20,
-    width: 619,
-    height: 427,
-    position: 'absolute',
-  },
-  homePageItem: {
-    top: 503,
-    left: -14,
-    width: 441,
-    height: 406,
-    position: 'absolute',
-  },
   headerParent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -139,16 +132,13 @@ const styles = StyleSheet.create({
     lineHeight: 36,
     color: '#321919',
     flex: 1,
-    left:25,
+    left: 25,
   },
   menuIcon: {
     width: 30,
     height: 30,
-    left: -310
-  },
-  searchIcon: {
-    fontSize: 18,
-    color: '#040502',
+    left: -310,
+    top:-10,
   },
   mainImage: {
     marginLeft: -160,
@@ -158,21 +148,41 @@ const styles = StyleSheet.create({
     height: 295,
     borderRadius: 30,
     position: 'absolute',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   mainButtons: {
     top: 533,
     width: 316,
     height: 142,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   uploadButton: {
     position: 'absolute',
     left: 56,
     alignItems: 'center',
+    shadowColor: "#000",
+    
   },
   photoButton: {
     position: 'absolute',
     right: 56,
     alignItems: 'center',
+    shadowColor: "#000",
+    
   },
   buttonBg: {
     width: 50,
@@ -212,6 +222,14 @@ const styles = StyleSheet.create({
     height: 46,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   nextButtonBg: {
     position: 'absolute',
@@ -257,7 +275,7 @@ const styles = StyleSheet.create({
     bottom: 3,
     width: '25%',
     backgroundColor: '#f97c7c',
-    borderRadius:100,
+    borderRadius: 100,
   },
   fileIcon: {
     position: 'absolute',
@@ -266,8 +284,11 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  bell:{
-    left:-5,
+  bell: {
+    left: -6,
+    width: 21,
+    height: 23,
+    top: -10
   },
   uploadingText: {
     position: 'absolute',
@@ -294,6 +315,16 @@ const styles = StyleSheet.create({
     marginLeft: -158,
     width: 316,
     height: 69,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   navBarBg: {
     position: 'absolute',
@@ -327,3 +358,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomePage;
+

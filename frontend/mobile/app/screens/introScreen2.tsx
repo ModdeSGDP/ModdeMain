@@ -3,7 +3,6 @@ import { Image, StyleSheet, Text, Pressable, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const IntroScreen2 = () => {
-
     const navigation = useNavigation();
     return (
         <View style={styles.introScreen2}>
@@ -57,8 +56,8 @@ const styles = StyleSheet.create({
         position: "absolute",
     },
     selectWhatYou: {
-        marginTop: 173,
-        marginLeft: -141.5,
+        marginTop: 160,
+        marginLeft: -140.5,
         fontSize: 24,
         lineHeight: 30,
         fontFamily: "Inter-SemiBold",
@@ -71,17 +70,17 @@ const styles = StyleSheet.create({
     },
     introScreen2Item: {
         top: 559,
-        left: 171,
-        width: 34,
-        height: 6,
-        position: "absolute",
+        left: 180,
+        width: 24,
+        height: 4,
+        position: "absolute"
     },
     skip1: {
-        fontSize: 13,
+        fontSize: 15,
         lineHeight: 16,
         color: "#321919",
         fontFamily: "JejuGothic",
-        textAlign: "center",
+        textAlign: "center"
     },
     skip: {
         left: 321,
@@ -100,7 +99,7 @@ const styles = StyleSheet.create({
     },
     exclusivelyCuratedSelection: {
         top: 616,
-        left: 42,
+        left: 52,
         lineHeight: 24,
         fontWeight: "500",
         fontFamily: "Rosario-Medium",
@@ -109,10 +108,10 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     icon: {
-        height: "100%",
-        width: "100%",
-        top:10,
-        left:20
+        height: "80%",
+        width: "80%",
+        top:20,
+        left:17
     },
     wrapper: {
         left: 23,

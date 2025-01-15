@@ -13,10 +13,9 @@ const IntroScreen = () => {
       			<Image style={[styles.introScreen1Item, styles.homeIndicator1Position]} resizeMode="cover" source={require("../assets/group5.png")} />
       			<Text style={styles.exploreFashion}>Explore Fashion</Text>
       			<Image style={styles.introScreen1Inner} resizeMode="cover" source={require("../assets/group10.png")} />
-      			<Pressable style={styles.skip} onPress={()=>{}}>
+      			<Pressable style={styles.skip} onPress={()=>navigation.navigate("Login")}>
         				<Text style={styles.skip1}>Skip</Text>
       			</Pressable>
-      			
       			<Text style={[styles.exploreThe2025s, styles.xploreThe2024sClr]}>{"Explore the 2025's hottest fashion, just uploading a picture...."
         				}</Text>
             <Pressable style={styles.wrapper} onPress={()=>navigation.navigate("OnboardingPage")}>
@@ -52,7 +51,6 @@ const styles = StyleSheet.create({
     homeIndicator1Position: {
         left: "50%",
         position: "absolute",
-        
     },
     xploreThe2024sClr: {
         color: "#5f6174",
@@ -78,9 +76,10 @@ const styles = StyleSheet.create({
     introScreen1Item: {
         marginTop: -179,
         marginLeft: -109.5,
-        top: "50%",
         width: 218,
-        height: 299
+        height: 299,
+        top: "50%",
+        left: "50%",
     },
     exploreFashion: {
         marginLeft: -93.5,
@@ -98,9 +97,9 @@ const styles = StyleSheet.create({
     },
     introScreen1Inner: {
         top: 559,
-        left: 171,
-        width: 34,
-        height: 6,
+        left: 180,
+        width: 24,
+        height: 4,
         position: "absolute"
     },
     skip1: {
@@ -136,10 +135,20 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     icon: {
-        height: "100%",
-        width: "100%",
-        top:10,
-        left:20
+        height: "80%",
+    width: "80%",
+    top: 20,
+    left: 17,
+    
+    shadowColor: "#000",
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // for Android
+    borderRadius: 26,
     },
     wrapper: {
         left: 24,
