@@ -8,12 +8,12 @@ interface PriceRangeSliderProps {
 }
 
 const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({ min, max, onChange }) => {
-  const [sliderWidth, setSliderWidth] = useState(300);
+  const [sliderWidth, setSliderWidth] = useState(0);
   const lowPriceRef = useRef(min);
   const highPriceRef = useRef(max);
 
   const lowThumbX = useRef(new Animated.Value(0)).current;
-  const highThumbX = useRef(new Animated.Value(sliderWidth)).current;
+  const highThumbX = useRef(new Animated.Value(0)).current;
 
   const updatePrices = useCallback((low: number, high: number) => {
     lowPriceRef.current = low;
@@ -24,6 +24,13 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({ min, max, onChange 
   useEffect(() => {
     updatePrices(min, max);
   }, [min, max, updatePrices]);
+
+  useEffect(() => {
+    if (sliderWidth > 0) {
+      lowThumbX.setValue(0);
+      highThumbX.setValue(sliderWidth);
+    }
+  }, [sliderWidth, lowThumbX, highThumbX]);
 
   const createPanResponder = useCallback((isLow: boolean) => PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -40,6 +47,8 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({ min, max, onChange 
         highPriceRef.current = newPrice;
         highThumbX.setValue(newX);
       }
+
+      updatePrices(lowPriceRef.current, highPriceRef.current);
     },
     onPanResponderRelease: () => {
       updatePrices(lowPriceRef.current, highPriceRef.current);
@@ -51,6 +60,7 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({ min, max, onChange 
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Price Range</Text>
       <View style={styles.labelContainer}>
         <Text style={styles.label}>LKR {lowPriceRef.current}</Text>
         <Text style={styles.label}>LKR {highPriceRef.current}</Text>
@@ -87,8 +97,15 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({ min, max, onChange 
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    paddingHorizontal: 10,
+    width: '90%',
+    paddingHorizontal: 0,
+    alignSelf: 'center',
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#321919',
+    marginBottom: 10,
   },
   labelContainer: {
     flexDirection: 'row',
@@ -96,24 +113,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   label: {
-    fontSize: 14,
-    color: '#321919',
+    fontSize: 12,
+    color: '#898989',
+    fontFamily: 'Inter-Regular',
   },
   sliderContainer: {
     position: 'relative',
     height: 40,
     justifyContent: 'center',
+    width: '100%',
   },
   track: {
     position: 'absolute',
     left: 0,
     right: 0,
-    height: 4,
+    height: 2,
     backgroundColor: '#DADADA',
   },
   selectedTrack: {
     position: 'absolute',
-    height: 4,
+    height: 2,
     backgroundColor: '#F97C7C',
   },
   thumb: {
@@ -121,10 +140,21 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#F97C7C',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#F97C7C',
     top: 10,
     marginLeft: -10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
 
 export default PriceRangeSlider;
+
