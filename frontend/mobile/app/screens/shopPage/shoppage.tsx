@@ -7,11 +7,13 @@ import {
   Pressable, 
   ScrollView, 
   TextInput,
-  Modal,
-  FlatList
+  FlatList,
+  Dimensions
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FilterMenu from './FilterMenu';
+
+const { width } = Dimensions.get('window');
 
 const ShopsPageInfinityScroll = () => {
   const navigation = useNavigation();
@@ -49,6 +51,7 @@ const ShopsPageInfinityScroll = () => {
     },
     // Add more products as needed
   ]);
+
   const ProductCard = ({ item }) => (
     <Pressable 
       style={styles.card}
@@ -81,6 +84,7 @@ const ShopsPageInfinityScroll = () => {
       </Pressable>
     </Pressable>
   );
+
   const renderItem = ({ item }) => (
     <ProductCard item={item} />
   );
@@ -191,16 +195,8 @@ const ShopsPageInfinityScroll = () => {
         </View>
         <View style={styles.activeIndicator} />
       </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isFilterMenuVisible}
-        onRequestClose={() => setIsFilterMenuVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <FilterMenu onClose={() => setIsFilterMenuVisible(false)} />
-        </View>
-      </Modal>
+      
+      <FilterMenu isVisible={isFilterMenuVisible} onClose={() => setIsFilterMenuVisible(false)} />
     </View>
   );
 };
@@ -264,7 +260,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFE2E6",
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 0,
+    bottom: 0,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -298,7 +295,7 @@ const styles = StyleSheet.create({
   },
   mostPopularText: {
     fontFamily: "Inter-SemiBold",
-    fontSize: 12,
+    fontSize: 15,
     color: "#979797",
   },
   filterButton: {
@@ -312,7 +309,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontFamily: "Inter-SemiBold",
-    fontSize: 12,
+    fontSize: 13,
     color: "#F97C7C",
   },
   productGrid: {
@@ -323,7 +320,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   card: {
-    width: "47%",
+    width: (width - 30) / 2,
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
     overflow: "hidden",
@@ -444,11 +441,6 @@ const styles = StyleSheet.create({
     top: -20,
     left: 0,
     right: 0,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Dimensions, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -20,7 +20,6 @@ type Product = {
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'ProductDetail'>;
 type ProductDetailNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductDetail'>;
-
 type Props = {
   route: ProductDetailRouteProp;
   navigation: ProductDetailNavigationProp;
@@ -31,12 +30,24 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
   const [selectedColor, setSelectedColor] = useState('black');
   const [selectedSize, setSelectedSize] = useState('M');
   const [quantity, setQuantity] = useState(1);
+  const [userRating, setUserRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [showReviewInput, setShowReviewInput] = useState(false);
 
   const colors = ['black', 'white', 'gray'];
   const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
+
+  const handleSubmitReview = () => {
+    // Here you would typically send the review to your backend
+    console.log('Submitting review:', { rating: userRating, text: reviewText });
+    // Reset the form
+    setUserRating(0);
+    setReviewText('');
+    setShowReviewInput(false);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -131,6 +142,67 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
           Shop {product.brand} for trendy sportswear for ladies in Sri Lanka. Stay stylish and comfortable during your workouts with our premium women's sportswear collection.
         </Text>
 
+        <Text style={styles.sectionTitle}>Reviews</Text>
+        <View style={styles.reviewsContainer}>
+          <View style={styles.overallRating}>
+            <Text style={styles.overallRatingText}>4.5</Text>
+            <View style={styles.starsContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Ionicons key={star} name="star" size={16} color={star <= 4 ? "#FFD700" : "#D3D3D3"} />
+              ))}
+            </View>
+            <Text style={styles.reviewCount}>Based on 1000+ reviews</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.addReviewButton} 
+            onPress={() => setShowReviewInput(!showReviewInput)}
+          >
+            <Text style={styles.addReviewButtonText}>
+              {showReviewInput ? 'Cancel Review' : 'Add Review'}
+            </Text>
+          </TouchableOpacity>
+          {showReviewInput && (
+            <View style={styles.reviewInputContainer}>
+              <Text style={styles.userRatingText}>Your Rating:</Text>
+              <View style={styles.userStarsContainer}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <TouchableOpacity key={star} onPress={() => setUserRating(star)}>
+                    <Ionicons name="star" size={32} color={star <= userRating ? "#FFD700" : "#D3D3D3"} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TextInput
+                style={styles.reviewInput}
+                multiline
+                numberOfLines={4}
+                placeholder="Write your review here..."
+                value={reviewText}
+                onChangeText={setReviewText}
+              />
+              <TouchableOpacity 
+                style={styles.submitReviewButton} 
+                onPress={handleSubmitReview}
+              >
+                <Text style={styles.submitReviewButtonText}>Submit Review</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <View style={styles.reviewList}>
+            <View style={styles.reviewItem}>
+              <View style={styles.reviewHeader}>
+                <Text style={styles.reviewerName}>John Doe</Text>
+                <View style={styles.reviewStars}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Ionicons key={star} name="star" size={14} color={star <= 4 ? "#FFD700" : "#D3D3D3"} />
+                  ))}
+                </View>
+              </View>
+              <Text style={styles.reviewText}>Great product! Very comfortable and stylish. Highly recommended.</Text>
+            </View>
+            {/* Add more review items as needed */}
+          </View>
+        </View>
+
         <TouchableOpacity style={styles.addToCartButton}>
           <Text style={styles.addToCartButtonText}>Add to Cart</Text>
         </TouchableOpacity>
@@ -142,9 +214,9 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop:40,
-    paddingBottom:80
+    backgroundColor: '#FFF0F5', // Light pink color
+    paddingTop: 40,
+    paddingBottom: 80
   },
   header: {
     flexDirection: 'row',
@@ -280,10 +352,95 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 16,
   },
+  reviewsContainer: {
+    marginBottom: 16,
+  },
+  overallRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  overallRatingText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginRight: 16,
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    marginRight: 8,
+  },
+  addReviewButton: {
+    backgroundColor: '#F97C7C',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  addReviewButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  reviewInputContainer: {
+    marginBottom: 16,
+  },
+  userRatingText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  userStarsContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  reviewInput: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    padding: 12,
+    height: 100,
+    textAlignVertical: 'top',
+    marginBottom: 16,
+  },
+  submitReviewButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+  },
+  submitReviewButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  reviewList: {
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingTop: 16,
+  },
+  reviewItem: {
+    marginBottom: 16,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  reviewerName: {
+    fontWeight: 'bold',
+  },
+  reviewStars: {
+    flexDirection: 'row',
+  },
+  reviewText: {
+    color: '#333',
+    fontSize: 14,
+    lineHeight: 20,
+  },
   addToCartButton: {
     backgroundColor: '#F97C7C',
     borderRadius: 8,
     padding: 16,
+    bottom:20,
     alignItems: 'center',
   },
   addToCartButtonText: {
@@ -294,3 +451,4 @@ const styles = StyleSheet.create({
 });
 
 export default ProductDetailPage;
+
