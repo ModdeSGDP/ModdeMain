@@ -16,4 +16,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // Attach user info from the token to the request object
     return { username: payload.username, role: payload.role };
   }
-}
+}   
