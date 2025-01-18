@@ -9,7 +9,6 @@ interface FilterMenuProps {
   isVisible: boolean;
   onClose: () => void;
 }
-
 const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -18,7 +17,6 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
   const [priceRange, setPriceRange] = useState({ low: 0, high: 25000 });
 
   const slideAnim = useMemo(() => new Animated.Value(SIDEBAR_WIDTH), []);
-
   React.useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: isVisible ? 0 : SIDEBAR_WIDTH,
@@ -227,7 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#321919',
   },
@@ -254,7 +252,7 @@ const styles = StyleSheet.create({
     color: '#321919',
   },
   closeIcon: {
-    fontSize: 24,
+    fontSize: 14,
     color: '#321919',
   },
   categoryContent: {

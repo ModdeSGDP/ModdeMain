@@ -212,8 +212,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
     margin: 50,
-    marginTop: 60,
-    padding: 10,
+    marginTop: 3,
+    padding: 6,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   backbutton: {
-    top: 65,
+    top: 15,
     left: 10,
     width: 27,
     height: 27,

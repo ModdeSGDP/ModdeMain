@@ -133,12 +133,13 @@ const styles = StyleSheet.create({
     color: '#321919',
     flex: 1,
     left: 25,
+    top:-30,
   },
   menuIcon: {
     width: 30,
     height: 30,
-    left: -310,
-    top:-10,
+    left: -320,
+    top:-50,
   },
   mainImage: {
     marginLeft: -160,
@@ -285,10 +286,10 @@ const styles = StyleSheet.create({
     height: 30,
   },
   bell: {
-    left: -6,
+    left: -2,
     width: 21,
     height: 23,
-    top: -10
+    top: -50
   },
   uploadingText: {
     position: 'absolute',

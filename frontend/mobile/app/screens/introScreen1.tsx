@@ -140,15 +140,6 @@ const styles = StyleSheet.create({
     top: 20,
     left: 17,
     
-    shadowColor: "#000",
-    shadowOffset: {
-        width: 0,
-        height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5, // for Android
-    borderRadius: 26,
     },
     wrapper: {
         left: 24,
