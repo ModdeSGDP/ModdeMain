@@ -1,40 +1,46 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
 const RegistrationComplete = () => {
   const navigation = useNavigation();
-
+  const confettiRef = useRef(null);
   return (
     <View style={styles.registrationComplete}>
-      <Image style={styles.registrationCompleteChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
-      
-      <Image style={[styles.confettiIcon, styles.iconPosition]} resizeMode="cover" source={require("../assets/Confetti.png")} />
-      
+      <Image
+        style={styles.registrationCompleteChild}
+        resizeMode="cover"
+        source={require("../assets/Ellipse1.png")}
+      />
+      {/* Confetti animation */}
+      <ConfettiCannon
+        ref={confettiRef}
+        count={200}
+        origin={{ x: -10, y: 0 }}
+        fadeOut={true}
+        explosionSpeed={500}
+        fallSpeed={2700}
+      />
       <View style={[styles.contentParent, styles.contentPosition]}>
         <Text style={[styles.woohoo, styles.woohooTypo]}>Woohoo!</Text>
         <Text style={styles.registrationIsComplete}>
           Registration is complete! Get ready to have the best shopping experiences of your life!
         </Text>
       </View>
-      
-      
-      <Pressable onPress={() => navigation.navigate('Login')}>
-        <Image 
-          style={styles.groupIcon} 
-          resizeMode="cover" 
-          source={require("../assets/chevron_left.png")} 
+      <Pressable onPress={() => navigation.navigate("Login")}>
+        <Image
+          style={styles.groupIcon}
+          resizeMode="cover"
+          source={require("../assets/chevron_left.png")}
         />
       </Pressable>
-      
       <View style={[styles.buttonParent, styles.buttonPosition]}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('HomePage')}>
+        <Pressable style={styles.button} onPress={() => navigation.navigate("HomePage")}>
           <View style={[styles.buttonChild, styles.buttonChildLayout]} />
           <Text style={[styles.letsBegin, styles.buttonTypo]}>Let's begin</Text>
         </Pressable>
       </View>
-      
-      
     </View>
   );
 };
@@ -60,10 +66,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
   },
-  skipTypo: {
-    fontFamily: "Rosario-Regular",
-    textAlign: "center",
-  },
   buttonPosition: {
     left: 35,
     position: "absolute",
@@ -77,10 +79,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
-  indicatorPosition: {
-    left: 0,
-    position: "absolute",
-  },
   registrationCompleteChild: {
     top: -16,
     left: -119,
@@ -88,22 +86,8 @@ const styles = StyleSheet.create({
     height: 353,
     position: "absolute",
   },
-  registrationCompleteItem: {
-    top: 503,
-    left: -14,
-    width: 441,
-    height: 406,
-    borderRadius: 150,
-    position: "absolute",
-  },
-  confettiIcon: {
-    marginLeft: -159.5,
-    top: 1,
-    width: 319,
-    height: 492,
-  },
   woohoo: {
-    fontSize: 24,
+    fontSize: 27,
     lineHeight: 36,
     color: "#321919",
     width: 187,
@@ -122,14 +106,6 @@ const styles = StyleSheet.create({
     marginLeft: -147,
     top: 319,
     alignItems: "center",
-  },
-  skip: {
-    top: 62,
-    right: 24,
-    fontSize: 14,
-    lineHeight: 21,
-    color: "#321919",
-    position: "absolute",
   },
   groupIcon: {
     top: 53,
@@ -154,7 +130,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     top: "30%",
-    
   },
   button: {
     width: 327,
@@ -171,22 +146,6 @@ const styles = StyleSheet.create({
     bottom: 59,
     alignItems: "center",
   },
-  homeIndicator1: {
-    marginLeft: -66.5,
-    bottom: 8,
-    left: "50%",
-    borderRadius: 100,
-    backgroundColor: "#000",
-    width: 134,
-    height: 5,
-    position: "absolute",
-  },
-  homeIndicator: {
-    top: 778,
-    width: 375,
-    height: 34,
-  },
 });
 
 export default RegistrationComplete;
-

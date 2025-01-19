@@ -1,93 +1,169 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, PanResponder, Animated } from 'react-native';
+import { View, StyleSheet, PanResponder, Animated, LayoutChangeEvent } from 'react-native';
 
 interface PriceRangeSliderProps {
   min: number;
   max: number;
   onChange: (low: number, high: number) => void;
+  initialLow?: number;
+  initialHigh?: number;
+  step?: number;
+  prefix?: string;
+  thumbColor?: string;
+  thumbBorderColor?: string;
+  trackColor?: string;
+  highlightColor?: string;
+  textColor?: string;
+  thumbSize?: number;
+  trackHeight?: number;
 }
 
-const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({ min, max, onChange }) => {
+const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({
+  min,
+  max,
+  onChange,
+  initialLow = min,
+  initialHigh = max,
+  step = 1,
+  prefix = 'LKR',
+  thumbColor = '#FFFFFF',
+  thumbBorderColor = '#F97C7C',
+  trackColor = '#DADADA',
+  highlightColor = '#F97C7C',
+  textColor = '#321919',
+  thumbSize = 20,
+  trackHeight = 2,
+}) => {
   const [sliderWidth, setSliderWidth] = useState(0);
-  const lowPriceRef = useRef(min);
-  const highPriceRef = useRef(max);
-
-  const lowThumbX = useRef(new Animated.Value(0)).current;
-  const highThumbX = useRef(new Animated.Value(0)).current;
+  const lowPrice = useRef(new Animated.Value(initialLow)).current;
+  const highPrice = useRef(new Animated.Value(initialHigh)).current;
 
   const updatePrices = useCallback((low: number, high: number) => {
-    lowPriceRef.current = low;
-    highPriceRef.current = high;
     onChange(low, high);
   }, [onChange]);
 
   useEffect(() => {
-    updatePrices(min, max);
-  }, [min, max, updatePrices]);
+    updatePrices(initialLow, initialHigh);
+  }, [initialLow, initialHigh, updatePrices]);
+
+  const valueToPosition = useCallback((value: number) => {
+    return ((value - min) / (max - min)) * sliderWidth;
+  }, [min, max, sliderWidth]);
+
+  const positionToValue = useCallback((position: number) => {
+    let value = min + (position / sliderWidth) * (max - min);
+    return Math.round(value / step) * step;
+  }, [min, max, sliderWidth, step]);
 
   useEffect(() => {
     if (sliderWidth > 0) {
-      lowThumbX.setValue(0);
-      highThumbX.setValue(sliderWidth);
+      Animated.parallel([
+        Animated.timing(lowPrice, { toValue: initialLow, duration: 0, useNativeDriver: false }),
+        Animated.timing(highPrice, { toValue: initialHigh, duration: 0, useNativeDriver: false }),
+      ]).start();
     }
-  }, [sliderWidth, lowThumbX, highThumbX]);
+  }, [sliderWidth, lowPrice, highPrice, initialLow, initialHigh]);
+
+  const lowThumbX = lowPrice.interpolate({
+    inputRange: [min, max],
+    outputRange: [0, sliderWidth],
+    extrapolate: 'clamp',
+  });
+
+  const highThumbX = highPrice.interpolate({
+    inputRange: [min, max],
+    outputRange: [0, sliderWidth],
+    extrapolate: 'clamp',
+  });
 
   const createPanResponder = useCallback((isLow: boolean) => PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (_, gestureState) => {
-      let newX = isLow ? lowThumbX._value + gestureState.dx : highThumbX._value + gestureState.dx;
-      newX = Math.max(0, Math.min(newX, sliderWidth));
-
-      const newPrice = Math.round(min + (newX / sliderWidth) * (max - min));
-
-      if (isLow && newPrice < highPriceRef.current) {
-        lowPriceRef.current = newPrice;
-        lowThumbX.setValue(newX);
-      } else if (!isLow && newPrice > lowPriceRef.current) {
-        highPriceRef.current = newPrice;
-        highThumbX.setValue(newX);
+      const value = isLow ? lowPrice : highPrice;
+      let newPosition = valueToPosition(value._value) + gestureState.dx;
+      newPosition = Math.max(0, Math.min(newPosition, sliderWidth));
+      
+      const newValue = positionToValue(newPosition);
+      
+      if (isLow && newValue < highPrice._value) {
+        Animated.timing(value, { toValue: newValue, duration: 0, useNativeDriver: false }).start();
+      } else if (!isLow && newValue > lowPrice._value) {
+        Animated.timing(value, { toValue: newValue, duration: 0, useNativeDriver: false }).start();
       }
-
-      updatePrices(lowPriceRef.current, highPriceRef.current);
+      
+      updatePrices(lowPrice._value, highPrice._value);
     },
     onPanResponderRelease: () => {
-      updatePrices(lowPriceRef.current, highPriceRef.current);
+      updatePrices(lowPrice._value, highPrice._value);
     },
-  }), [lowThumbX, highThumbX, min, max, sliderWidth, updatePrices]);
+  }), [lowPrice, highPrice, valueToPosition, positionToValue, sliderWidth, updatePrices]);
 
   const lowPanResponder = useRef(createPanResponder(true)).current;
   const highPanResponder = useRef(createPanResponder(false)).current;
 
+  const onLayout = (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setSliderWidth(width);
+  };
+
+  const formatPrice = (price: Animated.Value) => {
+    return price.interpolate({
+      inputRange: [min, max],
+      outputRange: [min.toFixed(0), max.toFixed(0)],
+      extrapolate: 'clamp',
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Price Range</Text>
+      <Animated.Text style={[styles.title, { color: textColor }]}>Price Range</Animated.Text>
       <View style={styles.labelContainer}>
-        <Text style={styles.label}>LKR {lowPriceRef.current}</Text>
-        <Text style={styles.label}>LKR {highPriceRef.current}</Text>
+        <Animated.Text style={[styles.label, { color: textColor }]}>
+          {prefix} {formatPrice(lowPrice)}
+        </Animated.Text>
+        <Animated.Text style={[styles.label, { color: textColor }]}>
+          {prefix} {formatPrice(highPrice)}
+        </Animated.Text>
       </View>
-      <View
-        style={styles.sliderContainer}
-        onLayout={(event) => {
-          const { width } = event.nativeEvent.layout;
-          setSliderWidth(width);
-        }}
-      >
-        <View style={styles.track} />
+      <View style={styles.sliderContainer} onLayout={onLayout}>
+        <View style={[styles.track, { height: trackHeight, backgroundColor: trackColor }]} />
         <Animated.View
           style={[
             styles.selectedTrack,
             {
               left: lowThumbX,
               right: Animated.subtract(sliderWidth, highThumbX),
+              height: trackHeight,
+              backgroundColor: highlightColor,
             },
           ]}
         />
         <Animated.View
-          style={[styles.thumb, { transform: [{ translateX: lowThumbX }] }]}
+          style={[
+            styles.thumb,
+            {
+              transform: [{ translateX: lowThumbX }],
+              width: thumbSize,
+              height: thumbSize,
+              borderRadius: thumbSize / 2,
+              backgroundColor: thumbColor,
+              borderColor: thumbBorderColor,
+            },
+          ]}
           {...lowPanResponder.panHandlers}
         />
         <Animated.View
-          style={[styles.thumb, { transform: [{ translateX: highThumbX }] }]}
+          style={[
+            styles.thumb,
+            {
+              transform: [{ translateX: highThumbX }],
+              width: thumbSize,
+              height: thumbSize,
+              borderRadius: thumbSize / 2,
+              backgroundColor: thumbColor,
+              borderColor: thumbBorderColor,
+            },
+          ]}
           {...highPanResponder.panHandlers}
         />
       </View>
@@ -97,14 +173,12 @@ const PriceRangeSlider: React.FC<PriceRangeSliderProps> = ({ min, max, onChange 
 
 const styles = StyleSheet.create({
   container: {
-    width: '90%',
-    paddingHorizontal: 0,
-    alignSelf: 'center',
+    width: '100%',
+    paddingHorizontal: 10,
   },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#321919',
     marginBottom: 10,
   },
   labelContainer: {
@@ -114,35 +188,24 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#898989',
     fontFamily: 'Inter-Regular',
   },
   sliderContainer: {
     position: 'relative',
     height: 40,
     justifyContent: 'center',
-    width: '100%',
   },
   track: {
     position: 'absolute',
     left: 0,
     right: 0,
-    height: 2,
-    backgroundColor: '#DADADA',
   },
   selectedTrack: {
     position: 'absolute',
-    height: 2,
-    backgroundColor: '#F97C7C',
   },
   thumb: {
     position: 'absolute',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
     borderWidth: 2,
-    borderColor: '#F97C7C',
     top: 10,
     marginLeft: -10,
     shadowColor: "#000",
