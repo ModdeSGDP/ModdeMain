@@ -39,7 +39,7 @@ const Cart = () => {
   return (
     <View style={styles.cart}>
       <View style={styles.top}></View>
-      <Pressable onPress={() => navigation.navigate("HomePage")}>
+      <Pressable onPress={() => navigation.navigate("ShopPage")}>
         <Image style={styles.backbutton} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
       </Pressable>
       <View style={styles.cart1}>
@@ -96,7 +96,7 @@ const Cart = () => {
 
 const styles = StyleSheet.create({
   dressCarddetails: {
-    top: -50,
+    top: -60,
   },
   home: {
     width: 20,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   top: {
-    height: 59,
+    height: 69,
     width: "100%",
   },
   statusbar: {
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   cartItem: {
     flexDirection: "row",
-    padding: 20,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
   itemImage: {
     width: 78,
     height: 71,
+    top:60,
     borderRadius: 10,
   },
   dressCardChild: {
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffccd4",
     padding: 20,
     borderRadius: 15,
-    bottom: 100,
+    bottom: 150,
   },
   checkptBar: {
     flexDirection: "row",
