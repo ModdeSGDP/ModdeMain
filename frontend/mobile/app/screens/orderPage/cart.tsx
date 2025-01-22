@@ -55,16 +55,16 @@ const Cart = () => {
 
       <View style={styles.checkoutBar}>
         <View style={styles.checkptBar}>
+          
           <Text style={styles.allText}>All</Text>
           <Text style={styles.totalPrice}>{`LKR ${totalPrice.toFixed(2)}`}</Text>
           <Pressable
-            style={styles.checkoutButton}
-            onPress={() => {
-              /* Handle checkout */
-            }}
+                     style={styles.checkoutButton}
+                     onPress={() => navigation.navigate("CheckoutPage")}
           >
-            <Text style={styles.checkoutText}>Checkout</Text>
+          <Text style={styles.checkoutText}>Checkout</Text>
           </Pressable>
+
         </View>
       </View>
 

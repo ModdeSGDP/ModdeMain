@@ -17,6 +17,7 @@ import VisualSearch from './screens/camera/visualSearch';
 import ProductDetailPage from './screens/shopPage/ProductDetailPage';
 import Cart from './screens/orderPage/cart';
 
+
 const Stack = createNativeStackNavigator();
 
 export default function MyStack() {
@@ -35,6 +36,7 @@ export default function MyStack() {
       <Stack.Screen name="ProductDetail"component={ProductDetailPage}/>
       <Stack.Screen name="ImageSearch"component={VisualSearch}/>
       <Stack.Screen name="CartPage"component={Cart}/>
+      
       
     </Stack.Navigator>
   );
