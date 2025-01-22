@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   filterIcon: {
     width: 16,
     height: 16,
-    marginRight: 5,
+    marginRight: 4,
   },
   filterText: {
     fontFamily: "Inter-SemiBold",
