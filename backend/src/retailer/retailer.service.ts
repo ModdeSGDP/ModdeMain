@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Retailer } from './schemas/retailer.schema';
-import { CreateRetailerDto } from './dto/create-retailer.dto';
-import { UpdateRetailerDto } from './dto/update-retailer.dto';
+import { CreateRetailerDto } from './dtos/create-retailer.dto';
+import { UpdateRetailerDto } from './dtos/update-retailer.dto';
 
 @Injectable()
 export class RetailerService {
