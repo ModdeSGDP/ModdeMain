@@ -18,6 +18,7 @@ import ProductDetailPage from './screens/shopPage/ProductDetailPage';
 import Cart from './screens/orderPage/cart';
 import CheckoutScreen from './screens/orderPage/checkout';
 
+
 const Stack = createNativeStackNavigator();
 
 export default function MyStack() {
@@ -37,6 +38,7 @@ export default function MyStack() {
       <Stack.Screen name="ImageSearch"component={VisualSearch}/>
       <Stack.Screen name="CartPage"component={Cart}/>
       <Stack.Screen name="CheckoutPage"component={CheckoutScreen}/>
+      
       
     </Stack.Navigator>
   );

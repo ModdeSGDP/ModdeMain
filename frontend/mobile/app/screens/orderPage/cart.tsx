@@ -51,33 +51,22 @@ const Cart = () => {
         </View>
       </View>
 
-      {items.length > 0 ? (
-        <ScrollView style={styles.carangeCartClothParent}>{items.map(renderCartItem)}</ScrollView>
-      ) : (
-        <View style={styles.oops}>
-          <Image style={styles.empty} resizeMode="cover" source={require("../../assets/empty.png")} />
-          <Text style={[styles.ooops, styles.ooopsLayout]}>Ooops!</Text>
-          <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>Once you add items, your items will appear here.</Text>
-        </View>
-      )}
+      <ScrollView style={styles.carangeCartClothParent}>{items.map(renderCartItem)}</ScrollView>
 
-      {items.length > 0 && (
-        <View style={styles.checkoutBar}>
-          <View style={styles.checkptBar}>
-            <Text style={styles.allText}>All</Text>
-            <Text style={styles.totalPrice}>{`LKR ${totalPrice.toFixed(2)}`}</Text>
-            <Pressable
-              style={styles.checkoutButton}
-              onPress={() => {
-                navigation.navigate("CheckoutPage")
-                /* Handle checkout */
-              }}
-            >
-              <Text style={styles.checkoutText}>Checkout</Text>
-            </Pressable>
-          </View>
+      <View style={styles.checkoutBar}>
+        <View style={styles.checkptBar}>
+          <Text style={styles.allText}>All</Text>
+          <Text style={styles.totalPrice}>{`LKR ${totalPrice.toFixed(2)}`}</Text>
+          <Pressable
+            style={styles.checkoutButton}
+            onPress={() => {
+              /* Handle checkout */
+            }}
+          >
+            <Text style={styles.checkoutText}>Checkout</Text>
+          </Pressable>
         </View>
-      )}
+      </View>
 
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
