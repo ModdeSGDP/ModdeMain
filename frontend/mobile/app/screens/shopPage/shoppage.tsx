@@ -15,7 +15,7 @@ const ShopsPageInfinityScroll = () => {
     {
       id: "1",
       name: "Hooded Long Sleeve -Teen Girls",
-      brand: "Incarnage",
+      brand: "Incarnag",
       price: "LKR 4,850",
       image: require("../../assets/Rectangle51.png"),
     },
