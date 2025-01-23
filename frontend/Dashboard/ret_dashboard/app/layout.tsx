@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,14 +19,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
+        <SidebarProvider> 
         {/* Fixed Header */}
-        <Header />
+         <Header /> 
+          
 
         {/* Main Content */}
-        <main className="flex-grow">{children}</main>
+        <main >{children}</main>
 
         {/* Fixed Footer */}
-        <Footer />
+        {/* <Footer /> */}
+        </SidebarProvider>
       </body>
     </html>
   );
