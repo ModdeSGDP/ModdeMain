@@ -438,9 +438,9 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     backgroundColor: '#F97C7C',
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 16,
-    bottom:20,
+    bottom:30,
     alignItems: 'center',
   },
   addToCartButtonText: {

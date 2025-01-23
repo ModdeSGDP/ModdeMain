@@ -43,7 +43,7 @@ const Cart = () => {
         <Image style={styles.backbutton} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
       </Pressable>
       <View style={styles.cart1}>
-        <Text style={styles.headerTitle}>Cart ({items.length})</Text>
+        <Text style={styles.headerTitle}>Cart {items.length > 0 ? `(${items.length})` : ""}</Text>
         <View style={styles.groupParent}>
           <Pressable onPress={() => navigation.goBack()}>
             <Image style={styles.bellIcon} resizeMode="cover" source={require("../../assets/bell.png")} />
@@ -55,16 +55,16 @@ const Cart = () => {
 
       <View style={styles.checkoutBar}>
         <View style={styles.checkptBar}>
-          
           <Text style={styles.allText}>All</Text>
           <Text style={styles.totalPrice}>{`LKR ${totalPrice.toFixed(2)}`}</Text>
           <Pressable
-                     style={styles.checkoutButton}
-                     onPress={() => navigation.navigate("CheckoutPage")}
+            style={styles.checkoutButton}
+            onPress={() => {
+              /* Handle checkout */
+            }}
           >
-          <Text style={styles.checkoutText}>Checkout</Text>
+            <Text style={styles.checkoutText}>Checkout</Text>
           </Pressable>
-
         </View>
       </View>
 
@@ -73,7 +73,7 @@ const Cart = () => {
         <View style={styles.navIcons}>
           <Pressable onPress={() => {}}>
             <View style={styles.lineView} />
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home.png")} />
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
@@ -97,6 +97,12 @@ const Cart = () => {
 const styles = StyleSheet.create({
   dressCarddetails: {
     top: -60,
+  },
+  empty:{
+    width:250,
+    height:250,
+    top:-150,
+
   },
   home: {
     width: 20,
@@ -199,7 +205,7 @@ const styles = StyleSheet.create({
   itemImage: {
     width: 78,
     height: 71,
-    top:60,
+    top: 60,
     borderRadius: 10,
   },
   dressCardChild: {
@@ -323,6 +329,24 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: "#fba3a3",
+  },
+  oops: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  ooopsLayout: {
+    textAlign: "center",
+    marginBottom: 20,
+    top:-150,
+  },
+  ooops: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  onceYouAdd: {
+    fontSize: 14,
   },
 })
 export default Cart
