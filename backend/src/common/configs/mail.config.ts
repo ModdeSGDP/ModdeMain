@@ -35,5 +35,5 @@ export const mailerConfig: MailerAsyncOptions = {
       },
     };
   },
-  inject: [ConfigService],
+  inject: [ConfigService], 
 };
