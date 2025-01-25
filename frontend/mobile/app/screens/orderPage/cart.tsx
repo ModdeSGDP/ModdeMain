@@ -30,7 +30,6 @@ const Cart = () => {
       </View>
     </Pressable>
   )
-
   const totalPrice = items.reduce((sum, item) => {
     const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""))
     return sum + price * item.quantity
@@ -81,7 +80,7 @@ const Cart = () => {
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
           <Pressable onPress={() => {}}>
-            <View style={styles.lineView} />
+            
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
@@ -90,8 +89,10 @@ const Cart = () => {
           <Pressable onPress={() => {}}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
           </Pressable>
+          
           <Pressable onPress={() => navigation.navigate("CartPage")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
+          <View style={styles.lineView} />
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cart2.png")} />
           </Pressable>
           <Pressable onPress={() => {}}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
@@ -107,7 +108,11 @@ const styles = StyleSheet.create({
   dressCarddetails: {
     top: -60,
   },
-  
+  lineView:{
+
+  },
+
+
   empty:{
     width:250,
     height:250,
