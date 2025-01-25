@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-
-
+import Sidebar from "./components/Sidebar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,18 +16,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
-        <SidebarProvider> 
-        {/* Fixed Header */}
-         <Header /> 
-          
-
+      <body className="min-h-screen flex">
+        {/* Sidebar */}
+        <Sidebar />
+        
         {/* Main Content */}
-        <main >{children}</main>
+        <div className="flex-1 flex flex-col">
+          {/* Header */}
+          <Header />
 
-        {/* Fixed Footer */}
-        {/* <Footer /> */}
-        </SidebarProvider>
+          <main className="flex-grow p-4">{children}</main>
+
+          {/* Footer */}
+          <Footer />
+        </div>
       </body>
     </html>
   );
