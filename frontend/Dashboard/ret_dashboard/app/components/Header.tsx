@@ -12,51 +12,51 @@ const projects = [
 
   {
     name: "Dashboard",
-    url: "/Dashboard",
-    icon: () => <Image src="public/sidebar-icons/dashboard.svg" alt="dashboard" width={24} height={24} />,
+    url: "/pages/Dashboard",
+    icon: () => <Image src="/sidebar-icons/dashboard.svg" alt="dashboard" width={24} height={24} />,
   },
   {
     name: "Analytics",
     url: "/Analytics",
-    icon: () => <Image src="E:\Modde\ModdeMain\frontend\Dashboard\ret_dashboard\public\sidebar-icons\analytics.svg" alt="Analytics" width={24} height={24} />,
+    icon: () => <Image src="/sidebar-icons/analytics.svg" alt="Analytics" width={24} height={24} />,
   },
   {
     name: "Product",
-    url: "/Product",
-    icon: () => <Image src="/icons/project3.svg" alt="Product" width={24} height={24} />,
+    url: "pages/Product",
+    icon: () => <Image src="/sidebar-icons/product.svg" alt="Product" width={24} height={24} />,
   },
   {
     name: "Payment",
-    url: "/Payment",
-    icon: () => <Image src="/icons/project3.svg" alt="Payment" width={24} height={24} />,
+    url: "pages/Payment",
+    icon: () => <Image src="/sidebar-icons/payment.svg" alt="Payment" width={24} height={24} />,
   },
   {
     name: "Orders",
     url: "/Orders",
-    icon: () => <Image src="/icons/project3.svg" alt="Orders" width={24} height={24} />,
+    icon: () => <Image src="/sidebar-icons/Oders.svg" alt="Orders" width={24} height={24} />,
   },
 
   {
     name: "Enquiry",
     url: "/Enquiry",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
+    icon: () => <Image src="/sidebar-icons/Enquiry.svg" alt="Enqiry" width={24} height={24} />,
   },
 
   {
     name: "Marketing",
     url: "/Marketing",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
+    icon: () => <Image src="/sidebar-icons/Marketing.svg" alt="Marketing" width={24} height={24} />,
   },
   
   {
     name: "Settings",
     url: "/Settings",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
+    icon: () => <Image src="/sidebar-icons/Setting.svg" alt="Setting" width={24} height={24} />,
   },
   {
     name: "Logout",
     url: "/Logout",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
+    icon: () => <Image src="/sidebar-icons/logout.svg" alt="logtout" width={24} height={24} />,
   },
 
 ];
@@ -65,7 +65,11 @@ const projects = [
      <Sidebar>
   <SidebarContent>
     <SidebarGroup>
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+    <SidebarGroupLabel>
+  <div className="pt-[100px] flex justify-center">
+    <Image src="/logo.svg" alt="Logo" width={127} height={35} />
+  </div>
+</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {projects.map((project) => (

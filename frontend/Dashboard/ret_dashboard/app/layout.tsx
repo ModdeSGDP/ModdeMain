@@ -3,8 +3,15 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { Lato } from '@next/font/google';
+import Home from "./page";
+import Dashboard from "./pages/Dashboard";
 
-
+const lato = Lato({
+  subsets: ['latin'], // Specify subsets you need
+  weight: ['400', '700'], // Optional: Specify font weights
+  variable: '--font-lato', // Add CSS variable for custom usage
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,14 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
+      <body className={lato.variable}>
         <SidebarProvider> 
         {/* Fixed Header */}
          <Header /> 
-          
+         <Dashboard/>
 
         {/* Main Content */}
-        <main >{children}</main>
+        <main > {children}</main>
 
         {/* Fixed Footer */}
         {/* <Footer /> */}
