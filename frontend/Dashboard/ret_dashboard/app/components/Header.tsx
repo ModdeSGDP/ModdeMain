@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import Image from 'next/image';
