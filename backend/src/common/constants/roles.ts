@@ -1,6 +1,5 @@
-export const ROLES={
-    ADMIN:"Admin",
-    PO:"Product Owner",
-    RETAILER:"Retailer"
-
+export enum ROLES{
+    ADMIN = "Admin",
+    PO ="Product Owner",
+    RETAILER="Retailer"
 }

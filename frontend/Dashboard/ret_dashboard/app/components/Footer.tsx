@@ -2,6 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/button"
+
+ 
+
+ 
+
+
 
 export default function Footer() {
   return (
@@ -112,6 +119,8 @@ export default function Footer() {
           </div>
         </Link>
       </div>
+      
+     
 
       {/* Copyright Information */}
       <div className="text-center text-gray-500 text-xs mt-6">
