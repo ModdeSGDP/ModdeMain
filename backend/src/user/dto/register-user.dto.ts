@@ -1,6 +1,9 @@
-import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional } from 'class-validator';
+import { Transform } from "class-transformer";
+import { ROLES } from 'src/common/constants/roles';
 
 export class RegisterUserDto {
+  @Transform(({ value }) => value.trim())
   @IsString()
   @IsNotEmpty()
   username: string;
@@ -8,4 +11,26 @@ export class RegisterUserDto {
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
   password: string;
+
+  @IsEnum(ROLES, {message: `Role must be one of these: ${Object.values(ROLES).join(', ')}`})
+  role: ROLES;
+
+  @IsString()
+  @IsNotEmpty()
+  firstName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  lastName: string;
+
+  @IsString()
+  @IsOptional()
+  address?: string;
+
+  @IsString()
+  @IsOptional()
+  gender?: string;
+
 }
+
+ 
