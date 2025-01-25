@@ -5,11 +5,13 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthModule } from 'src/auth/auth.module';
+import { EmailModule } from 'src/common/email/email.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     forwardRef(() => AuthModule),
+    forwardRef(() => EmailModule),
   ],
   providers: [UserService],    
   controllers: [UserController],
