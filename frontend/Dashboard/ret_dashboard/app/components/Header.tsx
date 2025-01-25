@@ -1,89 +1,64 @@
- "use client";
+import React from "react";
 
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
-
-export default function Header() {
-
-const projects = [
-
-  {
-    name: "Dashboard",
-    url: "/Dashboard",
-    icon: () => <Image src="public/sidebar-icons/dashboard.svg" alt="dashboard" width={24} height={24} />,
-  },
-  {
-    name: "Analytics",
-    url: "/Analytics",
-    icon: () => <Image src="E:\Modde\ModdeMain\frontend\Dashboard\ret_dashboard\public\sidebar-icons\analytics.svg" alt="Analytics" width={24} height={24} />,
-  },
-  {
-    name: "Product",
-    url: "/Product",
-    icon: () => <Image src="/icons/project3.svg" alt="Product" width={24} height={24} />,
-  },
-  {
-    name: "Payment",
-    url: "/Payment",
-    icon: () => <Image src="/icons/project3.svg" alt="Payment" width={24} height={24} />,
-  },
-  {
-    name: "Orders",
-    url: "/Orders",
-    icon: () => <Image src="/icons/project3.svg" alt="Orders" width={24} height={24} />,
-  },
-
-  {
-    name: "Enquiry",
-    url: "/Enquiry",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
-  },
-
-  {
-    name: "Marketing",
-    url: "/Marketing",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
-  },
-  
-  {
-    name: "Settings",
-    url: "/Settings",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
-  },
-  {
-    name: "Logout",
-    url: "/Logout",
-    icon: () => <Image src="/icons/project3.svg" alt="Project 3" width={24} height={24} />,
-  },
-
-];
+const Header = () => {
   return (
-    <header>
-     <Sidebar>
-  <SidebarContent>
-    <SidebarGroup>
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {projects.map((project) => (
-            <SidebarMenuItem key={project.name}>
-              <SidebarMenuButton asChild>
-                <a href={project.url}>
-                  <project.icon />
-                  <span>{project.name}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  </SidebarContent>
-</Sidebar>
+    <header className="bg-gray-800 text-white py-4 shadow-md">
+      <div className="container mx-auto flex items-center justify-between px-4">
+        {/* Logo */}
+        <div className="flex items-center space-x-2">
+          <img
+            src="/logo.png"
+            alt="Retail Logo"
+            className="h-8 w-8 object-contain"
+          />
+          <h1 className="text-xl font-bold">RetailShop</h1>
+        </div>
 
+        {/* Navigation Links */}
+        <nav className="hidden md:flex space-x-6">
+          <a
+            href="#"
+            className="text-gray-300 hover:text-white transition-colors"
+          >
+            Home
+          </a>
+          <a
+            href="#"
+            className="text-gray-300 hover:text-white transition-colors"
+          >
+            Shop
+          </a>
+          <a
+            href="#"
+            className="text-gray-300 hover:text-white transition-colors"
+          >
+            Deals
+          </a>
+          <a
+            href="#"
+            className="text-gray-300 hover:text-white transition-colors"
+          >
+            Contact
+          </a>
+        </nav>
+
+        {/* Search Bar */}
+        <div className="relative w-full max-w-xs">
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="form-control block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button
+            type="button"
+            className="absolute right-0 top-0 h-full px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-r-lg"
+          >
+            Search
+          </button>
+        </div>
+      </div>
     </header>
-  );
-}
+  );
+};
+
+export default Header;
