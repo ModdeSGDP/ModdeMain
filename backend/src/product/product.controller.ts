@@ -13,12 +13,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Post()
+  @Post('add')
   @UseInterceptors(FileInterceptor('file')) // Handle file uploads
   async createProduct(
     @Body() createProductDto: CreateProductDto,
@@ -27,7 +28,7 @@ export class ProductController {
     return this.productService.createProduct(createProductDto, file);
   }
 
-  @Get(':organizationId')
+  @Get('organization/:organizationId')  // Clearer path for organization products
   async getProducts(@Param('organizationId') orgId: string) {
     return this.productService.getProductsByOrganization(orgId);
   }
@@ -35,6 +36,14 @@ export class ProductController {
   @Patch(':id')
   async updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.updateProduct(id, updateProductDto);
+  }
+
+  @Patch(':id/status')
+  async updateProductStatus(
+    @Param('id') id: string,
+    @Body() updateProductStatusDto: UpdateProductStatusDto,
+  ) {
+    return this.productService.updateProductStatus(id, updateProductStatusDto);
   }
 
   @Delete(':id')

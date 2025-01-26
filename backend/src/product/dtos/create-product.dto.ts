@@ -17,6 +17,9 @@ export class CreateProductDto {
   @IsNotEmpty()
   category: string;
 
+  @IsNumber()
+  stock: number;
+
   @IsString()
   @IsNotEmpty()
   organizationId: string;
@@ -24,4 +27,5 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   image?: string; // Optional field for the product image URL
+
 }

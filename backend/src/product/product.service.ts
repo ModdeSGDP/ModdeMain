@@ -5,6 +5,7 @@ import { Product } from './schema/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { AwsService } from '../common/aws/aws.service';
+import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 
 @Injectable()
 export class ProductService {
@@ -36,6 +37,20 @@ export class ProductService {
 
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
     return this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
+  }
+
+  async updateProductStatus(id: string, updateStatusDto: UpdateProductStatusDto): Promise<Product> {
+    const updatedProduct = await this.productModel.findByIdAndUpdate(
+      id,
+      { isListed: updateStatusDto.isListed },
+      { new: true }, // Return the updated document
+    );
+
+    if (!updatedProduct) {
+      throw new Error('Product not found');
+    }
+
+    return updatedProduct;
   }
 
   async deleteProduct(id: string): Promise<Product> {
