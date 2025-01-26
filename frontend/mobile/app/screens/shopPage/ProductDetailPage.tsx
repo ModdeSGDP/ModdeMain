@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFF0F5', // Light pink color
-    paddingTop: 40,
+    paddingTop: 5,
     paddingBottom: 80
   },
   header: {
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
+
     borderBottomColor: '#e0e0e0',
   },
   headerTitle: {
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginTop: 16,
     marginBottom: 8,
@@ -439,8 +440,8 @@ const styles = StyleSheet.create({
   addToCartButton: {
     backgroundColor: '#F97C7C',
     borderRadius: 10,
-    padding: 16,
-    bottom:30,
+    padding: 15,
+    bottom:15,
     alignItems: 'center',
   },
   addToCartButtonText: {

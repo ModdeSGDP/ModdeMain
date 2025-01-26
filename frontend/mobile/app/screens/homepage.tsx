@@ -77,10 +77,10 @@ const HomePage = () => {
           <Pressable onPress={() => {}}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/cameraplus.png")} />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate("Intro2")}>
+          <Pressable onPress={() => navigation.navigate("CartPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/shopping_cart.png")} />
           </Pressable>
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/user.png")} />
           </Pressable>
         </View>
@@ -183,7 +183,6 @@ const styles = StyleSheet.create({
     right: 56,
     alignItems: 'center',
     shadowColor: "#000",
-    
   },
   buttonBg: {
     width: 50,
