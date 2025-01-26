@@ -53,9 +53,17 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-64 h-screen bg-gray-800 text-white flex flex-col fixed">
-      <div className="p-4 border-b border-gray-700">
-        <h1 className="text-2xl font-bold">My App</h1>
+    <div className="w-64 h-full min-h-screen bg-gray-800 text-white flex flex-col fixed top-0 left-0 shadow-md">
+      <div className="border-b border-gray-700 flex justify-center">
+        <Link href="/">
+          <Image
+            src="/sidebar-icons/logo.svg"
+            alt="App Logo"
+            width={100}
+            height={30}
+            className="object-contain"
+          />
+        </Link>
       </div>
       <nav className="flex-grow">
         <ul className="space-y-2 p-4">
@@ -78,6 +86,17 @@ export default function Sidebar() {
           ))}
         </ul>
       </nav>
+       {/* Need Help Section */}
+      <div className="bg-blue-100 text-black p-3 m-4 rounded-md shadow-md">
+        <h3 className="text-lg font-semibold">Need help?</h3>
+        <p className="text-sm mt-1">Please check our docs</p>
+        <Link href="/documentation">
+          <button className="bg-white text-blue-600 font-bold text-sm py-2 px-4 rounded-md mt-2 w-full">
+            DOCUMENTATION
+          </button>
+        </Link>
+      </div>
+
     </div>
   );
 }
