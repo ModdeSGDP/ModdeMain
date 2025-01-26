@@ -4,7 +4,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 export default function Products() {
     return (
         <div>
-            <h1>Analytics</h1><Breadcrumb>
+            <h1>Products</h1><Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/Dashboard">Dashboard</BreadcrumbLink>
@@ -16,6 +16,7 @@ export default function Products() {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
+
 
         </div>
     );
