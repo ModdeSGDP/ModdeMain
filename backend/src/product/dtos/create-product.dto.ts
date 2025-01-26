@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -20,4 +20,8 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   organizationId: string;
+
+  @IsOptional()
+  @IsString()
+  image?: string; // Optional field for the product image URL
 }
