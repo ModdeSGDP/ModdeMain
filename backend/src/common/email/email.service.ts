@@ -8,12 +8,12 @@ export class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com', // SMTP Host (e.g., Gmail)
-      port: 587, // Port for STARTTLS
-      secure: false, // Set to true for SSL
+      host: EMAIL_DEFAULTS.SMTP_HOST, // SMTP Host (e.g., Gmail)
+      port: EMAIL_DEFAULTS.SMTP_PORT, // Port for STARTTLS
+      secure: EMAIL_DEFAULTS.SMTP_SECURE, // Set to true for SSL
       auth: {
-        user: 'your-email@gmail.com', // Replace with your email
-        pass: 'your-email-password', // Replace with your email password
+        user: EMAIL_DEFAULTS.SMTP_USER, // Replace with your email
+        pass: EMAIL_DEFAULTS.SMTP_PASS, // Replace with your email password
       },
     });
   }
@@ -40,4 +40,29 @@ export class EmailService {
       throw new Error('Failed to send email');
     }
   }
+
+  //Admin invitation email
+
+  async sendAdminInvitation(email: string, inviteLink: string): Promise<void> {
+    const subject = 'Admin Invitation';
+    const html = `
+      <p>You have been invited to join our admin panel.</p>
+      <p>Click the link below to accept your invitation:</p>
+      <a href="${inviteLink}">${inviteLink}</a>
+      <p>If you did not request this, please ignore this email.</p>
+    `;
+  
+    await this.sendEmail(email, subject, undefined, html);
+  }
+
+  async testEmail(): Promise<void> {
+    const testEmail = 'test@example.com';
+    const testSubject = 'Test Email';
+    const testHtml = '<p>This is a test email.</p>';
+  
+    await this.sendEmail(testEmail, testSubject, undefined, testHtml);
+  }
+  
+  
+
 }

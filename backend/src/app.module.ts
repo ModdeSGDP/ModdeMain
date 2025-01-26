@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { mongooseModuleAsyncOptions } from './common/configs/mongodb.config';
 import { ConfigModule } from '@nestjs/config';
+import { EmailModule } from './common/email/email.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ConfigModule } from '@nestjs/config';
     }),
     MongooseModule.forRootAsync(mongooseModuleAsyncOptions),
     UserModule,
-    AuthModule,],
+    AuthModule,
+    EmailModule],
   controllers: [AppController],
   providers: [AppService],
 })
