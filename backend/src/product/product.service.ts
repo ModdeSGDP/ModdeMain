@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Product } from './schema/product.schema';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { CreateProductDto } from './dtos/create-product.dto';
-import { RedisService } from 'src/common/reddis/reddis.service';
+import { RedisService } from 'src/common/reddis/redds.service;
  // Import RedisService
 
 @Injectable()
