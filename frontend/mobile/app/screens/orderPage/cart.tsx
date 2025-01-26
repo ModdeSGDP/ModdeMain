@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useCartStore } from "../shopPage/cartState"
@@ -6,9 +6,52 @@ import { useCartStore } from "../shopPage/cartState"
 const Cart = () => {
   const navigation = useNavigation()
   const { items, removeItem, updateQuantity } = useCartStore()
+  const [selectedItems, setSelectedItems] = useState(new Set())
+  const [displayTotal, setDisplayTotal] = useState(0)
+
+  useEffect(() => {
+    calculateDisplayTotal()
+  }, [selectedItems, items])
+
+  const calculateDisplayTotal = () => {
+    if (selectedItems.size === 0) {
+      setDisplayTotal(calculateTotalPrice(items))
+    } else {
+      const selectedItemsArray = items.filter((item) => selectedItems.has(item.id))
+      setDisplayTotal(calculateTotalPrice(selectedItemsArray))
+    }
+  }
+
+  const calculateTotalPrice = (itemsToCalculate) => {
+    return itemsToCalculate.reduce((sum, item) => {
+      const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""))
+      return sum + price * item.quantity
+    }, 0)
+  }
+
+  const toggleItemSelection = (itemId) => {
+    const newSelectedItems = new Set(selectedItems)
+    if (newSelectedItems.has(itemId)) {
+      newSelectedItems.delete(itemId)
+    } else {
+      newSelectedItems.add(itemId)
+    }
+    setSelectedItems(newSelectedItems)
+  }
+
+  const selectAll = () => {
+    if (selectedItems.size === items.length) {
+      setSelectedItems(new Set())
+    } else {
+      setSelectedItems(new Set(items.map((item) => item.id)))
+    }
+  }
 
   const renderCartItem = (item) => (
     <Pressable key={item.id} style={styles.cartItem} onPress={() => navigation.navigate("ItemDetails", { item })}>
+      <Pressable onPress={() => toggleItemSelection(item.id)} style={styles.radioButton}>
+        <View style={[styles.radio, selectedItems.has(item.id) && styles.radioSelected]} />
+      </Pressable>
       <View style={styles.dressCard}>
         <Image style={styles.itemImage} resizeMode="cover" source={item.image} />
       </View>
@@ -25,15 +68,15 @@ const Cart = () => {
           </Pressable>
         </View>
         <Pressable onPress={() => removeItem(item.id)}>
-          <Text style={styles.removeButton}>Remove</Text>
+          <Image style={styles.removeButton} resizeMode="cover" source={require("../../assets/delete.png")} />
         </Pressable>
       </View>
     </Pressable>
   )
-  const totalPrice = items.reduce((sum, item) => {
-    const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""))
-    return sum + price * item.quantity
-  }, 0)
+  //const totalPrice = items.reduce((sum, item) => {
+  //  const price = Number.parseFloat(item.price.replace("LKR ", " ").replace(",", ""))
+  //  return sum + price * item.quantity
+  //}, 0)
 
   return (
     <View style={styles.cart}>
@@ -61,8 +104,12 @@ const Cart = () => {
       {items.length > 0 && (
         <View style={styles.checkoutBar}>
           <View style={styles.checkptBar}>
+            <Pressable onPress={selectAll} style={styles.radioButton}>
+              <View style={[styles.radio, selectedItems.size === items.length && styles.radioSelected]} />
+            </Pressable>
             <Text style={styles.allText}>All</Text>
-            <Text style={styles.totalPrice}>{`LKR ${totalPrice.toFixed(2)}`}</Text>
+            <Image style={styles.tag} resizeMode="cover" source={require("../../assets/tag.png")} />
+            <Text style={styles.totalPrice}>{`LKR ${displayTotal.toFixed(2)}`}</Text>
             <Pressable
               style={styles.checkoutButton}
               onPress={() => {
@@ -79,8 +126,7 @@ const Cart = () => {
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
-          <Pressable onPress={() => {}}>
-            
+          <Pressable onPress={() => navigation.navigate("HomePage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
@@ -89,9 +135,8 @@ const Cart = () => {
           <Pressable onPress={() => {}}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
           </Pressable>
-          
           <Pressable onPress={() => navigation.navigate("CartPage")}>
-          <View style={styles.lineView} />
+            <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cart2.png")} />
           </Pressable>
           <Pressable onPress={() => {}}>
@@ -103,21 +148,38 @@ const Cart = () => {
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   dressCarddetails: {
-    top: -60,
+    top: -80,
   },
-  lineView:{
-
+  tag: {
+    width: 24,
+    height: 24,
+    left: 15,
+  },
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    position: "absolute",
+    top: -20,
+    left: 0,
+    right: 0,
+  },
+  activeIndicator: {
+    position: "absolute",
+    left: 217,
+    bottom: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#fba3a3",
   },
 
-
-  empty:{
-    width:250,
-    height:250,
-    top:-150,
-
+  empty: {
+    width: 250,
+    height: 250,
+    top: -150,
   },
   home: {
     width: 20,
@@ -132,9 +194,15 @@ const styles = StyleSheet.create({
     top: -30,
   },
   radio: {
-    width: 15,
-    height: 15,
-    top: 10,
+    width: 20,
+    height: 20,
+    top: 0,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#f97c7c",
+  },
+  radioSelected: {
+    backgroundColor: "#f97c7c",
   },
   backbutton: {
     width: 35,
@@ -209,18 +277,19 @@ const styles = StyleSheet.create({
   cartItem: {
     flexDirection: "row",
     padding: 10,
+    top: -20,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
   dressCard: {
-    width: 79,
+    width: 100,
     height: 71,
     top: -60,
   },
   itemImage: {
-    width: 78,
-    height: 71,
-    top: 60,
+    width: 88,
+    height: 81,
+    top: 55,
     borderRadius: 10,
   },
   dressCardChild: {
@@ -265,7 +334,14 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     color: "red",
-    marginTop: 5,
+    marginTop: -20,
+    width: 12,
+    height: 15,
+    left: 200,
+  },
+  radioButton: {
+    marginRight: 10,
+    
   },
   checkoutBar: {
     backgroundColor: "#ffccd4",
@@ -279,11 +355,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   allText: {
-    fontSize: 10,
+    fontSize: 13,
     color: "#321919",
   },
   totalPrice: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "500",
     color: "#321919",
   },
@@ -336,15 +412,6 @@ const styles = StyleSheet.create({
     width: 23,
     height: 24,
   },
-  activeIndicator: {
-    position: "absolute",
-    left: 26,
-    bottom: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#fba3a3",
-  },
   oops: {
     flex: 1,
     justifyContent: "center",
@@ -354,7 +421,7 @@ const styles = StyleSheet.create({
   ooopsLayout: {
     textAlign: "center",
     marginBottom: 20,
-    top:-150,
+    top: -150,
   },
   ooops: {
     fontSize: 24,
@@ -365,3 +432,4 @@ const styles = StyleSheet.create({
   },
 })
 export default Cart
+
