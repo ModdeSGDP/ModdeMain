@@ -5,7 +5,6 @@ import FilterMenu from "./FilterMenu"
 import { useCartStore } from "./cartState"
 
 const { width } = Dimensions.get("window")
-
 const ShopsPageInfinityScroll = () => {
   const navigation = useNavigation()
   const [searchQuery, setSearchQuery] = useState("")
@@ -40,12 +39,23 @@ const ShopsPageInfinityScroll = () => {
       price: "LKR 5,200",
       image: require("../../assets/Rectangle51.png"),
     },
-    // Add more products as needed
+    {
+      id: "4",
+      name: "Fourth Product",
+      brand: "Kelly Felder",
+      price: "LKR 5,200",
+      image: require("../../assets/Rectangle51.png"),
+    },
+    {
+      id: "4",
+      name: "Fourth Product",
+      brand: "Kelly Felder",
+      price: "LKR 5,200",
+      image: require("../../assets/Rectangle51.png"),
+    },
   ])
-
-  const ProductCard = ({ item }) => {
+  const ProductCard = ({item}) => {
     const addItem = useCartStore((state) => state.addItem)
-
     return (
       <Pressable style={styles.card} onPress={() => navigation.navigate("ProductDetail", { product: item })}>
         <Image style={styles.productImage} resizeMode="cover" source={item.image} />
@@ -67,12 +77,9 @@ const ShopsPageInfinityScroll = () => {
       </Pressable>
     )
   }
-
   const renderItem = ({ item }) => <ProductCard item={item} />
-
   const CartButton = () => {
-    const itemCount = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0))
-
+  const itemCount = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0))
     return (
       <Pressable onPress={() => navigation.navigate("CartPage")}>
         <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
@@ -112,7 +119,6 @@ const ShopsPageInfinityScroll = () => {
           <Image style={styles.searchIcon} resizeMode="cover" source={require("../../assets/vector.png")} />
         </Pressable>
       </View>
-
       <Image style={styles.bannerImage} resizeMode="cover" source={require("../../assets/Rectangle41.png")} />
       <View style={styles.filterBar}>
         <View style={styles.sortOptions}>
@@ -141,7 +147,6 @@ const ShopsPageInfinityScroll = () => {
           <Text style={styles.filterText}>Filters</Text>
         </Pressable>
       </View>
-
       <FlatList
         data={products}
         renderItem={renderItem}
@@ -150,7 +155,6 @@ const ShopsPageInfinityScroll = () => {
         contentContainerStyle={styles.productGrid}
         columnWrapperStyle={styles.columnWrapper}
       />
-
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
@@ -291,6 +295,7 @@ const styles = StyleSheet.create({
   productGrid: {
     paddingHorizontal: 10,
     gap: 10,
+    bottom:100,
   },
   columnWrapper: {
     justifyContent: "space-between",
