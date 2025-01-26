@@ -15,8 +15,11 @@ export class Product extends Document {
   @Prop({ required: true })
   category: string;
 
-  @Prop({ required: true, ref: 'Retailer' }) // Reference the Retailer
+  @Prop({ required: true, ref: 'Retailer' })
   organizationId: string;
+
+  @Prop()
+  image?: string; // Optional field for storing the image URL
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
