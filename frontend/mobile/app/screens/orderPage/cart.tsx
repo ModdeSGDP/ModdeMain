@@ -139,7 +139,7 @@ const Cart = () => {
             <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cart2.png")} />
           </Pressable>
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
           </Pressable>
         </View>
