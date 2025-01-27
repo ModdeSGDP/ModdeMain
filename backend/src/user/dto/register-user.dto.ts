@@ -15,14 +15,17 @@ export class RegisterUserDto {
   @IsEnum(ROLES, {message: `Role must be one of these: ${Object.values(ROLES).join(', ')}`})
   role: ROLES;
 
+  @Transform(({ value }) => value.trim())
   @IsString()
   @IsNotEmpty()
   firstName: string;
 
+  @Transform(({ value }) => value.trim())
   @IsString()
   @IsNotEmpty()
   lastName: string;
 
+  @Transform(({ value }) => value.trim())
   @IsString()
   @IsOptional()
   address?: string;

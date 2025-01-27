@@ -22,7 +22,7 @@ export class Product {
   organizationId: string;
 
   @Prop()
-  image?: string; // Optional field for storing the image URL
+  image?: string; // field for storing the image URL
 
   @Prop({ default: true }) // Default to "listed"
   isListed: boolean;

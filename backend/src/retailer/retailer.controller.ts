@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { RetailerService } from './retailer.service';
 import { CreateRetailerDto } from './dtos/create-retailer.dto';
 import { UpdateRetailerDto } from './dtos/update-retailer.dto';
+import { PaginationDto } from './dtos/pagination.dto';
 
 @Controller('retailers')
 export class RetailerController {
@@ -13,8 +14,8 @@ export class RetailerController {
   }
 
   @Get()
-  findAll() {
-    return this.retailerService.findAll();
+  async findAll(@Query() paginationDto: PaginationDto) {
+    return this.retailerService.findAll(paginationDto);
   }
 
   @Get(':id')
