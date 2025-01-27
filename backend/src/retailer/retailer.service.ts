@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Retailer } from './schemas/retailer.schema';
 import { CreateRetailerDto } from './dtos/create-retailer.dto';
 import { UpdateRetailerDto } from './dtos/update-retailer.dto';
+import { PaginationDto } from './dtos/pagination.dto';
 
 @Injectable()
 export class RetailerService {
@@ -16,8 +17,14 @@ export class RetailerService {
     return newRetailer.save();
   }
 
-  async findAll(): Promise<Retailer[]> {
-    return this.retailerModel.find().exec();
+  async findAll(paginationDto: PaginationDto): Promise<{ data: Retailer[]; total: number }> {
+    const { page = 1, limit = 10 } = paginationDto;
+    const skip = (page - 1) * limit;
+
+    const data = await this.retailerModel.find().skip(skip).limit(limit).exec();
+    const total = await this.retailerModel.countDocuments();
+
+    return { data, total };
   }
 
   async findOne(id: string): Promise<Retailer> {

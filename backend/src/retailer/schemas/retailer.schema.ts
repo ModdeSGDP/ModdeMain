@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 @Schema({ timestamps: true }) // Automatically adds `createdAt` and `updatedAt`
-export class Retailer extends Document {
+export class Retailer {
   @Prop({ required: true })
   name: string;
 
@@ -22,4 +22,5 @@ export class Retailer extends Document {
   admins: string[];
 }
 
+export type RetailerDocument = HydratedDocument<Retailer>;
 export const RetailerSchema = SchemaFactory.createForClass(Retailer);

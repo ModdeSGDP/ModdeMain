@@ -4,6 +4,8 @@ import { AuthService } from '../auth/auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { EmailService } from 'src/common/email/email.service';
+import { InviteAdminDto } from './dto/invite-admin.dto';
+
 
 
 @Controller('user')
@@ -12,6 +14,7 @@ export class UserController {
     private readonly userService: UserService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
+    private readonly emailService: EmailService 
   ) {}
 
   @Post('register')
@@ -27,18 +30,18 @@ export class UserController {
     return this.authService.validateUser(username, password);
   }
 
-//   @Post('invite-admin')
-//   async inviteAdmin(@Body() inviteAdminDto: InviteAdminDto) {
-//     const inviteLink = `https://your-domain.com/admin/accept?email=${inviteAdminDto.email}`;
-//     await this.emailService.sendAdminInvitation(inviteAdminDto.email, inviteLink);
-//     return { message: 'Invitation sent successfully!' };
-//   }
+  @Post('invite-admin')
+  async inviteAdmin(@Body() inviteAdminDto: InviteAdminDto) {
+    const inviteLink = `https://your-domain.com/admin/accept?email=${inviteAdminDto.email}`;
+    await this.emailService.sendAdminInvitation(inviteAdminDto.email, inviteLink);
+    return { message: 'Invitation sent successfully!' };
+  }
 
-//   @Post('test-email')
-//   async testEmail(): Promise<{ message: string }> {
-//     await this.emailService.testEmail();
-//     return { message: 'Test email sent successfully!' };
-// }
+  @Post('test-email')
+  async testEmail(): Promise<{ message: string }> {
+    await this.emailService.testEmail();
+    return { message: 'Test email sent successfully!' };
+}
 
 
 }

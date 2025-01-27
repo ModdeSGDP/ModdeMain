@@ -1,7 +1,9 @@
 
 import { IsString, IsEmail, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateRetailerDto {
+  @Transform(({ value }) => value.trim())
   @IsString()
   name: string;
 
