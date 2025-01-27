@@ -87,7 +87,14 @@ export default function Sidebar() {
         </ul>
       </nav>
        {/* Need Help Section */}
-      <div className="bg-blue-100 text-black p-3 m-4 rounded-md shadow-md">
+      <div className="bg-blue-100 text-black p-2 m-4 rounded-md shadow-md">
+        <Image 
+          src="/images/QSmark.png"
+          alt="Qs Mark"
+          width={30}
+          height={30}
+          className="mb-2"
+        />
         <h3 className="text-lg font-semibold">Need help?</h3>
         <p className="text-sm mt-1">Please check our docs</p>
         <Link href="/documentation">
