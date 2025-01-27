@@ -169,7 +169,7 @@ const ShopsPageInfinityScroll = () => {
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
           </Pressable>
           <CartButton />
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
           </Pressable>
         </View>

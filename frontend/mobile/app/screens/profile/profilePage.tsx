@@ -27,10 +27,15 @@ const Profile = () => {
       <Pressable onPress={() => navigation.goBack()}>
         <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
       </Pressable>
-
       <Text style={styles.profileTitle}>Profile</Text>
       <Image style={styles.profileImage} source={require("../../assets/ellipse-20.png")} />
       <Text style={styles.userName}>Anne Fernando</Text>
+
+      <Pressable onPress={() => navigation.goBack()}>
+        <Image style={styles.bell} source={require("../../assets/bell.png")} />
+      </Pressable>
+
+
 
       <ScrollView style={styles.profileOptions}>
         <ProfileOption title="Photo" />
@@ -62,8 +67,9 @@ const Profile = () => {
           <NavIcon source={require("../../assets/smart_home1.png")} onPress={() => navigation.navigate("HomePage")} />
           <NavIcon source={require("../../assets/shirt.png")} onPress={() => navigation.navigate("ShopPage")} />
           <NavIcon source={require("../../assets/camera-plus.png")} onPress={() => {}} />
+          <View style={styles.lineView} />
           <NavIcon source={require("../../assets/shopping-cart.png")} onPress={() => navigation.navigate("CartPage")} />
-          <NavIcon source={require("../../assets/user.png")} onPress={() => {}} isActive />
+          <NavIcon source={require("../../assets/user1.png")} onPress={() => {}} isActive />
         </View>
       </View>
     </View>
@@ -73,7 +79,7 @@ const Profile = () => {
 const ProfileOption = ({ title, onPress }) => (
   <Pressable style={styles.profileOption} onPress={onPress}>
     <Text style={styles.optionText}>{title}</Text>
-    <Image source={require("../../assets/vector.png")} style={styles.arrowIcon} />
+    <Image source={require("../../assets/Vector4.png")} style={styles.arrowIcon} />
   </Pressable>
 )
 
@@ -88,6 +94,23 @@ const styles = StyleSheet.create({
   profile: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    position: "absolute",
+    top: 2,
+    width:23,
+    left: 275,
+    right: 0,
+  },
+
+  bell:{
+    width: 22,
+    height: 24,
+    left: 360,
+    top: -240,
   },
   top: {
     height: 59,
@@ -123,7 +146,7 @@ const styles = StyleSheet.create({
     width: 27,
     height: 27,
     position: "absolute",
-    top: 68,
+    top: 20,
     left: 13,
   },
   profileTitle: {
@@ -148,7 +171,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   profileOptions: {
-    marginTop: 20,
+    marginTop: 30,
+    top:-50,
     paddingHorizontal: 26,
   },
   profileOption: {
@@ -171,6 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fba3a3",
     borderRadius: 10,
     paddingVertical: 12,
+    top:-150,
     marginHorizontal: 27,
     marginTop: 20,
   },
@@ -211,7 +236,7 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
     left: 6,
-    top: -20,
+    top: 35,
     width: 10,
     height: 10,
     borderRadius: 5,
