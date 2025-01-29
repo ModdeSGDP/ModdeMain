@@ -66,12 +66,14 @@ const Profile = () => {
         <View style={styles.navIcons}>
           <NavIcon source={require("../../assets/smart_home1.png")} onPress={() => navigation.navigate("HomePage")} />
           <NavIcon source={require("../../assets/shirt.png")} onPress={() => navigation.navigate("ShopPage")} />
-          <NavIcon source={require("../../assets/camera-plus.png")} onPress={() => {}} />
+          <NavIcon source={require("../../assets/cameraplus.png")} onPress={() => {}} />
           <View style={styles.lineView} />
-          <NavIcon source={require("../../assets/shopping-cart.png")} onPress={() => navigation.navigate("CartPage")} />
+          <NavIcon source={require("../../assets/shopping_cart.png")} onPress={() => navigation.navigate("CartPage")} />
           <NavIcon source={require("../../assets/user1.png")} onPress={() => {}} isActive />
         </View>
       </View>
+
+      
     </View>
   )
 }
