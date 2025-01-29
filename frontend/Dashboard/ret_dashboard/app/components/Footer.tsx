@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="w-[calc(100%-16rem)] bg-gray-100 py-6 border-t border-gray-300 fixed bottom-0 left-0 md:left-64 z-50 shadow-lg">
+    <footer className="w-[calc(100%-16rem)] bg-gray-100 py-1 border-t border-gray-300 fixed bottom-0 left-0 md:left-64 z-50 shadow-lg">
      
       
 

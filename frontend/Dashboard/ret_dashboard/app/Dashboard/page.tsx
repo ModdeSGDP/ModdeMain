@@ -1,6 +1,8 @@
 import React from 'react'
 import Summary from "../components/summary";
-import Retailor from "../components/retailor";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
+import DateStatusFilter from "../components/DateStatusFilter";
+
 
 
 function page() {
@@ -11,28 +13,52 @@ function page() {
     cancelledOrders: 100,
     totalUsers: 350
   };
-  const retailorData = {
-    name: "Incarange",
-    avatar: "/images/maleavatar.svg", // Adjust path based on your project structure
-    greeting: "Hi, Joel !",
-  };
+  
 
 
   return (
-     <div className="pt-0 pl-64">
-      {/* Retailor Details Section */}
-      <div className="flex justify-between items-center mb-2 mt-[-80px]">
-        <Retailor {...retailorData} />
-      </div>
-      <Summary
-        completedOrders={dashboardData.completedOrders}
-        pendingOrders={dashboardData.pendingOrders}
-        cancelledOrders={dashboardData.cancelledOrders}
-        totalUsers={dashboardData.totalUsers}
-      />
+    <div className="pt-0 pl-64">
+     
       <div>
-        {/* Additional content goes here */}
+            <h1 className="font-bold text-2xl mb-2">Orders List</h1><Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href="/Analytics">Analytics</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
+            {/* Horizontal Line */}
+        <hr className="my-4 border-gray-300" />
+
+
+      {/* Summary Section */}
+      <div className="mt-4"> {/* Added margin-top */}
+        <Summary
+          completedOrders={dashboardData.completedOrders}
+          pendingOrders={dashboardData.pendingOrders}
+          cancelledOrders={dashboardData.cancelledOrders}
+          totalUsers={dashboardData.totalUsers}
+        />
       </div>
+
+      {/* Date & Status Filter Section */}
+      <DateStatusFilter />
+
+   
+
+
+           
+
+
+        </div>
+
+      
     </div>
   )
 }
