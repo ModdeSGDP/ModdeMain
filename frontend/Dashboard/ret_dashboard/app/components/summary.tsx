@@ -11,7 +11,7 @@ interface SummaryProps {
 
 const Summary: React.FC<SummaryProps> = ({ completedOrders, pendingOrders, cancelledOrders, totalUsers }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mt-5 px-16">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mt-4 px-16">
       
       {/* Orders Completed */}
       <div className="flex items-center space-x-3 bg-green-100 p-3 rounded-lg shadow-md w-30">

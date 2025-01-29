@@ -89,7 +89,7 @@ export default function Sidebar() {
        {/* Need Help Section */}
       <div className="bg-blue-100 text-black p-2 m-4 rounded-md shadow-md">
         <Image 
-          src="/images/QSmark.png"
+          src="/images/QSmark.svg"
           alt="Qs Mark"
           width={30}
           height={30}
