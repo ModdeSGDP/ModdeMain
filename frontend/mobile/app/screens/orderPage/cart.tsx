@@ -150,7 +150,7 @@ const Cart = () => {
 }
 const styles = StyleSheet.create({
   dressCarddetails: {
-    top: -80,
+    top: 80,
   },
   tag: {
     width: 24,
@@ -175,7 +175,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fba3a3",
   },
-
   empty: {
     width: 250,
     height: 250,
@@ -217,12 +216,7 @@ const styles = StyleSheet.create({
   top: {
     height: 69,
     width: "100%",
-  },
-  statusbar: {
-    height: 59,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    top: 40,
   },
   sideFlexBox: {
     alignItems: "center",
@@ -252,8 +246,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
+    top:-40,
+    
     backgroundColor: "#fffff",
-    top: -100,
+    marginTop: -60,
   },
   headerTitle: {
     fontSize: 20,
@@ -269,27 +265,26 @@ const styles = StyleSheet.create({
     width: 22,
     height: 23,
     left: -20,
-    top: 1,
   },
   carangeCartClothParent: {
     flex: 1,
+    paddingTop: 10,
   },
   cartItem: {
     flexDirection: "row",
     padding: 10,
-    top: -20,
+    top:-20,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
   dressCard: {
     width: 100,
-    height: 71,
-    top: -60,
+    height: 100,
+    marginRight: 10,
   },
   itemImage: {
     width: 88,
     height: 81,
-    top: 55,
     borderRadius: 10,
   },
   dressCardChild: {
@@ -341,11 +336,13 @@ const styles = StyleSheet.create({
   },
   radioButton: {
     marginRight: 10,
-    
   },
   checkoutBar: {
     backgroundColor: "#ffccd4",
     padding: 20,
+    width: 400,
+    height: 80,
+    left: 5,
     borderRadius: 15,
     bottom: 150,
   },

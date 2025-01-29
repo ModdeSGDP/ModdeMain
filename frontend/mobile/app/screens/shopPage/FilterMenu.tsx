@@ -1,109 +1,114 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, Animated } from 'react-native';
-import PriceRangeSlider from './PriceRangeSlider';
+import React, { useState, useCallback, useMemo } from "react"
+import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, Animated } from "react-native"
+import PriceRangeSlider from "./PriceRangeSlider"
 
-const { width } = Dimensions.get('window');
-const SIDEBAR_WIDTH = width * 0.75; // 75% of screen width
+const { width } = Dimensions.get("window")
+const SIDEBAR_WIDTH = width * 0.75 // 75% of screen width
 
 interface FilterMenuProps {
-  isVisible: boolean;
-  onClose: () => void;
+  isVisible: boolean
+  onClose: () => void
+  onApplyFilters: (filters: {
+    categories: string[]
+    sizes: string[]
+    materials: string[]
+    priceRange: { low: number; high: number }
+  }) => void
+  initialFilters: {
+    categories: string[]
+    sizes: string[]
+    materials: string[]
+    priceRange: { low: number; high: number }
+  }
 }
-const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
-  const [expandedSections, setExpandedSections] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState({ low: 0, high: 25000 });
 
-  const slideAnim = useMemo(() => new Animated.Value(SIDEBAR_WIDTH), []);
+const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose, onApplyFilters, initialFilters }) => {
+  const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialFilters.categories)
+  const [selectedSizes, setSelectedSizes] = useState<string[]>(initialFilters.sizes)
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(initialFilters.materials)
+  const [priceRange, setPriceRange] = useState(initialFilters.priceRange)
+
+  const slideAnim = useMemo(() => new Animated.Value(SIDEBAR_WIDTH), [])
   React.useEffect(() => {
     Animated.timing(slideAnim, {
       toValue: isVisible ? 0 : SIDEBAR_WIDTH,
       duration: 300,
       useNativeDriver: true,
-    }).start();
-  }, [isVisible, slideAnim]);
+    }).start()
+  }, [isVisible, slideAnim])
 
   const toggleSection = useCallback((section: string) => {
-    setExpandedSections(prev => 
-      prev.includes(section) 
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
-    );
-  }, []);
+    setExpandedSections((prev) => (prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]))
+  }, [])
 
-  const toggleSelection = useCallback((item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
-    setSelectedItems(prev => 
-      prev.includes(item)
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
-  }, []);
+  const toggleSelection = useCallback(
+    (item: string, selectedItems: string[], setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>) => {
+      setSelectedItems((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]))
+    },
+    [],
+  )
 
   const handlePriceRangeChange = useCallback((low: number, high: number) => {
-    setPriceRange({ low, high });
-  }, []);
+    setPriceRange({ low, high })
+  }, [])
+
+  const handleApplyFilters = useCallback(() => {
+    onApplyFilters({
+      categories: selectedCategories,
+      sizes: selectedSizes,
+      materials: selectedMaterials,
+      priceRange,
+    })
+    onClose()
+  }, [selectedCategories, selectedSizes, selectedMaterials, priceRange, onApplyFilters, onClose])
 
   const FilterSection = useMemo(() => {
-    return ({ title, children }: { title: string, children: React.ReactNode }) => {
-      const isExpanded = expandedSections.includes(title);
+    return ({ title, children }: { title: string; children: React.ReactNode }) => {
+      const isExpanded = expandedSections.includes(title)
       return (
         <View style={styles.section}>
           <Pressable style={styles.sectionHeader} onPress={() => toggleSection(title)}>
             <Text style={styles.sectionTitle}>{title}</Text>
-            <Text style={styles.chevron}>{isExpanded ? '▲' : '▼'}</Text>
+            <Text style={styles.chevron}>{isExpanded ? "▲" : "▼"}</Text>
           </Pressable>
           {isExpanded && children}
         </View>
-      );
-    };
-  }, [expandedSections, toggleSection]);
+      )
+    }
+  }, [expandedSections, toggleSection])
 
   const SelectableItem = useMemo(() => {
-    return ({ item, isSelected, onToggle }: { item: string, isSelected: boolean, onToggle: () => void }) => (
-      <Pressable
-        style={[styles.selectableItem, isSelected && styles.selectedItem]}
-        onPress={onToggle}
-      >
+    return ({ item, isSelected, onToggle }: { item: string; isSelected: boolean; onToggle: () => void }) => (
+      <Pressable style={[styles.selectableItem, isSelected && styles.selectedItem]} onPress={onToggle}>
         <Text style={[styles.selectableItemText, isSelected && styles.selectedItemText]}>{item}</Text>
       </Pressable>
-    );
-  }, []);
+    )
+  }, [])
 
   const CategoryItem = useMemo(() => {
-    return ({ item, isSelected, onToggle }: { item: string, isSelected: boolean, onToggle: () => void }) => (
-      <Pressable
-        style={styles.categoryItem}
-        onPress={onToggle}
-      >
+    return ({ item, isSelected, onToggle }: { item: string; isSelected: boolean; onToggle: () => void }) => (
+      <Pressable style={styles.categoryItem} onPress={onToggle}>
         <Text style={[styles.categoryItemText, isSelected && styles.selectedCategoryItemText]}>{item}</Text>
       </Pressable>
-    );
-  }, []);
+    )
+  }, [])
 
   const womenCategories = [
-    'New Arrivals',
-    'Casual Wear',
-    'Office Wear',
-    'Party Wear',
-    'Plus Size',
-    'Sport Wear',
-    'Swimming Wear',
-    'Nightwear & Lingerie',
-    'Maternity Wear'
-  ];
+    "New Arrivals",
+    "Casual Wear",
+    "Office Wear",
+    "Party Wear",
+    "Plus Size",
+    "Sport Wear",
+    "Swimming Wear",
+    "Nightwear & Lingerie",
+    "Maternity Wear",
+  ]
 
-  const menCategories = [
-    'New Arrivals',
-    'Formal Wear',
-    'Casual Wear',
-    'Plus Size',
-    'Sportswear',
-    'Undergarments'
-  ];
+  const menCategories = ["New Arrivals", "Formal Wear", "Casual Wear", "Plus Size", "Sportswear", "Undergarments"]
 
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
   return (
     <View style={styles.container}>
@@ -119,10 +124,10 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
             <View style={styles.categoryContent}>
               <CategoryItem
                 item="Women"
-                isSelected={selectedCategories.includes('Women')}
-                onToggle={() => toggleSelection('Women', selectedCategories, setSelectedCategories)}
+                isSelected={selectedCategories.includes("Women")}
+                onToggle={() => toggleSelection("Women", selectedCategories, setSelectedCategories)}
               />
-              {selectedCategories.includes('Women') && (
+              {selectedCategories.includes("Women") && (
                 <View style={styles.subCategoryContent}>
                   {womenCategories.map((category) => (
                     <CategoryItem
@@ -136,10 +141,10 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
               )}
               <CategoryItem
                 item="Men"
-                isSelected={selectedCategories.includes('Men')}
-                onToggle={() => toggleSelection('Men', selectedCategories, setSelectedCategories)}
+                isSelected={selectedCategories.includes("Men")}
+                onToggle={() => toggleSelection("Men", selectedCategories, setSelectedCategories)}
               />
-              {selectedCategories.includes('Men') && (
+              {selectedCategories.includes("Men") && (
                 <View style={styles.subCategoryContent}>
                   {menCategories.map((category) => (
                     <CategoryItem
@@ -155,7 +160,37 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
           </FilterSection>
           <FilterSection title="Size">
             <View style={styles.sizeContent}>
-              {['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', 'Free Size', 'UK 4', 'UK 6', 'UK 8'].map((size) => (
+              {[
+                "XXS",
+                "XS",
+                "S",
+                "M",
+                "L",
+                "XL",
+                "XXL",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "40",
+                "41",
+                "Free Size",
+                "UK 4",
+                "UK 6",
+                "UK 8",
+              ].map((size) => (
                 <SelectableItem
                   key={size}
                   item={size}
@@ -167,7 +202,26 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
           </FilterSection>
           <FilterSection title="Material">
             <View style={styles.materialContent}>
-              {['Canvas', 'Chiffon', 'Corduroy', 'Cotton', 'Denim', 'Embroidery', 'Fabric', 'Knitwear', 'Lace', 'Linen', 'Nylon', 'Polyester', 'Rib knit', 'Sequins', 'Silk', 'Suedette', 'Tweed', 'Viscose'].map((material) => (
+              {[
+                "Canvas",
+                "Chiffon",
+                "Corduroy",
+                "Cotton",
+                "Denim",
+                "Embroidery",
+                "Fabric",
+                "Knitwear",
+                "Lace",
+                "Linen",
+                "Nylon",
+                "Polyester",
+                "Rib knit",
+                "Sequins",
+                "Silk",
+                "Suedette",
+                "Tweed",
+                "Viscose",
+              ].map((material) => (
                 <SelectableItem
                   key={material}
                   item={material}
@@ -177,25 +231,27 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isVisible, onClose }) => {
               ))}
             </View>
           </FilterSection>
-          <FilterSection title="Price Range (LKR)">
+          <FilterSection title="Price Range">
             <View style={styles.priceContent}>
               <PriceRangeSlider
                 min={0}
                 max={25000}
+                initialLow={priceRange.low}
+                initialHigh={priceRange.high}
                 onChange={handlePriceRangeChange}
               />
             </View>
           </FilterSection>
         </ScrollView>
         <View style={styles.footer}>
-          <Pressable style={styles.applyButton} onPress={onClose}>
+          <Pressable style={styles.applyButton} onPress={handleApplyFilters}>
             <Text style={styles.applyButtonText}>Apply Filters</Text>
           </Pressable>
         </View>
       </Animated.View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -325,4 +381,5 @@ const styles = StyleSheet.create({
 });
 
 export default FilterMenu;
+
 

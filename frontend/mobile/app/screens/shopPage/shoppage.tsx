@@ -1,85 +1,155 @@
-import React, { useState } from "react"
-import { StyleSheet, View, Text, Image, Pressable, ScrollView, TextInput, FlatList, Dimensions } from "react-native"
+import React, { useState, useCallback, useMemo } from "react"
+import { StyleSheet, View, Text, Image, Pressable, TextInput, FlatList, Dimensions } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import FilterMenu from "./FilterMenu"
 import { useCartStore } from "./cartState"
+import type { Product } from "./types/product"
 
 const { width } = Dimensions.get("window")
+
 const ShopsPageInfinityScroll = () => {
   const navigation = useNavigation()
   const [searchQuery, setSearchQuery] = useState("")
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false)
-  const [selectedSort, setSelectedSort] = useState("recommend")
-  const [products, setProducts] = useState([
+  const [selectedSort, setSelectedSort] = useState("all")
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([])
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([])
+  const [priceRange, setPriceRange] = useState({ low: 0, high: 25000 })
+  const [products, setProducts] = useState<Product[]>([
     {
       id: "1",
       name: "Hooded Long Sleeve -Teen Girls",
       brand: "Incarnag",
-      price: "LKR 4,850",
+      price: 4850,
       image: require("../../assets/Rectangle51.png"),
+      tag: "popular",
+      category: "Casual Wear",
+      gender: "Women",
+      sizes: ["S", "M", "L"],
+      material: "Cotton",
     },
     {
       id: "2",
       name: "Another Product",
       brand: "Kelly Felder",
-      price: "LKR 3,500",
+      price: 3500,
       image: require("../../assets/Rectangle52.png"),
+      tag: "popular",
+      category: "Party Wear",
+      gender: "Women",
+      sizes: ["M", "L", "XL"],
+      material: "Silk",
     },
     {
       id: "3",
       name: "Third Product",
       brand: "Incarnage",
-      price: "LKR 2,750",
+      price: 2750,
       image: require("../../assets/Rectangle52.png"),
+      tag: "recommended",
+      category: "Formal Wear",
+      gender: "Men",
+      sizes: ["M", "L", "XXL"],
+      material: "Polyester",
     },
     {
       id: "4",
       name: "Fourth Product",
       brand: "Kelly Felder",
-      price: "LKR 5,200",
+      price: 5200,
       image: require("../../assets/Rectangle51.png"),
+      tag: "recommended",
+      category: "Sportswear",
+      gender: "Men",
+      sizes: ["S", "M", "L", "XL"],
+      material: "Nylon",
     },
     {
-      id: "4",
-      name: "Fourth Product",
+      id: "5",
+      name: "Fifth Product",
       brand: "Kelly Felder",
-      price: "LKR 5,200",
+      price: 5200,
       image: require("../../assets/Rectangle51.png"),
+      category: "Plus Size",
+      gender: "Women",
+      sizes: ["XL", "XXL"],
+      material: "Cotton",
     },
     {
-      id: "4",
-      name: "Fourth Product",
+      id: "6",
+      name: "Sixth Product",
       brand: "Kelly Felder",
-      price: "LKR 5,200",
+      price: 5200,
       image: require("../../assets/Rectangle51.png"),
+      category: "Casual Wear",
+      gender: "Men",
+      sizes: ["M", "L", "XL"],
+      material: "Denim",
     },
   ])
-  const ProductCard = ({item}) => {
-    const addItem = useCartStore((state) => state.addItem)
-    return (
-      <Pressable style={styles.card} onPress={() => navigation.navigate("ProductDetail", { product: item })}>
-        <Image style={styles.productImage} resizeMode="cover" source={item.image} />
-        <View style={styles.inStockLabel}>
-          <Text style={styles.inStockText}>In stock</Text>
-        </View>
-        <View style={styles.description}>
-          <Text style={styles.productName}>{item.name}</Text>
-          <Image style={styles.brandLogo} resizeMode="cover" source={require("../../assets/Ellipse18.png")} />
-          <Text style={styles.brandName}>{item.brand}</Text>
-          <Text style={styles.price}>{item.price}</Text>
-        </View>
-        <Pressable
-          style={styles.addToCartButton}
-          onPress={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.image, quantity: 1 })}
-        >
-          <Image style={styles.addToCartIcon} resizeMode="cover" source={require("../../assets/addcart.png")} />
+
+  const filteredProducts = useMemo(() => {
+    let filtered = products.filter((product) => {
+      const categoryMatch =
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(product.category) ||
+        selectedCategories.includes(product.gender)
+      const sizeMatch = selectedSizes.length === 0 || product.sizes.some((size) => selectedSizes.includes(size))
+      const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(product.material)
+      const priceMatch = product.price >= priceRange.low && product.price <= priceRange.high
+
+      return categoryMatch && sizeMatch && materialMatch && priceMatch
+    })
+
+    if (selectedSort === "popular") {
+      filtered = filtered.filter((product) => product.tag === "popular")
+    } else if (selectedSort === "recommended") {
+      filtered = filtered.filter((product) => product.tag === "recommended")
+    }
+
+    return filtered
+  }, [products, selectedSort, selectedCategories, selectedSizes, selectedMaterials, priceRange])
+
+  const addItem = useCartStore((state) => state.addItem)
+
+  const ProductCard = useCallback(
+    ({ item }: { item: Product }) => {
+      return (
+        <Pressable style={styles.card} onPress={() => navigation.navigate("ProductDetail", { product: item })}>
+          <Image style={styles.productImage} resizeMode="cover" source={item.image} />
+          <View style={styles.inStockLabel}>
+            <Text style={styles.inStockText}>In stock</Text>
+          </View>
+          {item.tag && (
+            <View style={[styles.tagLabel, item.tag === "popular" ? styles.popularTag : styles.recommendedTag]}>
+              <Text style={styles.tagText}>{item.tag === "popular" ? "Most Popular" : "Recommended"}</Text>
+            </View>
+          )}
+          <View style={styles.description}>
+            <Text style={styles.productName}>{item.name}</Text>
+            <Image style={styles.brandLogo} resizeMode="cover" source={require("../../assets/Ellipse18.png")} />
+            <Text style={styles.brandName}>{item.brand}</Text>
+            <Text style={styles.price}>LKR {item.price}</Text>
+          </View>
+          <Pressable
+            style={styles.addToCartButton}
+            onPress={() =>
+              addItem({ id: item.id, name: item.name, price: item.price.toString(), image: item.image, quantity: 1 })
+            }
+          >
+            <Image style={styles.addToCartIcon} resizeMode="cover" source={require("../../assets/addcart.png")} />
+          </Pressable>
         </Pressable>
-      </Pressable>
-    )
-  }
-  const renderItem = ({ item }) => <ProductCard item={item} />
+      )
+    },
+    [addItem, navigation],
+  )
+
+  const renderItem = useCallback(({ item }: { item: Product }) => <ProductCard item={item} />, [ProductCard])
+
   const CartButton = () => {
-  const itemCount = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0))
+    const itemCount = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0))
     return (
       <Pressable onPress={() => navigation.navigate("CartPage")}>
         <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
@@ -92,11 +162,28 @@ const ShopsPageInfinityScroll = () => {
     )
   }
 
+  const handleApplyFilters = useCallback(
+    (filters: {
+      categories: string[]
+      sizes: string[]
+      materials: string[]
+      priceRange: { low: number; high: number }
+    }) => {
+      setSelectedCategories(filters.categories)
+      setSelectedSizes(filters.sizes)
+      setSelectedMaterials(filters.materials)
+      setPriceRange(filters.priceRange)
+      setIsFilterMenuVisible(false)
+    },
+    [],
+  )
+
   return (
     <View style={styles.shopsPageInfinityScroll}>
-      <Pressable onPress={() => navigation.navigate("HomePage")}>
-        <Image style={styles.backbutton} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
+      <Pressable style={styles.backButton} onPress={() => navigation.navigate("HomePage")}>
+        <Image style={styles.backButtonIcon} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
       </Pressable>
+
       <View style={styles.searchBar}>
         <Pressable
           onPress={() => {
@@ -119,12 +206,17 @@ const ShopsPageInfinityScroll = () => {
           <Image style={styles.searchIcon} resizeMode="cover" source={require("../../assets/vector.png")} />
         </Pressable>
       </View>
+
       <Image style={styles.bannerImage} resizeMode="cover" source={require("../../assets/Rectangle41.png")} />
+
       <View style={styles.filterBar}>
         <View style={styles.sortOptions}>
-          <Pressable onPress={() => setSelectedSort("recommend")}>
-            <Text style={[styles.sortOptionText, selectedSort === "recommend" && styles.selectedSortText]}>
-              Recommend
+          <Pressable onPress={() => setSelectedSort("all")}>
+            <Text style={[styles.sortOptionText, selectedSort === "all" && styles.selectedSortText]}>All</Text>
+          </Pressable>
+          <Pressable onPress={() => setSelectedSort("recommended")}>
+            <Text style={[styles.sortOptionText, selectedSort === "recommended" && styles.selectedSortText]}>
+              Recommended
             </Text>
           </Pressable>
           <Pressable onPress={() => setSelectedSort("popular")}>
@@ -147,14 +239,16 @@ const ShopsPageInfinityScroll = () => {
           <Text style={styles.filterText}>Filters</Text>
         </Pressable>
       </View>
+
       <FlatList
-        data={products}
+        data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={styles.productGrid}
         columnWrapperStyle={styles.columnWrapper}
       />
+
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
@@ -176,7 +270,17 @@ const ShopsPageInfinityScroll = () => {
         <View style={styles.activeIndicator} />
       </View>
 
-      <FilterMenu isVisible={isFilterMenuVisible} onClose={() => setIsFilterMenuVisible(false)} />
+      <FilterMenu
+        isVisible={isFilterMenuVisible}
+        onClose={() => setIsFilterMenuVisible(false)}
+        onApplyFilters={handleApplyFilters}
+        initialFilters={{
+          categories: selectedCategories,
+          sizes: selectedSizes,
+          materials: selectedMaterials,
+          priceRange: priceRange,
+        }}
+      />
     </View>
   )
 }
@@ -186,13 +290,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  backButton: {
+    position: "absolute",
+    top: 15,
+    left: 10,
+    zIndex: 1,
+  },
+  backButtonIcon: {
+    width: 27,
+    height: 27,
+  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
+    width:340,
+    left:30,
+    height:50,
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
-    margin: 50,
-    marginTop: 3,
+    margin: 10,
+    marginTop: 5,
     padding: 6,
     shadowColor: "#000",
     shadowOffset: {
@@ -213,13 +330,6 @@ const styles = StyleSheet.create({
     height: 18,
     marginLeft: 10,
   },
-  backbutton: {
-    top: 15,
-    left: 10,
-    width: 27,
-    height: 27,
-    position: "absolute",
-  },
   searchInput: {
     flex: 1,
     fontFamily: "Inter-SemiBold",
@@ -227,12 +337,11 @@ const styles = StyleSheet.create({
     color: "#321919",
   },
   bannerImage: {
-    width: "80%",
-    height: 145,
+    width: "90%",
+    height: 165,
     borderRadius: 10,
-    alignSelf: "center",
-    marginBottom: 10,
-    marginTop: -40,
+    left:20,
+    marginVertical: 10,
   },
   filterBar: {
     flexDirection: "row",
@@ -240,8 +349,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFE2E6",
     padding: 10,
-    marginBottom: 0,
-    bottom: 0,
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -273,11 +381,6 @@ const styles = StyleSheet.create({
     height: 12,
     marginLeft: 5,
   },
-  mostPopularText: {
-    fontFamily: "Inter-SemiBold",
-    fontSize: 15,
-    color: "#979797",
-  },
   filterButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -294,8 +397,7 @@ const styles = StyleSheet.create({
   },
   productGrid: {
     paddingHorizontal: 10,
-    gap: 10,
-    bottom:100,
+    paddingBottom: 120,
   },
   columnWrapper: {
     justifyContent: "space-between",
@@ -439,6 +541,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
+  tagLabel: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    borderRadius: 2,
+    padding: 5,
+  },
+  popularTag: {
+    backgroundColor: "#FFD700",
+  },
+  recommendedTag: {
+    backgroundColor: "#90EE90",
+  },
+  tagText: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 10,
+    color: "#000",
+  },
 })
 
 export default ShopsPageInfinityScroll
+
