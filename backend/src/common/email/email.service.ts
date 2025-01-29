@@ -3,7 +3,7 @@ import * as nodemailer from 'nodemailer';
 import { EMAIL_DEFAULTS } from './email.constants';
 
 @Injectable()
-export class EmailService {
+export class EmailService { 
   private transporter;
 
   constructor() {
