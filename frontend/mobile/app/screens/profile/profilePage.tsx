@@ -7,22 +7,6 @@ const Profile = () => {
 
   return (
     <View style={styles.profile}>
-      {/* <View style={styles.top}>
-        <View style={styles.statusbar}>
-          <View style={[styles.leftSide, styles.sideFlexBox]}>
-            <View style={styles.statusbarTime}>
-              <Text style={styles.time}>9:41</Text>
-            </View>
-          </View>
-          <View style={[styles.rightSide, styles.sideFlexBox]}>
-            <View style={styles.signalWifiBattery}>
-              <Image source={require("../../assets/icon--mobile-signal.png")} style={styles.statusIcon} />
-              <Image source={require("../../assets/wifi.png")} style={styles.statusIcon} />
-              <Image source={require("../../assets/-statusbarbattery.png")} style={styles.statusIcon} />
-            </View>
-          </View>
-        </View>
-      </View> */}
 
       <Pressable onPress={() => navigation.goBack()}>
         <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
@@ -35,15 +19,11 @@ const Profile = () => {
         <Image style={styles.bell} source={require("../../assets/bell.png")} />
       </Pressable>
 
-
-
       <ScrollView style={styles.profileOptions}>
         <ProfileOption title="Photo" />
         <ProfileOption
           title="Account information"
-          onPress={() => {
-            /* Handle navigation */
-          }}
+          onPress={() => navigation.navigate("AccountInfoPage")}
         />
         <ProfileOption title="Name" />
         <ProfileOption title="Gender" />
@@ -72,8 +52,6 @@ const Profile = () => {
           <NavIcon source={require("../../assets/user1.png")} onPress={() => {}} isActive />
         </View>
       </View>
-
-      
     </View>
   )
 }

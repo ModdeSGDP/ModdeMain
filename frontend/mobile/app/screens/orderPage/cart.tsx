@@ -56,13 +56,17 @@ const Cart = () => {
         <Image style={styles.itemImage} resizeMode="cover" source={item.image} />
       </View>
       <View style={styles.itemDetails}>
+        <View style={styles.shopContainer}>
+          <Image style={styles.shopIcon} source={require("../../assets/home.png")} />
+          <Text style={styles.shopName}>{item.ssdss}</Text>
+        </View>
         <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>{item.price}</Text>
+        <Text style={styles.itemPrice}>LKR {item.price}</Text>
         <View style={styles.quantitySelector}>
           <Pressable onPress={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}>
             <Text style={styles.quantityButton}>-</Text>
           </Pressable>
-          <Text style={styles.quantityText}>{item.quantity}</Text>
+          <Text style={styles.quantityValue}>{item.quantity}</Text>
           <Pressable onPress={() => updateQuantity(item.id, item.quantity + 1)}>
             <Text style={styles.quantityButton}>+</Text>
           </Pressable>
@@ -72,7 +76,8 @@ const Cart = () => {
         </Pressable>
       </View>
     </Pressable>
-  )
+);
+  
   //const totalPrice = items.reduce((sum, item) => {
   //  const price = Number.parseFloat(item.price.replace("LKR ", " ").replace(",", ""))
   //  return sum + price * item.quantity
@@ -152,6 +157,12 @@ const styles = StyleSheet.create({
   dressCarddetails: {
     top: 80,
   },
+  quantityValue: {
+    marginHorizontal: 10,
+    fontSize: 16,
+    minWidth: 20,
+    textAlign: 'center'
+  },
   tag: {
     width: 24,
     height: 24,
@@ -166,6 +177,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  shopContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  shopIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 6,
+  },
+  shopName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#555",
+  },
+  
   activeIndicator: {
     position: "absolute",
     left: 217,
