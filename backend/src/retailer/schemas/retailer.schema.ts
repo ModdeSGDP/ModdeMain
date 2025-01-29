@@ -10,7 +10,7 @@ export class Retailer {
   email: string;
 
   @Prop({ required: true })
-  phone: string;
+  contactNumber: string;
 
   @Prop()
   address: string;
@@ -18,8 +18,6 @@ export class Retailer {
   @Prop({ required: true })
   registrationNumber: string;
 
-  @Prop({ default: [] }) // List of admins
-  admins: string[];
 }
 
 export type RetailerDocument = HydratedDocument<Retailer>;
