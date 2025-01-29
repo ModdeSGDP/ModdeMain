@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class S3Service {
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
     const fileKey = `${uuidv4()}-${file.originalname}`; // Generate unique file name
-    const params = {
+    const params:PutObjectCommandInput = {
       Bucket: this.bucketName,
       Key: fileKey,
       Body: file.buffer,
@@ -30,6 +30,6 @@ export class S3Service {
     await this.s3.send(new PutObjectCommand(params));
 
     // Return the public URL
-    return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+    return fileKey;
   }
 }
