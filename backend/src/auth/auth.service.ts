@@ -14,7 +14,7 @@ export class AuthService {
     const user = await this.userService.findUserByUsername(username);
     if (user && (await bcrypt.compare(password, user.password))) {
       // Generate JWT token
-      const payload = { username: user.username, role: user.role };
+      const payload = {userId: user._id, username: user.username, role: user.role };
       return { accessToken: this.jwtService.sign(payload) };
     } else {
       throw new UnauthorizedException('Invalid credentials');
