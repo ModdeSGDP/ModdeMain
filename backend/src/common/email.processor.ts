@@ -13,8 +13,11 @@ export class EmailProcessor {
     const { to, subject, message } = job.data;
     
     try {
+      console.log(`Sending email to ${to} with subject: ${subject}`);
+
       // Send email using MailerService
       await this.mailerService.sendMail(to, subject, message);
+
       console.log(`Email sent successfully to ${to}`);
     } catch (error) {
       console.error(`Failed to send email to ${to}:`, error);
@@ -22,9 +25,3 @@ export class EmailProcessor {
     }
   }
 }
-
-//How This Works Now:
-//  ProductService adds emails to the queue
-//  EmailProcessor picks up jobs & calls MailerService
-//  MailerService sends real emails using Nodemailer
-//  Errors are logged, and Bull can retry failed emails

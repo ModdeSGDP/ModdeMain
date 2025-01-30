@@ -35,10 +35,12 @@ export class ProductService {
 
     // Queue an email notification
     await this.emailQueue.add('sendEmail', {
-      to: 'admin@example.com',
-      subject: 'New Product Added',
-      body: `A new product, ${savedProduct.name}, has been added.`,
+      to: 'admin@example.com', // Replace with dynamic admin email if needed
+      subject: `New Product Added: ${savedProduct.name}`,
+      message: `A new product "${savedProduct.name}" has been added.`,
     });
+
+    console.log(`Email job added to queue for new product: ${savedProduct.name}`);
 
     return savedProduct;
   }
