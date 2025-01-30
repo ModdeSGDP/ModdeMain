@@ -33,11 +33,12 @@ const AccountInfo = () => {
         <View style={styles.homeNavigationBar}>
           <View style={styles.homeNavigationBarChild} />
           <View style={styles.naviIcons}>
-            <Image style={[styles.smartHome, styles.iconLayout]} resizeMode="cover" source={require("../../assets/smart-home.png")} />
+            <Image style={[styles.smartHome, styles.iconLayout]} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
             <Image style={[styles.shirt, styles.iconLayout]} resizeMode="cover" source={require("../../assets/shirt.png")} />
-            <Image style={[styles.cameraPlusIcon, styles.iconLayout]} resizeMode="cover" source={require("../../assets/camera-plus.png")} />
-            <Image style={[styles.shoppingCart, styles.iconLayout]} resizeMode="cover" source={require("../../assets/shopping-cart.png")} />
-            <Image style={[styles.user, styles.iconLayout]} resizeMode="cover" source={require("../../assets/user.png")} />
+            <Image style={[styles.cameraPlusIcon, styles.iconLayout]} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
+            <Image style={[styles.shoppingCart, styles.iconLayout]} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
+            <View style={styles.lineView} />
+            <Image style={[styles.user, styles.iconLayout]} resizeMode="cover" source={require("../../assets/user1.png")} />
           </View>
         </View>
       </View>
@@ -47,8 +48,17 @@ const AccountInfo = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    position: "absolute",
+    top: -19,
+    width:23,
+    left: 250,
+    right: 0,
+  },
   accountInfo: {
     borderRadius: 30,
     backgroundColor: "#fff",
@@ -65,7 +75,7 @@ const styles = StyleSheet.create({
   },
   accountInformation: {
     marginLeft: -88.5,
-    top: 75,
+    top: 45,
     fontSize: 18,
     lineHeight: 23,
     fontFamily: "Inter-SemiBold",
@@ -73,17 +83,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "600",
     position: "absolute",
-    left: "50%",
+    left: "45%",
   },
   sideFlexBox: {
     alignItems: "center",
     alignSelf: "stretch",
+  },
+  activeIndicator: {
+    position: "absolute",
+    left: 6,
+    top: 35,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#fba3a3",
   },
   memberIdTypo: {
     textAlign: "left",
     fontFamily: "Inter-Medium",
     lineHeight: 16,
     fontSize: 13,
+    top:28,
     fontWeight: "500",
   },
   textTypo: {
@@ -91,6 +111,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Regular",
     textAlign: "left",
     lineHeight: 16,
+    top:28,
     fontSize: 13,
   },
   memberId: {
@@ -136,10 +157,12 @@ const styles = StyleSheet.create({
   smartHome: {
     right: "91.79%",
     bottom: "7.69%",
-    left: "0%",
-    top: "0%",
     maxHeight: "100%",
     maxWidth: "100%",
+    left: 6,
+    top: 1,
+    width:20,
+    height:30,
   },
   shirt: {
     top: "7.69%",
@@ -168,10 +191,10 @@ const styles = StyleSheet.create({
   user: {
     right: "0%",
     bottom: "7.69%",
-    left: "91.79%",
-    top: "0%",
-    maxHeight: "100%",
-    maxWidth: "100%",
+    left: 250,
+    top: 1,
+    width:20,
+    height:30,
   },
   naviIcons: {
     height: "37.68%",
@@ -205,10 +228,10 @@ const styles = StyleSheet.create({
     left: 17,
   },
   backButton: {
-    left: 24,
-    top: 50,
-    height: 27,
-    width: 27,
+    left: 10,
+    top: 20,
+    height: 37,
+    width: 37,
     position: "absolute",
   },
 });

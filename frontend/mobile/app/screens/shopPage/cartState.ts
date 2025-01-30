@@ -7,14 +7,12 @@ interface CartItem {
   image: any
   quantity: number
 }
-
 interface CartStore {
   items: CartItem[]
   addItem: (item: CartItem) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
 }
-
 export const useCartStore = create<CartStore>((set) => ({
   items: [],
   addItem: (item) =>
