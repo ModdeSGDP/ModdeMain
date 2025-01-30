@@ -10,8 +10,6 @@ import { EmailModule } from 'src/common/email/email.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    forwardRef(() => AuthModule),
-    forwardRef(() => EmailModule),
   ],
   providers: [UserService],    
   controllers: [UserController],

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Product {
@@ -18,14 +18,14 @@ export class Product {
   @Prop({ required: true })
   stock: number;
 
-  @Prop({ required: true, ref: 'Retailer' })
-  organizationId: string;
-
   @Prop()
   image?: string; // field for storing the image URL
 
   @Prop({ default: true }) // Default to "listed"
   isListed: boolean;
+
+  @Prop({type: Types.ObjectId, ref: 'Retailer', required:true })
+  retailerId: Types.ObjectId
 }
 
 export type ProductDocument = HydratedDocument<Product>;

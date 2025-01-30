@@ -7,7 +7,6 @@ import { JwtStrategy } from './jwt.strategy'; // Import JwtStrategy
 
 @Module({
   imports: [
-    forwardRef(() => UserModule),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'default_secret', // Use environment variables for production
       signOptions: { expiresIn: '1h' }, // Token expiry
