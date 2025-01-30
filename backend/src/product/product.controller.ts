@@ -20,7 +20,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post('add')
-  @UseInterceptors(FileInterceptor('file')) // Handle file uploads
+  @UseInterceptors(FileInterceptor('file'))
   async createProduct(
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() file?: Express.Multer.File,
@@ -28,9 +28,9 @@ export class ProductController {
     return this.productService.createProduct(createProductDto, file);
   }
 
-  @Get('organization/:organizationId') // Clearer path for organization products
-  async getProducts(@Param('organizationId') orgId: string) {
-    return this.productService.getProductsByOrganization(orgId);
+  @Get('retailer/:retailerId')
+  async getProducts(@Param('retailerId') retailerId: string) {
+    return this.productService.getProductsByRetailer(retailerId);
   }
 
   @Patch(':id')
@@ -39,10 +39,7 @@ export class ProductController {
   }
 
   @Patch(':id/status')
-  async updateProductStatus(
-    @Param('id') id: string,
-    @Body() updateProductStatusDto: UpdateProductStatusDto,
-  ) {
+  async updateProductStatus(@Param('id') id: string, @Body() updateProductStatusDto: UpdateProductStatusDto) {
     return this.productService.updateProductStatus(id, updateProductStatusDto);
   }
 
