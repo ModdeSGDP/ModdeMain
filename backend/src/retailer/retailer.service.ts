@@ -48,10 +48,4 @@ export class RetailerService {
     return updatedRetailer;
   }
 
-  async delete(id: string): Promise<void> {
-    const result = await this.retailerModel.findByIdAndDelete(id).exec();
-    if (!result) {
-      throw new NotFoundException(`Retailer with ID ${id} not found`);
-    }
-  }
 }

@@ -12,7 +12,6 @@ import { InviteAdminDto } from './dto/invite-admin.dto';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
     private readonly emailService: EmailService 
   ) {}
@@ -30,7 +29,7 @@ export class UserController {
     return this.authService.validateUser(username, password);
   }
 
-  @Post('invite-admin')
+  @Post('invite-admin')       //Should be done using userService. Not emailService
   async inviteAdmin(@Body() inviteAdminDto: InviteAdminDto) {
     const inviteLink = `https://your-domain.com/admin/accept?email=${inviteAdminDto.email}`;
     await this.emailService.sendAdminInvitation(inviteAdminDto.email, inviteLink);

@@ -30,9 +30,5 @@ export class RetailerController {
   ) {
     return this.retailerService.update(id, updateRetailerDto);
   }
-
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.retailerService.delete(id);
-  }
+  
 }
