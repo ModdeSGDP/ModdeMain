@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
 import { Sidebar } from "lucide-react";
+import ProductCard from "../Product/page";
+
 
 
 
@@ -15,10 +17,12 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const products: any[] = []; // Define the products array
+
     return (
         <html lang="en">
             <body className="min-h-screen flex">
-              
+
 
                 {/* Main Content */}
                 <div className="flex-1 flex flex-col">
@@ -38,13 +42,16 @@ export default function RootLayout({
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
-
-
                     <main className="flex-grow p-4">{children}</main>
-
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {products.map((product) => (
+                            <ProductCard key={product.id} {...product} />
+                        ))}
+                    </div>
 
                 </div>
             </body>
         </html>
+
     );
 }
