@@ -2,6 +2,7 @@ import React from 'react'
 import Summary from "../components/summary";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
 import DateStatusFilter from "../components/DateStatusFilter";
+import OrderList from "../components/OrderList";
 
 
 
@@ -13,6 +14,23 @@ function page() {
     cancelledOrders: 100,
     totalUsers: 350
   };
+
+   // Dynamic retailer data
+  const retailerOrders = [
+    { id: 25426, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Komal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25425, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Nikhil", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
+    { id: 25424, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Nimal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25423, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kushan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
+    { id: 25422, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kidura", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25421, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Yougesh", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25420, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Priyantha", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
+    { id: 25419, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kishan", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25417, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kumal", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
+    { id: 25412, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer:{ name: "Priyanka", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
+    { id: 25413, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer:{ name: "Nuwan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
+    { id: 254, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer:{ name: "Dumal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" }
+  ];
+
   
 
 
@@ -50,6 +68,8 @@ function page() {
       {/* Date & Status Filter Section */}
       <DateStatusFilter />
 
+        {/* Orders Table */}
+      <OrderList orders={retailerOrders} />
    
 
 
