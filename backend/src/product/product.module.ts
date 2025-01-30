@@ -3,15 +3,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { Product, ProductSchema } from './schema/product.schema';
-import { S3Service } from '../common/aws/s3.service';
-import { ConfigService } from '../common/configs/config.service'; // Import ConfigService
+import { CommonModule } from '../common/common.module'; // Import CommonModule
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+    CommonModule, // Use CommonModule instead of registering services manually
   ],
   controllers: [ProductController],
-  providers: [ProductService, S3Service, ConfigService], // Register ConfigService
+  providers: [ProductService],
   exports: [ProductService],
 })
 export class ProductModule {}
+  
