@@ -24,7 +24,6 @@ type Props = {
   route: ProductDetailRouteProp;
   navigation: ProductDetailNavigationProp;
 };
-
 const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
   const { product } = route.params;
   const [selectedColor, setSelectedColor] = useState('black');
@@ -60,7 +59,6 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
           <Ionicons name="heart-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
-
       <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
         {[1, 2, 3, 4].map((img) => (
           <Image
@@ -70,7 +68,6 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
           />
         ))}
       </ScrollView>
-
       <View style={styles.productInfo}>
         <Text style={styles.productTitle}>{product.name}</Text>
         <View style={styles.priceContainer}>
@@ -80,7 +77,6 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
             <Text style={styles.discountText}>10%</Text>
           </View>
         </View>
-
         <View style={styles.ratingContainer}>
           <View style={styles.stars}>
             {[1, 2, 3, 4, 5].map((star) => (
@@ -89,7 +85,6 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
           </View>
           <Text style={styles.reviewCount}>(1000+)</Text>
         </View>
-
         <Text style={styles.sectionTitle}>Color</Text>
         <View style={styles.colorOptions}>
           {colors.map((color) => (

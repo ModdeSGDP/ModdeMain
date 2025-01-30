@@ -58,7 +58,7 @@ const Cart = () => {
       <View style={styles.itemDetails}>
         <View style={styles.shopContainer}>
           <Image style={styles.shopIcon} source={require("../../assets/home.png")} />
-          <Text style={styles.shopName}>{item.ssdss}</Text>
+          <Text style={styles.shopName}>{item.shop}</Text>
         </View>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.itemPrice}>LKR {item.price}</Text>

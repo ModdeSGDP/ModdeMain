@@ -34,9 +34,7 @@ const Profile = () => {
 
       <Pressable
         style={styles.logoutButton}
-        onPress={() => {
-          /* Handle logout */
-        }}
+        onPress={() => navigation.navigate("Login")}
       >
         <Text style={styles.logoutText}>Logout</Text>
       </Pressable>
