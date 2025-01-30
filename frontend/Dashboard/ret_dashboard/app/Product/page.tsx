@@ -17,6 +17,8 @@ export default function Products() {
                 </BreadcrumbList>
             </Breadcrumb>
 
+            <h2>Product List</h2>
+
            
 
 
