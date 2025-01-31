@@ -6,7 +6,6 @@ import { Queue } from 'bull';
 import { Product } from './schema/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 import { AwsService } from '../common/aws/aws.service';
 import { ConfigService } from '../common/configs/config.service';
 
@@ -50,10 +49,10 @@ export class ProductService {
     return this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
   }
 
-  async updateProductStatus(id: string, updateStatusDto: UpdateProductStatusDto): Promise<Product> {
+  async updateProductStatus(id: string, updateProduct: UpdateProductDto): Promise<Product> {
     const updatedProduct = await this.productModel.findByIdAndUpdate(
       id,
-      { isListed: updateStatusDto.isListed },
+      { isListed: updateProduct.isListed },
       { new: true },
     );
     return updatedProduct;
