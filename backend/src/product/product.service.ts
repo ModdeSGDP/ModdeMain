@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { InjectQueue } from '@nestjs/bull';
 import { Model } from 'mongoose';
+import { Queue } from 'bull';
 import { Product } from './schema/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { AwsService } from '../common/aws/aws.service';
 import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
+import { AwsService } from '../common/aws/aws.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
     private readonly awsService: AwsService, // AWS Service for S3 integration
+    @InjectQueue('emailQueue') private readonly emailQueue: Queue, // Email queue for notifications
   ) {}
 
   async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File): Promise<Product> {
@@ -28,11 +31,22 @@ export class ProductService {
       image: imageUrl,
     });
 
-    return newProduct.save();
+    const savedProduct = await newProduct.save();
+
+    // Queue an email notification
+    await this.emailQueue.add('sendEmail', {
+      to: 'admin@example.com', // Replace with dynamic admin email if needed
+      subject: `New Product Added: ${savedProduct.name}`,
+      message: `A new product "${savedProduct.name}" has been added.`,
+    });
+
+    console.log(`Email job added to queue for new product: ${savedProduct.name}`);
+
+    return savedProduct;
   }
 
-  async getProductsByOrganization(orgId: string): Promise<Product[]> {
-    return this.productModel.find({ organizationId: orgId }).exec();
+  async getProductsByRetailer(retailerId: string): Promise<Product[]> {
+    return this.productModel.find({ retailerId }).exec();
   }
 
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
@@ -43,7 +57,7 @@ export class ProductService {
     const updatedProduct = await this.productModel.findByIdAndUpdate(
       id,
       { isListed: updateStatusDto.isListed },
-      { new: true }, // Return the updated document
+      { new: true },
     );
 
     if (!updatedProduct) {

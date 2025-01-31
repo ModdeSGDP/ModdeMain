@@ -14,35 +14,52 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
-import { S3Service } from '../common/aws/s3.service'; // Import S3Service
+import { S3Service } from '../common/aws/s3.service';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { ConfigService } from '../common/configs/config.service';
 
 @Controller('product')
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
-    private readonly s3Service: S3Service, // Inject S3Service
+    private readonly s3Service: S3Service,
+    private readonly configService: ConfigService,
+    @InjectQueue('emailQueue') private readonly emailQueue: Queue,
   ) {}
 
   @Post('add')
-  @UseInterceptors(FileInterceptor('file')) // Handle file uploads
+  @UseInterceptors(FileInterceptor('file'))
   async createProduct(
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     let fileUrl = null;
 
-    // If a file is uploaded, upload it to S3
+    // Upload file to AWS S3 if available
     if (file) {
       fileUrl = await this.s3Service.uploadFile(file);
-      createProductDto['imageUrl'] = fileUrl; // Add the file URL to the DTO
+      createProductDto.imageUrl = fileUrl;
     }
 
-    return this.productService.createProduct(createProductDto);
+    const product = await this.productService.createProduct(createProductDto);
+
+    // Queue email notification for new product
+    await this.emailQueue.add('sendEmail', {
+      to: this.configService.adminEmail, // Admin email from ConfigService
+      subject: 'New Product Added',
+      message: `
+        <h3>A new product has been added: ${product.name}</h3>
+        <p>Check it out in the dashboard.</p>
+      `,
+    });
+
+    return product;
   }
 
-  @Get('organization/:organizationId') // Clearer path for organization products
-  async getProducts(@Param('organizationId') orgId: string) {
-    return this.productService.getProductsByOrganization(orgId);
+  @Get('retailer/:retailerId')
+  async getProducts(@Param('retailerId') retailerId: string) {
+    return this.productService.getProductsByRetailer(retailerId);
   }
 
   @Patch(':id')
@@ -51,15 +68,34 @@ export class ProductController {
   }
 
   @Patch(':id/status')
-  async updateProductStatus(
-    @Param('id') id: string,
-    @Body() updateProductStatusDto: UpdateProductStatusDto,
-  ) {
-    return this.productService.updateProductStatus(id, updateProductStatusDto);
+  async updateProductStatus(@Param('id') id: string, @Body() updateProductStatusDto: UpdateProductStatusDto) {
+    const updatedProduct = await this.productService.updateProductStatus(id, updateProductStatusDto);
+
+    //  Queue email notification for status update
+    await this.emailQueue.add('sendEmail', {
+      to: this.configService.adminEmail,
+      subject: `Product Status Updated`,
+      message: `
+        <h3>Product ID: ${id} status changed to ${updateProductStatusDto.status}</h3>
+      `,
+    });
+
+    return updatedProduct;
   }
 
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
-    return this.productService.deleteProduct(id);
+    const deletedProduct = await this.productService.deleteProduct(id);
+
+    //  Queue email notification for product deletion
+    await this.emailQueue.add('sendEmail', {
+      to: this.configService.adminEmail,
+      subject: `Product Deleted`,
+      message: `
+        <h3>Product ID: ${id} has been removed from the system.</h3>
+      `,
+    });
+
+    return deletedProduct;
   }
 }
