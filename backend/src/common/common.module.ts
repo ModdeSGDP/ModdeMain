@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
-import { S3Service } from './aws/s3.service';
+import { AwsService } from './aws/aws.service';
 import { ConfigService } from './configs/config.service';
 
 @Module({
@@ -11,13 +11,9 @@ import { ConfigService } from './configs/config.service';
         port: parseInt(process.env.REDIS_PORT, 10) || 6379,
       },
     }),
-    BullModule.registerQueue({
-      name: 'emailQueue', // Register queue for emails
-    }),
+    BullModule.registerQueue({ name: 'emailQueue' }),
   ],
-  providers: [S3Service, ConfigService],
-  exports: [S3Service, ConfigService, BullModule], // Export BullModule
+  providers: [AwsService, ConfigService],
+  exports: [AwsService, ConfigService, BullModule],
 })
 export class CommonModule {}
-
-
