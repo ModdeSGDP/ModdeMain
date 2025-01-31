@@ -67,7 +67,15 @@ export class UserService {
     const inviteLink = `https://your-domain.com/admin/accept?token=${token}`;
 
     // Send the email using EmailService
-    await this.emailService.sendAdminInvitation(email, inviteLink);
+    const subject = 'Admin Invitation';
+    const html = `
+      <p>You have been invited to join our admin panel.</p>
+      <p>Click the link below to accept your invitation:</p>
+      <a href="${inviteLink}">${inviteLink}</a>
+      <p>If you did not request this, please ignore this email.</p>
+    `;
+
+    await this.emailService.sendEmail(email, subject, undefined, html);
 
     return { message: 'Admin invitation sent successfully!' };
   }

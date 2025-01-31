@@ -29,11 +29,9 @@ export class UserController {
     return this.authService.validateUser(username, password);
   }
 
-  @Post('invite-admin')       //Should be done using userService. Not emailService
-  async inviteAdmin(@Body() inviteAdminDto: InviteAdminDto) {
-    const inviteLink = `https://your-domain.com/admin/accept?email=${inviteAdminDto.email}`;
-    await this.emailService.sendAdminInvitation(inviteAdminDto.email, inviteLink);
-    return { message: 'Invitation sent successfully!' };
+  @Post('invite-admin')
+  async inviteAdmin(@Body() InviteAdminDto: InviteAdminDto){
+    return this.userService.inviteAdmin(InviteAdminDto);
   }
 
   @Post('test-email')

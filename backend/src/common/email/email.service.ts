@@ -40,29 +40,4 @@ export class EmailService {
       throw new Error('Failed to send email');
     }
   }
-
-  //Admin invitation email
-
-  async sendAdminInvitation(email: string, inviteLink: string): Promise<void> {
-    const subject = 'Admin Invitation';
-    const html = `
-      <p>You have been invited to join our admin panel.</p>
-      <p>Click the link below to accept your invitation:</p>
-      <a href="${inviteLink}">${inviteLink}</a>
-      <p>If you did not request this, please ignore this email.</p>
-    `;
-  
-    await this.sendEmail(email, subject, undefined, html);
-  }
-
-  async testEmail(): Promise<void> {
-    const testEmail = 'test@example.com';
-    const testSubject = 'Test Email';
-    const testHtml = '<p>This is a test email.</p>';
-  
-    await this.sendEmail(testEmail, testSubject, undefined, testHtml);
-  }
-  
-  
-
 }

@@ -3,7 +3,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
@@ -42,8 +41,8 @@ export class ProductController {
   }
 
   @Patch(':id/status')
-  async updateProductStatus(@Param('id') id: string, @Body() updateProductStatusDto: UpdateProductStatusDto) {
-    return this.productService.updateProductStatus(id, updateProductStatusDto);
+  async updateProductStatus(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    return this.productService.updateProductStatus(id, updateProductDto);
   }
 
   @Delete(':id')
