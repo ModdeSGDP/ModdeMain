@@ -8,39 +8,36 @@ import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 import { AwsService } from '../common/aws/aws.service';
+import { ConfigService } from '../common/configs/config.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
-    private readonly awsService: AwsService, // AWS Service for S3 integration
-    @InjectQueue('emailQueue') private readonly emailQueue: Queue, // Email queue for notifications
+    private readonly awsService: AwsService,
+    private readonly configService: ConfigService,
+    @InjectQueue('emailQueue') private readonly emailQueue: Queue,
   ) {}
 
   async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File): Promise<Product> {
     let imageUrl = null;
 
     if (file) {
-      const bucketName = process.env.AWS_S3_BUCKET_NAME;
       const fileKey = `products/${Date.now()}-${file.originalname}`;
-      imageUrl = await this.awsService.uploadFile(bucketName, fileKey, file.buffer, file.mimetype);
+      imageUrl = await this.awsService.uploadFile(fileKey, file.buffer, file.mimetype);
     }
 
     const newProduct = new this.productModel({
       ...createProductDto,
       image: imageUrl,
     });
-
     const savedProduct = await newProduct.save();
 
-    // Queue an email notification
     await this.emailQueue.add('sendEmail', {
-      to: 'admin@example.com', // Replace with dynamic admin email if needed
+      to: this.configService.get('ADMIN_EMAIL'),
       subject: `New Product Added: ${savedProduct.name}`,
       message: `A new product "${savedProduct.name}" has been added.`,
     });
-
-    console.log(`Email job added to queue for new product: ${savedProduct.name}`);
 
     return savedProduct;
   }
@@ -59,11 +56,6 @@ export class ProductService {
       { isListed: updateStatusDto.isListed },
       { new: true },
     );
-
-    if (!updatedProduct) {
-      throw new Error('Product not found');
-    }
-
     return updatedProduct;
   }
 
