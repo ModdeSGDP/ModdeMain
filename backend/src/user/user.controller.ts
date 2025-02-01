@@ -34,13 +34,6 @@ export class UserController {
     return this.userService.inviteAdmin(InviteAdminDto);
   }
 
-  @Post('test-email')
-  async testEmail(): Promise<{ message: string }> {
-    await this.emailService.testEmail();
-    return { message: 'Test email sent successfully!' };
-}
-
-
 }
 
 
