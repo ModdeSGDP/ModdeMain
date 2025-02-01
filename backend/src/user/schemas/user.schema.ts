@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { ROLES } from 'src/common/constants/roles';
 
 @Schema({timestamps:true})
@@ -21,6 +21,9 @@ export class User  {
 
   @Prop()
   address: string;
+
+  @Prop({type: Types.ObjectId, ref: 'Retailer', required:true })
+    retailerId: Types.ObjectId
 
   
 }

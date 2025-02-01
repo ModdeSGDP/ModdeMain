@@ -1,6 +1,7 @@
-import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, IsEnum, IsOptional, IsMongoId } from 'class-validator';
 import { Transform } from "class-transformer";
 import { ROLES } from 'src/common/constants/roles';
+import{ Types } from 'mongoose';
 
 export class RegisterUserDto {
   @Transform(({ value }) => value.trim())
@@ -33,6 +34,9 @@ export class RegisterUserDto {
   @IsString()
   @IsOptional()
   gender?: string;
+
+  @IsMongoId()
+  retailerId: Types.ObjectId;
 
 }
 
