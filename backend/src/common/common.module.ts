@@ -1,19 +1,19 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
-import { AwsService } from './aws/aws.service';
-import { ConfigService } from './configs/config.service';
+import { asyncBullConfig } from './configs/redis.config';
+import { S3Service } from './aws/s3.service';
+import { GlobalAccelerator } from 'aws-sdk';
 
+
+
+
+@Global()
 @Module({
   imports: [
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT, 10) || 6379,
-      },
-    }),
+    BullModule.forRootAsync(asyncBullConfig),
     BullModule.registerQueue({ name: 'emailQueue' }),
   ],
-  providers: [AwsService, ConfigService],
-  exports: [AwsService, ConfigService, BullModule],
+  providers: [S3Service],
+  exports: [S3Service ],
 })
 export class CommonModule {}
