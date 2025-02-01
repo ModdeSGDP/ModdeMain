@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { EMAIL_DEFAULTS } from './email.constants';
+
 
 @Injectable()
 export class EmailService { 
@@ -8,12 +9,12 @@ export class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: EMAIL_DEFAULTS.SMTP_HOST, // SMTP Host (e.g., Gmail)
-      port: EMAIL_DEFAULTS.SMTP_PORT, // Port for STARTTLS
-      secure: EMAIL_DEFAULTS.SMTP_SECURE, // Set to true for SSL
+      host: EMAIL_DEFAULTS.get("SMTP_HOST"), // SMTP Host (e.g., Gmail)
+      port: EMAIL_DEFAULTS.get("SMTP_PORT"), // Port for STARTTLS
+      secure: EMAIL_DEFAULTS.get("SMTP_SECURE"), // Set to true for SSL
       auth: {
-        user: EMAIL_DEFAULTS.SMTP_USER, // Replace with your email
-        pass: EMAIL_DEFAULTS.SMTP_PASS, // Replace with your email password
+        user: EMAIL_DEFAULTS.get("SMTP_USER"), // Replace with your email
+        pass: ConfigService.get("SMTP_PASSWORD"), // Replace with your email password
       },
     });
   }
