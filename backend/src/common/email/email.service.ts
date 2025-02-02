@@ -7,26 +7,27 @@ import * as nodemailer from 'nodemailer';
 export class EmailService { 
   private transporter;
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      host: EMAIL_DEFAULTS.get("SMTP_HOST"), // SMTP Host (e.g., Gmail)
-      port: EMAIL_DEFAULTS.get("SMTP_PORT"), // Port for STARTTLS
-      secure: EMAIL_DEFAULTS.get("SMTP_SECURE"), // Set to true for SSL
+      host: this.configService.get("SMTP_HOST"), // SMTP Host
+      port: this.configService.get("SMTP_PORT"), // SMTP Port
+      secure: this.configService.get("SMTP_SECURE"), // Set true for SSL
       auth: {
-        user: EMAIL_DEFAULTS.get("SMTP_USER"), // Replace with your email
-        pass: ConfigService.get("SMTP_PASSWORD"), // Replace with your email password
+        user: this.configService.get("SMTP_USER"), // SMTP Username
+        pass: this.configService.get("SMTP_PASSWORD"), // SMTP Password
       },
     });
   }
 
-  async sendEmail(
+
+  async sendEmail( 
     to: string,
     subject: string,
     text?: string,
     html?: string,
   ): Promise<void> {
     const mailOptions = {
-      from: EMAIL_DEFAULTS.SENDER_EMAIL,
+      from: this.configService.get("SENDER_EMAIL"),
       to,
       subject,
       text,
