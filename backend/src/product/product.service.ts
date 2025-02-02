@@ -3,33 +3,60 @@ import { InjectModel } from '@nestjs/mongoose';
 import { InjectQueue } from '@nestjs/bull';
 import { Model } from 'mongoose';
 import { Queue } from 'bull';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Product } from './schema/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { AwsService } from '../common/aws/aws.service';
 import { ConfigService } from '../common/configs/config.service';
 
 @Injectable()
 export class ProductService {
+  private readonly s3: S3Client;
+  private readonly bucketName: string;
+
   constructor(
     @InjectModel(Product.name) private productModel: Model<Product>,
-    private readonly awsService: AwsService,
     private readonly configService: ConfigService,
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
-  ) {}
+  ) {
+    this.s3 = new S3Client({
+      region: this.configService.get('AWS_REGION'),
+      credentials: {
+        accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
+      },
+    });
+
+    this.bucketName = this.configService.get('AWS_S3_BUCKET_NAME');
+  }
+
+  private async uploadToS3(file: Express.Multer.File): Promise<string> {
+    const fileKey = `products/${Date.now()}-${file.originalname}`;
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: fileKey,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    });
+
+    await this.s3.send(command);
+
+    return `https://${this.bucketName}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${fileKey}`;
+  }
 
   async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File): Promise<Product> {
     let imageUrl = null;
 
     if (file) {
-      const fileKey = `products/${Date.now()}-${file.originalname}`;
-      imageUrl = await this.awsService.uploadFile(fileKey, file.buffer, file.mimetype);
+      imageUrl = await this.uploadToS3(file);
     }
 
     const newProduct = new this.productModel({
       ...createProductDto,
       image: imageUrl,
     });
+
     const savedProduct = await newProduct.save();
 
     await this.emailQueue.add('sendEmail', {
@@ -50,12 +77,7 @@ export class ProductService {
   }
 
   async updateProductStatus(id: string, updateProduct: UpdateProductDto): Promise<Product> {
-    const updatedProduct = await this.productModel.findByIdAndUpdate(
-      id,
-      { isListed: updateProduct.isListed },
-      { new: true },
-    );
-    return updatedProduct;
+    return this.productModel.findByIdAndUpdate(id, { isListed: updateProduct.isListed }, { new: true });
   }
 
   async deleteProduct(id: string): Promise<Product> {
