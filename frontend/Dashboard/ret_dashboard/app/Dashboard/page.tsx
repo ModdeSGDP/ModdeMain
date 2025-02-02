@@ -1,8 +1,9 @@
 import React from 'react'
 import Summary from "../components/summary";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from "@/components/ui/pagination";
 import DateStatusFilter from "../components/DateStatusFilter";
-import OrderList from "../components/OrderList";
+import RecentPurchases from "../components/RecentPurchases";
 
 
 
@@ -69,7 +70,35 @@ function page() {
       <DateStatusFilter />
 
         {/* Orders Table */}
-      <OrderList orders={retailerOrders} />
+      <RecentPurchases orders={retailerOrders} />
+
+      
+               {/* Pagination (Move to Left Side) */}
+        <div className="mt-6 w-full flex">
+          <div className="w-fit">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious href="#" />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">1</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext href="#" />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </div>
+
+
+
+      
+
    
 
 
@@ -78,6 +107,7 @@ function page() {
 
         </div>
 
+        
       
     </div>
   )
