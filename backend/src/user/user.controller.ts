@@ -12,7 +12,6 @@ import { InviteAdminDto } from './dto/invite-admin.dto';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly authService: AuthService,
     private readonly emailService: EmailService 
   ) {}
 
@@ -20,13 +19,6 @@ export class UserController {
   async register(@Body() registerUserDto: RegisterUserDto) {
     // The DTO is automatically validated here
     return this.userService.createUser(registerUserDto);
-  }
-
-  @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto) {
-    // Reuse the same DTO for login if fields match
-    const { username, password } = loginUserDto;
-    return this.authService.validateUser(username, password);
   }
 
   @Post('invite-admin')

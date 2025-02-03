@@ -13,5 +13,5 @@ export class AdminInvite {
   accepted: boolean;
 }
 
-export type UserDocument= HydratedDocument<AdminInvite>;
-export const UserSchema = SchemaFactory.createForClass(AdminInvite);
+export type AdminInviteDocument= HydratedDocument<AdminInvite>;
+export const AdminInviteSchema = SchemaFactory.createForClass(AdminInvite);
