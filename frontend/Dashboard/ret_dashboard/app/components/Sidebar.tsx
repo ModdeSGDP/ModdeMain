@@ -31,16 +31,6 @@ export default function Sidebar() {
       icon: "/sidebar-icons/orders.svg",
     },
     {
-      name: "Enquiry",
-      url: "/Enquiry",
-      icon: "/sidebar-icons/enquiry.svg",
-    },
-    {
-      name: "Marketing",
-      url: "/Marketing",
-      icon: "/sidebar-icons/marketing.svg",
-    },
-    {
       name: "Settings",
       url: "/Settings",
       icon: "/sidebar-icons/settings.svg",
@@ -53,7 +43,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-64 h-full min-h-screen bg-gray-800 text-white flex flex-col fixed top-0 left-0 shadow-md">
+    <div className="w-64 h-screen bg-gray-800 text-white flex flex-col fixed top-0 left-0 shadow-md">
       <div className="border-b border-gray-700 flex justify-center">
         <Link href="/">
           <Image
