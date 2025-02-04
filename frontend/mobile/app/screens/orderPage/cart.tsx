@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useCartStore } from "../shopPage/cartState"
@@ -76,12 +76,7 @@ const Cart = () => {
         </Pressable>
       </View>
     </Pressable>
-);
-  
-  //const totalPrice = items.reduce((sum, item) => {
-  //  const price = Number.parseFloat(item.price.replace("LKR ", " ").replace(",", ""))
-  //  return sum + price * item.quantity
-  //}, 0)
+  )
 
   return (
     <View style={styles.cart}>
@@ -104,6 +99,10 @@ const Cart = () => {
           <Image style={styles.empty} resizeMode="cover" source={require("../../assets/empty.png")} />
           <Text style={[styles.ooops, styles.ooopsLayout]}>Ooops!</Text>
           <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>Once you add items, your items will appear here.</Text>
+          <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
+            <Text style={styles.shopButtonText}>Shop Now</Text>
+            <Image style={styles.angleRight} resizeMode="contain" source={require("../../assets/angle-right.png")} />
+          </Pressable>
         </View>
       )}
       {items.length > 0 && (
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     fontSize: 16,
     minWidth: 20,
-    textAlign: 'center'
+    textAlign: "center",
   },
   tag: {
     width: 24,
@@ -192,7 +191,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#555",
   },
-  
   activeIndicator: {
     position: "absolute",
     left: 217,
@@ -273,8 +271,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    top:-40,
-    
+    top: -40,
     backgroundColor: "#fffff",
     marginTop: -60,
   },
@@ -300,7 +297,7 @@ const styles = StyleSheet.create({
   cartItem: {
     flexDirection: "row",
     padding: 10,
-    top:-20,
+    top: -20,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
@@ -453,6 +450,26 @@ const styles = StyleSheet.create({
   },
   onceYouAdd: {
     fontSize: 14,
+  },
+  shopButton: {
+    backgroundColor: "#f97c7c",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 10,
+    top:-150,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  shopButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  angleRight: {
+    width: 20,
+    height: 20,
+    marginLeft: 10,
   },
 })
 export default Cart
