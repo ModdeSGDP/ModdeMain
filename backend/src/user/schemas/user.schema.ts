@@ -22,7 +22,10 @@ export class User  {
   @Prop()
   address: string;
 
-  @Prop({type: Types.ObjectId, ref: 'Retailer', required:true })
+  @Prop({required: false})
+  gender: string;
+
+  @Prop({type: Types.ObjectId, ref: 'Retailer', required: false })
     retailerId: Types.ObjectId
 
   
