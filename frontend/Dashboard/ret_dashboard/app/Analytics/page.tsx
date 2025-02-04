@@ -13,11 +13,11 @@ function page() {
                <Breadcrumb>
                  <BreadcrumbList>
                    <BreadcrumbItem>
-                     <BreadcrumbLink href="/Marketing">Marketing</BreadcrumbLink>
+                     <BreadcrumbLink href="/Product">Product</BreadcrumbLink>
                    </BreadcrumbItem>
                    <BreadcrumbSeparator />
                    <BreadcrumbItem>
-                     <BreadcrumbPage>Orders</BreadcrumbPage>
+                     <BreadcrumbPage>Analytics</BreadcrumbPage>
                    </BreadcrumbItem>
                  </BreadcrumbList>
                </Breadcrumb>
