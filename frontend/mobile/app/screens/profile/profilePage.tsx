@@ -38,7 +38,6 @@ const Profile = () => {
       >
         <Text style={styles.logoutText}>Logout</Text>
       </Pressable>
-
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>

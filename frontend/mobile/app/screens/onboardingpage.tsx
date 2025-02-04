@@ -1,29 +1,19 @@
-import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { Image, StyleSheet, Text, View, Pressable } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 
 const OnboardingPage = () => {
-  const navigation = useNavigation(); // Use the navigation hook
+  const navigation = useNavigation()
   return (
     <View style={styles.onboardingPage}>
-      <Image
-        style={styles.onboardingPageChild}
-        resizeMode="cover"
-        source={require("../assets/Ellipse1.png")}
-      />
-      
-      <Text style={[styles.getStartedWith, styles.logoIconPosition]}>
-        Get Started with Modde
-      </Text>
+      <Image style={styles.onboardingPageChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
+
+      <Text style={[styles.getStartedWith, styles.logoIconPosition]}>Get Started with Modde</Text>
       <Image
         style={[styles.logoIcon, styles.logoIconPosition]}
         resizeMode="cover"
         source={require("../assets/logo5.png")}
       />
-      <Pressable
-        style={[styles.button, styles.buttonPosition]}
-        onPress={() => navigation.navigate('Intro1')} // Navigate to the Intro1 screen
-      >
+      <Pressable style={[styles.button, styles.buttonPosition]} onPress={() => navigation.navigate("Intro1")}>
         <Image
           style={[styles.buttonChild, styles.buttonLayout]}
           resizeMode="cover"
@@ -37,8 +27,8 @@ const OnboardingPage = () => {
         />
       </Pressable>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   buttonPosition: {
@@ -119,6 +109,14 @@ const styles = StyleSheet.create({
     top: 667,
     width: 327,
     height: 40,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   onboardingPage: {
     borderRadius: 0,
@@ -128,6 +126,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flex: 1,
   },
-});
+})
 
-export default OnboardingPage;
+export default OnboardingPage
+
