@@ -1,5 +1,8 @@
-import React from "react";
+"use client"; 
+
+import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
+import AddNewAccount from "./Addnewaccount";
 
 interface BankDetails {
   bankName: string;
@@ -13,16 +16,24 @@ interface PaymentDetailsProps {
   revenueChange: number;
   subscription: number;
   subscriptionChange: number;
-  bankDetails: BankDetails;
 }
+
+// Default empty values for bank details
+const defaultBankDetails: BankDetails = {
+  bankName: "✗",
+  accountHolder: "✗",
+  accountNumber: "✗",
+  branchName: "✗",
+};
 
 const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   revenue,
   revenueChange,
   subscription,
   subscriptionChange,
-  bankDetails,
 }) => {
+  const [bankDetails, setBankDetails] = useState<BankDetails>(defaultBankDetails);
+
   return (
     <div className="mt-8 flex flex-col items-center w-full">
       {/* Revenue & Subscription Section */}
@@ -81,9 +92,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
         </p>
 
         {/* Add New Account Button */}
-        <button className="bg-red-400 text-white w-full py-2 rounded-md font-medium mt-4 hover:bg-red-600">
-          + ADD NEW ACCOUNT
-        </button>
+        <AddNewAccount setBankDetails={setBankDetails} />
 
         {/* Deactivate Account Toggle */}
         <div className="flex items-center justify-between mt-4">
