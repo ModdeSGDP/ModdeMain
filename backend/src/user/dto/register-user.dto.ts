@@ -36,6 +36,7 @@ export class RegisterUserDto {
   gender?: string;
 
   @IsMongoId()
+  @IsOptional()
   retailerId: Types.ObjectId;
 
 }
