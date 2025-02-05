@@ -117,8 +117,10 @@ const Cart = () => {
             <Pressable
               style={styles.checkoutButton}
               onPress={() => {
-                navigation.navigate("CheckoutPage")
-                /* Handle checkout */
+                navigation.navigate("CheckoutPage", {
+                  selectedItems: items.filter((item) => selectedItems.has(item.id)),
+                  total: displayTotal,
+                })
               }}
             >
               <Text style={styles.checkoutText}>Checkout</Text>
@@ -457,7 +459,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     marginTop: 10,
-    top:-150,
+    top: -150,
     flexDirection: "row",
     alignItems: "center",
   },
