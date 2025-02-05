@@ -12,7 +12,7 @@ export default function Products() {
 
             <div className="space-y-4 flex justify-end">
                 <Button className="mt-2 w-50% ml-auto bg-black text-white hover:bg-gray-800" variant="outline">
-                    <Link href="AddProduct"><Plus className="mr-2 h-5 w-5" /> {/* Icon before text */}
+                    <Link href="/AddProducts"><Plus className="mr-2 h-5 w-5" /> {/* Icon before text */}
                     Add Products</Link>
                 </Button>
             </div>
