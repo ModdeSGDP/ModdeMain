@@ -1,9 +1,8 @@
-import { useNavigation } from "@react-navigation/native";
-import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
+import { useNavigation } from "@react-navigation/native"
+import { Image, StyleSheet, Text, Pressable, View } from "react-native"
 
 const AccountInfo = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   return (
     <View style={styles.accountInfo}>
@@ -23,31 +22,58 @@ const AccountInfo = () => {
           <Text style={[styles.text, styles.textTypo]}>+94- 771234567</Text>
         </View>
         <View style={[styles.memberIdParent, styles.sideFlexBox]}>
+          <Text style={[styles.memberIdParent, styles.memberIdTypo]}>Address</Text>
+          <Text style={[styles.text, styles.textTypo]}>No:123 Milepost Avenue,Colombo,Sri Lanka</Text>
+        </View>
+        <View style={[styles.memberIdParent, styles.sideFlexBox]}>
           <Text style={styles.memberIdTypo}>
             <Text style={styles.password1}>Password</Text>
           </Text>
           <Text style={[styles.changePassword, styles.textTypo]}>change password</Text>
         </View>
       </View>
-      <View style={styles.naviBar}>
-        <View style={styles.homeNavigationBar}>
-          <View style={styles.homeNavigationBarChild} />
-          <View style={styles.naviIcons}>
-            <Image style={[styles.smartHome, styles.iconLayout]} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
-            <Image style={[styles.shirt, styles.iconLayout]} resizeMode="cover" source={require("../../assets/shirt.png")} />
-            <Image style={[styles.cameraPlusIcon, styles.iconLayout]} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
-            <Image style={[styles.shoppingCart, styles.iconLayout]} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
+      <Pressable
+        style={styles.checkoutButton}
+        onPress={() => {
+          navigation.navigate("CheckoutPage", {
+            address: {
+              name: "Anne", // You might want to replace this with actual user data
+              phone: "+94- 771234567",
+              fullAddress: "No:123 Milepost Avenue, Colombo, Sri Lanka",
+            },
+          })
+        }}
+      >
+        <Text style={styles.checkoutButtonText}>Go to Checkout</Text>
+      </Pressable>
+      <View style={styles.navigationBar}>
+        <View style={styles.navBarBg} />
+        <View style={styles.navIcons}>
+          <Pressable onPress={() => {}}>
             <View style={styles.lineView} />
-            <Image style={[styles.user, styles.iconLayout]} resizeMode="cover" source={require("../../assets/user1.png")} />
-          </View>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("ShopPage")}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
+          </Pressable>
+          <Pressable onPress={() => {}}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("CartPage")}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user1.png")} />
+          </Pressable>
         </View>
+        <View style={styles.activeIndicator} />
       </View>
       <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
         <Image style={styles.icon} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
       </Pressable>
     </View>
-  );
-};
+  )
+}
 const styles = StyleSheet.create({
   lineView: {
     borderStyle: "solid",
@@ -55,12 +81,12 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     position: "absolute",
     top: -19,
-    width:23,
-    left: 250,
+    width: 23,
+    left: 256,
     right: 0,
   },
   accountInfo: {
-    borderRadius: 30,
+    borderRadius: 0,
     backgroundColor: "#fff",
     flex: 1,
     height: 812,
@@ -91,8 +117,8 @@ const styles = StyleSheet.create({
   },
   activeIndicator: {
     position: "absolute",
-    left: 6,
-    top: 35,
+    left: 282,
+    top: 56,
     width: 10,
     height: 10,
     borderRadius: 5,
@@ -103,7 +129,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Medium",
     lineHeight: 16,
     fontSize: 13,
-    top:28,
+    top: 28,
     fontWeight: "500",
   },
   textTypo: {
@@ -111,7 +137,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Regular",
     textAlign: "left",
     lineHeight: 16,
-    top:28,
+    top: 28,
     fontSize: 13,
   },
   memberId: {
@@ -161,8 +187,8 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     left: 6,
     top: 1,
-    width:20,
-    height:30,
+    width: 20,
+    height: 30,
   },
   shirt: {
     top: "7.69%",
@@ -193,8 +219,46 @@ const styles = StyleSheet.create({
     bottom: "7.69%",
     left: 250,
     top: 1,
-    width:20,
-    height:30,
+    width: 20,
+    height: 30,
+  },
+  navigationBar: {
+    position: 'absolute',
+    bottom: 34,
+    left: '50%',
+    marginLeft: -158,
+    width: 316,
+    height: 69,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  navBarBg: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#ffe2e6',
+    borderRadius: 20,
+  },
+  navIcons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingTop: 22,
+  },
+  navIcon: {
+    width: 23,
+    height: 24,
   },
   naviIcons: {
     height: "37.68%",
@@ -234,6 +298,21 @@ const styles = StyleSheet.create({
     width: 37,
     position: "absolute",
   },
-});
+  checkoutButton: {
+    backgroundColor: "#FBA3A3",
+    borderRadius: 10,
+    padding: 15,
+    top:400,
+    alignItems: "center",
+    marginTop: 20,
+    marginHorizontal: 24,
+  },
+  checkoutButtonText: {
+    fontFamily: "Inter-Medium",
+    fontSize: 16,
+    color: "#FFFFFF",
+  },
+})
 
-export default AccountInfo;
+export default AccountInfo
+

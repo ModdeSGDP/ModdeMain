@@ -1,11 +1,59 @@
-import React, { useState } from "react"
+import { useState, useEffect } from "react"
 import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 
-const CheckoutScreen = ({ route }) => {
+type Address = {
+  name: string
+  phone: string
+  fullAddress: string
+}
+
+type CartItem = {
+  id: string
+  name: string
+  shop: string
+  price: string
+  image: any
+  quantity: number
+}
+
+const CheckoutScreen = ({
+  route,
+}: { route: { params?: { address?: Address; selectedItems?: CartItem[]; total?: number } } }) => {
   const navigation = useNavigation()
-  const { address } = route.params
+  const address = route.params?.address || {
+    name: "Default Name",
+    phone: "Default Phone",
+    fullAddress: "Default Address",
+  }
+
   const [paymentMethod, setPaymentMethod] = useState("card")
+  const [selectedItems, setSelectedItems] = useState<CartItem[]>(route.params?.selectedItems || [])
+  const [total, setTotal] = useState(route.params?.total || 0)
+
+  useEffect(() => {
+    if (route.params?.selectedItems) {
+      setSelectedItems(route.params.selectedItems)
+    }
+    if (route.params?.total) {
+      setTotal(route.params.total)
+    }
+  }, [route.params])
+
+  const renderCartItem = (item: CartItem) => (
+    <View key={item.id} style={styles.cartItem}>
+      <Image style={styles.itemImage} resizeMode="cover" source={item.image} />
+      <View style={styles.itemDetails}>
+        <View style={styles.shopContainer}>
+          <Image style={styles.shopIcon} source={require("../../assets/home.png")} />
+          <Text style={styles.shopName}>{item.shop}</Text>
+        </View>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemPrice}>LKR {item.price}</Text>
+        <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
+      </View>
+    </View>
+  )
 
   return (
     <View style={styles.container}>
@@ -29,7 +77,7 @@ const CheckoutScreen = ({ route }) => {
           <View style={styles.addressInfo}>
             <Text style={styles.addressName}>{address.name}</Text>
             <Text style={styles.addressDetails}>{address.phone}</Text>
-            <Text style={styles.addressDetails}>{`${address.street}, ${address.city}, ${address.country}`}</Text>
+            <Text style={styles.addressDetails}>{address.fullAddress}</Text>
           </View>
         </View>
 
@@ -58,6 +106,8 @@ const CheckoutScreen = ({ route }) => {
           </View>
         </View>
 
+        
+
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Promotions</Text>
@@ -70,7 +120,6 @@ const CheckoutScreen = ({ route }) => {
             </Pressable>
           </View>
         </View>
-
         <View style={styles.totalSection}>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Delivery</Text>
@@ -78,10 +127,9 @@ const CheckoutScreen = ({ route }) => {
           </View>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>LKR 4,370</Text>
+            <Text style={styles.totalValue}>LKR {total.toFixed(2)}</Text>
           </View>
         </View>
-
         <Pressable
           style={styles.payNowButton}
           onPress={() => {
@@ -107,7 +155,7 @@ const CheckoutScreen = ({ route }) => {
           <Pressable onPress={() => navigation.navigate("CartPage")}>
             <Image style={styles.navIcon} source={require("../../assets/shopping_cart.png")} />
           </Pressable>
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
             <Image style={styles.navIcon} source={require("../../assets/user.png")} />
           </Pressable>
         </View>
@@ -132,6 +180,8 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontFamily: "Inter-SemiBold",
     fontSize: 24,
+    left:120,
+    top:-50,
     color: "#321919",
     marginBottom: 20,
   },
@@ -238,10 +288,21 @@ const styles = StyleSheet.create({
   },
   navigationBar: {
     position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    bottom: 34,
+    left: "50%",
+    marginLeft: -158,
+    width: 316,
     height: 69,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   navBarBg: {
     position: "absolute",
@@ -249,20 +310,65 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "#FFE2E6",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: "#ffe2e6",
+    borderRadius: 20,
   },
   navIcons: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingHorizontal: 18,
+    paddingTop: 22,
   },
   navIcon: {
-    width: 24,
+    width: 23,
     height: 24,
+  },
+  cartItem: {
+    flexDirection: "row",
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  itemImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  itemDetails: {
+    flex: 1,
+  },
+  shopContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  shopIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 6,
+  },
+  shopName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#555",
+  },
+  itemName: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#321919",
+    marginBottom: 4,
+  },
+  itemPrice: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#000",
+    marginBottom: 4,
+  },
+  itemQuantity: {
+    fontSize: 14,
+    color: "#555",
   },
 })
 
