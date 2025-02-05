@@ -8,7 +8,7 @@ import { PaginationDto } from './dtos/pagination.dto';
 export class RetailerController {
   constructor(private readonly retailerService: RetailerService) {}
 
-  @Post()
+  @Post('register')
   create(@Body() createRetailerDto: CreateRetailerDto) {
     return this.retailerService.create(createRetailerDto);
   }
@@ -30,5 +30,10 @@ export class RetailerController {
   ) {
     return this.retailerService.update(id, updateRetailerDto);
   }
+
+  @Get('test')
+  test(): string {
+    return 'Hello World!';
+}
   
 }
