@@ -12,7 +12,7 @@ function page() {
                          <Breadcrumb>
                            <BreadcrumbList>
                              <BreadcrumbItem>
-                               <BreadcrumbLink href="/Logout">Logout</BreadcrumbLink>
+                               <BreadcrumbLink href="/Dashboard">Dahboard</BreadcrumbLink>
                              </BreadcrumbItem>
                              <BreadcrumbSeparator />
                              <BreadcrumbItem>

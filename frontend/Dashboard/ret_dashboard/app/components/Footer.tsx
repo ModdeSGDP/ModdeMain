@@ -12,22 +12,18 @@ export default function Footer() {
 
       {/* Footer Navigation */}
       <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-8 text-gray-700 text-sm">
-        <Link href="/about">
+        <Link href="/Aboutus">
           <span className="hover:text-[#f56d6d] transition duration-300">
             About Us
           </span>
         </Link>
-        <Link href="/privacy">
+        <Link href="/PrivacyPolicy">
           <span className="hover:text-[#f56d6d] transition duration-300">
             Privacy Policy
           </span>
         </Link>
-        <Link href="/terms">
-          <span className="hover:text-[#f56d6d] transition duration-300">
-            Terms of Service
-          </span>
-        </Link>
-        <Link href="/contact">
+        
+        <Link href="/Contact">
           <span className="hover:text-[#f56d6d] transition duration-300">
             Contact
           </span>
