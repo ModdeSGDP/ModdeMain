@@ -1,6 +1,11 @@
-import { Metadata } from "next";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import ProductUploadForm from "../components/ProductUploadForm";
+import type { Metadata } from "next";
+import "./globals.css";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
+import { Sidebar } from "lucide-react";
+import ProductCard from "../Product/page";
+
+
+
 
 export const metadata: Metadata = {
   title: "Add New Product",

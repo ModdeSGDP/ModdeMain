@@ -28,7 +28,7 @@ function Page() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/Enquiry">Enquiry</BreadcrumbLink>
+            <BreadcrumbLink href="/Settings">Settings</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

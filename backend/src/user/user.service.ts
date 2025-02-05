@@ -20,7 +20,7 @@ export class UserService {
   ) {}
 
   async createUser(registerUserDto: RegisterUserDto): Promise<User> {
-    const { username, password } = registerUserDto;
+    const { username, password, firstName, lastName, role, address, gender, retailerId } = registerUserDto;
 
     // Check if the username already exists
     const existingUser = await this.userModel.findOne({ username });
@@ -34,7 +34,13 @@ export class UserService {
     // Create and save the new user
     const newUser = new this.userModel({ 
       username, 
-      password: hashedPassword 
+      password: hashedPassword,
+      firstName,
+      lastName,
+      role,
+      address,
+      gender,
+      retailerId 
     });
     return newUser.save();
   }
