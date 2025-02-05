@@ -32,7 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen flex">
         {/* Sidebar */}
-        <Sidebar />
+         <Sidebar /> 
       
          
         {/* Main Content */}
