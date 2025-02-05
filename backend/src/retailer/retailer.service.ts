@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Retailer } from './schemas/retailer.schema';
@@ -13,6 +13,11 @@ export class RetailerService {
   ) {}
 
   async create(createRetailerDto: CreateRetailerDto): Promise<Retailer> {
+    const { email } = createRetailerDto;
+    const existingRetailer = await this.retailerModel.findOne({ email }).exec();
+    if(existingRetailer){
+      throw new ConflictException(`Retailer with email ${email} already exists`);
+    }
     const newRetailer = new this.retailerModel(createRetailerDto);
     return newRetailer.save();
   }
