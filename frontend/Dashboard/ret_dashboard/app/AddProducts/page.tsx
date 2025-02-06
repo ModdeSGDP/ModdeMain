@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
-
 import ProductUploadForm from "../components/ProductUploadForm";
-
 
 
 
