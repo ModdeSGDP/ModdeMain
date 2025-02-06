@@ -62,6 +62,9 @@ const CheckoutScreen = ({
           <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
         </Pressable>
         <Text style={styles.pageTitle}>Checkout</Text>
+        <Pressable onPress={() => navigation.goBack()}>
+          <Image style={styles.bell} source={require("../../assets/bell.png")} />
+        </Pressable>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -169,6 +172,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
+  bell: {
+    left: 340,
+    width: 21,
+    height: 23,
+    top: -100
+  },
   scrollContent: {
     padding: 20,
   },
@@ -180,13 +189,14 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontFamily: "Inter-SemiBold",
     fontSize: 24,
-    left:120,
+    left:130,
     top:-50,
     color: "#321919",
     marginBottom: 20,
   },
   section: {
     marginBottom: 24,
+    top:-50,
   },
   sectionHeader: {
     flexDirection: "row",
@@ -258,6 +268,7 @@ const styles = StyleSheet.create({
   },
   totalSection: {
     marginTop: 20,
+    top:-90,
   },
   totalRow: {
     flexDirection: "row",
@@ -279,7 +290,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     alignItems: "center",
-    marginTop: 20,
+    marginTop: -50,
   },
   payNowText: {
     fontFamily: "Inter-Medium",
