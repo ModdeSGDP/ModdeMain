@@ -1,29 +1,32 @@
-import React from 'react'
+"use client";
+
+import React from "react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import ProfileForm from "@/app/components/ProfileForm";
 
-
-function page() {
+function Page() {
   return (
-     <div className="pt-0 pl-64">
-                    {/* Payment Heading */}
-                    <h1 className="font-bold text-2xl mb-2">Settings</h1>
-              
-                    {/* Breadcrumb Positioned Under Payment Heading & Right-Aligned */}
-                   
-                      <Breadcrumb>
-                        <BreadcrumbList>
-                          <BreadcrumbItem>
-                            <BreadcrumbLink href="/Logout">Logout</BreadcrumbLink>
-                          </BreadcrumbItem>
-                          <BreadcrumbSeparator />
-                          <BreadcrumbItem>
-                            <BreadcrumbPage>Settings</BreadcrumbPage>
-                          </BreadcrumbItem>
-                        </BreadcrumbList>
-                      </Breadcrumb>
-                   
-                  </div>
-  )
+    <div className="pt-0 pl-64">
+      {/* Page Heading */}
+      <h1 className="font-bold text-2xl mb-2">Settings</h1>
+
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/Dashboard">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Settings</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      {/* Profile Form Component */}
+      <ProfileForm />
+    </div>
+  );
 }
 
-export default page
+export default Page;
