@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface AddNewAccountProps {
-  setBankDetails: React.Dispatch<React.SetStateAction<{
+  setBankDetails: React.Dispatch<React.SetStateAction<{   
     bankName: string;
     accountHolder: string;
     accountNumber: string;
@@ -26,44 +26,36 @@ const AddNewAccount: React.FC<AddNewAccountProps> = ({ setBankDetails }) => {
   const [branchName, setBranchName] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Capitalize the first letter of each word
-  const capitalizeFirstLetter = (text: string) => {
-    return text.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
-  };
-
-  // Validate Bank Name, Branch Name & Account Holder Name (Only Letters & Spaces)
-  const validateTextInput = (input: string) => /^[A-Za-z\s]+$/.test(input);
-
-  // Validate Account Number (Only Numbers, 8-16 Digits)
+  // Validation functions
+  const validateText = (input: string) => /^[A-Za-z\s]+$/.test(input);
   const validateAccountNumber = (num: string) => /^[0-9]{8,16}$/.test(num);
 
-  // Handle Form Submission
   const handleSave = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!validateTextInput(bankName)) {
-      newErrors.bankName = "Bank name should contain only letters.";
+    if (!validateText(bankName) || bankName.trim() === "") {
+      newErrors.bankName = "Bank name must contain only letters and spaces.";
     }
-    if (!validateTextInput(accountHolder)) {
-      newErrors.accountHolder = "Account holder name should contain only letters.";
+
+    if (!validateText(accountHolder) || accountHolder.trim() === "") {
+      newErrors.accountHolder = "Account holder name must contain only letters and spaces.";
     }
-    if (!validateTextInput(branchName)) {
-      newErrors.branchName = "Branch name should contain only letters.";
+
+    if (!validateText(branchName) || branchName.trim() === "") {
+      newErrors.branchName = "Branch name must contain only letters and spaces.";
     }
-    if (!validateAccountNumber(accountNumber)) {
-      newErrors.accountNumber = "Account number must be 8-16 digits.";
+
+    if (!validateAccountNumber(accountNumber) || accountNumber.trim() === "") {
+      newErrors.accountNumber = "Account number must be 8-16 digits and contain only numbers.";
     }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
     } else {
       setErrors({});
-      setBankDetails({
-        bankName: capitalizeFirstLetter(bankName),
-        accountHolder: capitalizeFirstLetter(accountHolder),
-        accountNumber,
-        branchName: capitalizeFirstLetter(branchName),
-      });
+      const newBankDetails = { bankName, accountHolder, accountNumber, branchName };
+      setBankDetails(newBankDetails);
+      localStorage.setItem("bankDetails", JSON.stringify(newBankDetails));
       setIsDialogOpen(false);
     }
   };
@@ -76,66 +68,62 @@ const AddNewAccount: React.FC<AddNewAccountProps> = ({ setBankDetails }) => {
         </button>
       </DialogTrigger>
 
-      {/* Dialog Content */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Account</DialogTitle>
         </DialogHeader>
 
-        {/* Bank Form Fields */}
-        <div className="space-y-4">
-          {/* Bank Name */}
-          <div>
-            <label className="text-gray-700 font-medium">Enter Your Bank Name:</label>
-            <input
-              type="text"
-              placeholder="Bank Name"
-              value={bankName}
-              onChange={(e) => setBankName(capitalizeFirstLetter(e.target.value.replace(/[^A-Za-z\s]/g, "")))}
-              className="w-full p-3 border rounded-lg bg-gray-200 focus:ring-2 focus:ring-red-400 outline-none"
-            />
-            {errors.bankName && <p className="text-red-500 text-sm">{errors.bankName}</p>}
-          </div>
+        {/* Bank Name Input */}
+        <div>
+          <label className="text-gray-700 font-medium">Bank Name:</label>
+          <input
+            type="text"
+            placeholder="Bank Name"
+            value={bankName}
+            onChange={(e) => setBankName(e.target.value.replace(/[^A-Za-z\s]/g, ""))}
+            className="w-full p-2 border rounded mt-1"
+          />
+          {errors.bankName && <p className="text-red-500 text-sm">{errors.bankName}</p>}
+        </div>
 
-          {/* Account Holder Name */}
-          <div>
-            <label className="text-gray-700 font-medium">Enter Account Holder Name:</label>
-            <input
-              type="text"
-              placeholder="Name"
-              value={accountHolder}
-              onChange={(e) => setAccountHolder(capitalizeFirstLetter(e.target.value.replace(/[^A-Za-z\s]/g, "")))}
-              className="w-full p-3 border rounded-lg bg-gray-200 focus:ring-2 focus:ring-red-400 outline-none"
-            />
-            {errors.accountHolder && <p className="text-red-500 text-sm">{errors.accountHolder}</p>}
-          </div>
+        {/* Account Holder Name Input */}
+        <div>
+          <label className="text-gray-700 font-medium">Account Holder Name:</label>
+          <input
+            type="text"
+            placeholder="Account Holder Name"
+            value={accountHolder}
+            onChange={(e) => setAccountHolder(e.target.value.replace(/[^A-Za-z\s]/g, ""))}
+            className="w-full p-2 border rounded mt-1"
+          />
+          {errors.accountHolder && <p className="text-red-500 text-sm">{errors.accountHolder}</p>}
+        </div>
 
-          {/* Account Number */}
-          <div>
-            <label className="text-gray-700 font-medium">Enter Account Number:</label>
-            <input
-              type="text"
-              placeholder="Account Number"
-              value={accountNumber}
-              onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
-              className="w-full p-3 border rounded-lg bg-gray-200 focus:ring-2 focus:ring-red-400 outline-none"
-              maxLength={16}
-            />
-            {errors.accountNumber && <p className="text-red-500 text-sm">{errors.accountNumber}</p>}
-          </div>
+        {/* Account Number Input */}
+        <div>
+          <label className="text-gray-700 font-medium">Account Number:</label>
+          <input
+            type="text"
+            placeholder="Account Number"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 16))}
+            className="w-full p-2 border rounded mt-1"
+            maxLength={16}
+          />
+          {errors.accountNumber && <p className="text-red-500 text-sm">{errors.accountNumber}</p>}
+        </div>
 
-          {/* Branch Name */}
-          <div>
-            <label className="text-gray-700 font-medium">Enter Branch Name:</label>
-            <input
-              type="text"
-              placeholder="Branch Name"
-              value={branchName}
-              onChange={(e) => setBranchName(capitalizeFirstLetter(e.target.value.replace(/[^A-Za-z\s]/g, "")))}
-              className="w-full p-3 border rounded-lg bg-gray-200 focus:ring-2 focus:ring-red-400 outline-none"
-            />
-            {errors.branchName && <p className="text-red-500 text-sm">{errors.branchName}</p>}
-          </div>
+        {/* Branch Name Input */}
+        <div>
+          <label className="text-gray-700 font-medium">Branch Name:</label>
+          <input
+            type="text"
+            placeholder="Branch Name"
+            value={branchName}
+            onChange={(e) => setBranchName(e.target.value.replace(/[^A-Za-z\s]/g, ""))}
+            className="w-full p-2 border rounded mt-1"
+          />
+          {errors.branchName && <p className="text-red-500 text-sm">{errors.branchName}</p>}
         </div>
 
         {/* Buttons */}
@@ -159,3 +147,4 @@ const AddNewAccount: React.FC<AddNewAccountProps> = ({ setBankDetails }) => {
 };
 
 export default AddNewAccount;
+ 
