@@ -1,6 +1,6 @@
-"use client"; 
+"use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import AddNewAccount from "./Addnewaccount";
 
@@ -33,6 +33,33 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   subscriptionChange,
 }) => {
   const [bankDetails, setBankDetails] = useState<BankDetails>(defaultBankDetails);
+  const [isDeactivated, setIsDeactivated] = useState(false);
+
+  // Load bank details from localStorage or sessionStorage
+  useEffect(() => {
+    const savedDetails = localStorage.getItem("bankDetails") || sessionStorage.getItem("bankDetails");
+    if (savedDetails) {
+      setBankDetails(JSON.parse(savedDetails));
+    }
+  }, []);
+
+  // Save bank details to localStorage & sessionStorage whenever they change
+  useEffect(() => {
+    if (bankDetails.bankName !== "✗") {
+      localStorage.setItem("bankDetails", JSON.stringify(bankDetails));
+      sessionStorage.setItem("bankDetails", JSON.stringify(bankDetails)); // Fallback for some browsers
+    }
+  }, [bankDetails]);
+
+  // Handle account deactivation (delete stored bank details)
+  const handleDeactivate = () => {
+    setIsDeactivated(!isDeactivated);
+    if (!isDeactivated) {
+      setBankDetails(defaultBankDetails);
+      localStorage.removeItem("bankDetails");
+      sessionStorage.removeItem("bankDetails");
+    }
+  };
 
   return (
     <div className="mt-8 flex flex-col items-center w-full">
@@ -97,7 +124,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
         {/* Deactivate Account Toggle */}
         <div className="flex items-center justify-between mt-4">
           <span className="text-gray-500">Deactivate Account</span>
-          <Switch />
+          <Switch checked={isDeactivated} onCheckedChange={handleDeactivate} />
         </div>
       </div>
     </div>

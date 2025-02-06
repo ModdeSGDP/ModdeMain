@@ -1,10 +1,8 @@
 "use client";
 import Image from 'next/image';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { MoreVertical, Trash2, Pencil } from 'lucide-react';
+
+import { MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 
 interface ProductCardProps {
