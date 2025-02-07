@@ -1,7 +1,7 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import { Injectable } from '@nestjs/common';
-import { EmailService } from '../email/email.service';
+import { EmailService } from '../common/email/email.service';
 
 @Injectable()
 @Processor('emailQueue')
