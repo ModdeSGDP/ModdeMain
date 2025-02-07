@@ -20,12 +20,12 @@ export class UserService {
   ) {}
 
   async createUser(registerUserDto: RegisterUserDto): Promise<User> {
-    const { username, password, firstName, lastName, role, address, gender, retailerId } = registerUserDto;
+    const { email, password, firstName, lastName, role, address, gender, retailerId } = registerUserDto;
 
     // Check if the username already exists
-    const existingUser = await this.userModel.findOne({ username });
+    const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
-      throw new ConflictException('Username already exists');
+      throw new ConflictException('User by this email already exists');
     }
 
     // Hash the password
@@ -33,7 +33,7 @@ export class UserService {
 
     // Create and save the new user
     const newUser = new this.userModel({ 
-      username, 
+      email, 
       password: hashedPassword,
       firstName,
       lastName,
@@ -45,8 +45,8 @@ export class UserService {
     return newUser.save();
   }
 
-  async findUserByUsername(username: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ username });
+  async findUserByUsername(email: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ email });
   }
 
   async verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
