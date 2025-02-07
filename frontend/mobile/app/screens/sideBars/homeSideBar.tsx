@@ -8,28 +8,14 @@ const SideMenu = () => {
     <View style={styles.sideMenu}>
       <Image style={styles.sideMenuChild} resizeMode="cover" source={require("../../assets/Ellipse1.png")} />
       <Image style={styles.logoIcon} resizeMode="cover" source={require("../../assets/logo.png")} />
+
+      <Image style={styles.logoIcon} resizeMode="cover" source={require("../../assets/logo.png")} />
       <Pressable style={styles.top} onPress={() => navigation.navigate("SideMenu")}>
         <View style={styles.statusbar}>
           <View style={[styles.leftSide, styles.sideFlexBox]}>
-            <View style={styles.statusbarTime}>
-              <Text style={styles.time}>9:41</Text>
-            </View>
           </View>
           <View style={[styles.dynamicIsland, styles.sideFlexBox]} />
           <View style={[styles.rightSide, styles.sideFlexBox]}>
-            {/* <View style={styles.signalWifiBattery}>
-              <Image
-                style={styles.iconMobileSignal}
-                resizeMode="cover"
-                source={require("../assets/icon--mobile-signal.png")}
-              />
-              <Image style={styles.wifiIcon} resizeMode="cover" source={require("../../assets/wifi.png")} />
-              <Image
-                style={styles.statusbarBatteryIcon}
-                resizeMode="cover"
-                source={require("../assets/-statusbarbattery.png")}
-              />
-            </View> */}
           </View>
         </View>
       </Pressable>
@@ -43,12 +29,12 @@ const SideMenu = () => {
           resizeMode="cover"
           source={require("../../assets/Ellipse2.png")}
         />
+        <Text style={[styles.myOrders, styles.helpLayout1]}>My Orders</Text>
         <Image
           style={[styles.truckIcon, styles.fireLayout]}
           resizeMode="cover"
           source={require("../../assets/truck.png")}
         />
-        <Text style={[styles.myOrders, styles.helpLayout1]}>My Orders</Text>
         <Image
           style={[styles.heartIcon, styles.helpLayout]}
           resizeMode="cover"
@@ -61,7 +47,7 @@ const SideMenu = () => {
         <Image style={styles.shoppingBagIcon} resizeMode="cover" source={require("../../assets/shopping-bag.png")} />
         <Text style={[styles.history, styles.historyTypo]}>History</Text>
         <Image style={[styles.fire, styles.fireLayout]} resizeMode="cover" source={require("../../assets/fire.png")} />
-        <Pressable style={styles.promotions} onPress={() => {}}>
+        <Pressable style={styles.promotions} onPress={() => navigation.navigate("PromotionPage")}>
           <Text style={[styles.promotions1, styles.helpClr]}>Promotions</Text>
         </Pressable>
         <Image
@@ -72,9 +58,7 @@ const SideMenu = () => {
         <Pressable style={styles.camera} onPress={() => {}}>
           <Text style={[styles.camera1, styles.helpClr]}>Camera</Text>
         </Pressable>
-        <Text style={[styles.settings, styles.historyTypo]}>Settings</Text>
         <Text style={[styles.help, styles.helpClr]}>Help</Text>
-        <Image style={[styles.cogIcon, styles.iconLayout]} resizeMode="cover" source={require("../../assets/cog.png")} />
         <Image
           style={[styles.questionCircleIcon, styles.iconLayout]}
           resizeMode="cover"
@@ -136,11 +120,27 @@ const styles = StyleSheet.create({
     position: "absolute",
     overflow: "hidden",
   },
+  sideMenu: {
+    borderRadius: 0,
+    backgroundColor: "#fff",
+    height: 812,
+    overflow: "hidden",
+    width: "100%",
+    flex: 1,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   sideMenuChild: {
-    top: -106,
-    left: -139,
-    width: 449,
-    height: 353,
+    top: -100,
+    left: -100,
+    width: 509,
+    height: 500,
     position: "absolute",
   },
   logoIcon: {
@@ -150,24 +150,6 @@ const styles = StyleSheet.create({
     top: 53,
     position: "absolute",
   },
-  time: {
-    top: 1,
-    fontSize: 17,
-    letterSpacing: 0,
-    fontWeight: "600",
-    fontFamily: "SF Pro Text",
-    color: "#000",
-    height: 20,
-    textAlign: "center",
-    left: 0,
-    width: 54,
-    position: "absolute",
-  },
-  statusbarTime: {
-    borderRadius: 24,
-    height: 21,
-    width: 54,
-  },
   leftSide: {
     justifyContent: "center",
     flex: 1,
@@ -175,22 +157,6 @@ const styles = StyleSheet.create({
   },
   dynamicIsland: {
     width: 125,
-  },
-  iconMobileSignal: {
-    width: 18,
-    height: 12,
-  },
-  wifiIcon: {
-    width: 17,
-    height: 12,
-  },
-  statusbarBatteryIcon: {
-    width: 27,
-    height: 13,
-  },
-  signalWifiBattery: {
-    gap: 8,
-    flexDirection: "row",
   },
   rightSide: {
     justifyContent: "center",
@@ -239,24 +205,25 @@ const styles = StyleSheet.create({
     top: 203,
     left: 0,
   },
-  truckIcon: {
-    top: 0,
-  },
   myOrders: {
     top: 6,
     color: "#954a4a",
-    width: 50,
+    width: 80,
     fontFamily: "Inter-Regular",
-    left: 98,
+    left: 85,
     fontSize: 10,
     position: "absolute",
     textAlign: "center",
   },
+  truckIcon: {
+    top: 0,
+    left: 98,
+  },
   heartIcon: {
     left: 62,
     top: 53,
-    height:20,
-    width:20,
+    height: 20,
+    width: 20,
     overflow: "hidden",
   },
   favorites1: {
@@ -306,7 +273,7 @@ const styles = StyleSheet.create({
     top: 210,
   },
   camera1: {
-    width: 37,
+    width: 50,
     fontFamily: "Inter-Regular",
     lineHeight: 12,
     fontSize: 10,
@@ -317,33 +284,22 @@ const styles = StyleSheet.create({
     left: 100,
     position: "absolute",
   },
-  settings: {
-    top: 268,
-    left: 96,
-    width: 41,
-  },
   help: {
-    left: 101,
-    height:20,
-    width:21,
+    left: 110,
+    top: 270,
+    height: 20,
+    width: 22,
     position: "absolute",
     fontFamily: "Inter-Regular",
-    lineHeight: 12,
+    lineHeight: 10,
     fontSize: 10,
-
-    top: 319,
-  },
-  cogIcon: {
-    top: "45.27%",
-    bottom: "50.75%",
-    width:20,
-    height:20,
   },
   questionCircleIcon: {
-    top: "54.09%",
+    top: 265,
     bottom: "41.77%",
-    width:20,
-    height:20,
+    left: 120,
+    width: 20,
+    height: 20,
   },
   navigationBarDeatis: {
     left: -32,
@@ -358,14 +314,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily: "Rosario-Bold",
     position: "absolute",
-  },
-  sideMenu: {
-    borderRadius: 30,
-    backgroundColor: "#fff",
-    height: 812,
-    overflow: "hidden",
-    width: "100%",
-    flex: 1,
   },
 })
 
