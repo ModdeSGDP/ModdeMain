@@ -30,7 +30,7 @@ const HomePage = () => {
     <View style={styles.homePage}>
       <View style={[styles.headerParent, styles.headerPosition]}>
         <Text style={[styles.exploreModdeFashion, styles.exploreTypo]}>Explore Modde Fashion Studio</Text>
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={() => {navigation.navigate("HomeSideBar")}}>
           <Image style={styles.menuIcon} resizeMode="cover" source={require("../assets/bars-from-left.png")} />
         </Pressable>
         <Pressable onPress={() => {}}>
@@ -89,7 +89,6 @@ const HomePage = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   homePage: {
     flex: 1,

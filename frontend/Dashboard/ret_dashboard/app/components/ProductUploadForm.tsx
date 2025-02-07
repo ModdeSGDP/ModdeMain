@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
 import Image from 'next/image';
+import ProductGallery from "./ProductGallery";
 
 const ProductUploadForm = () => {
   const [productName, setProductName] = useState("");
@@ -84,65 +85,92 @@ const ProductUploadForm = () => {
             />
           </div>
 
-          {/* Category Dropdown */}
-          <div className="flex flex-col gap-2">
-            <Label>Category</Label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center justify-between w-full">
-                  {category}
-                  <Image src="/images/chevron_down.svg" alt="Dropdown Icon" width={16} height={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => setCategory("All")}>All</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setCategory("Female")}>Female</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setCategory("Male")}>Male</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          {/* Category and Size Dropdowns in One Line */}
+          <div className="flex gap-4">
+            {/* Category Dropdown */}
+            <div className="flex-1">
+              <Label>Category</Label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center justify-between w-full">
+                    {category}
+                    <Image src="/images/chevron_down.svg" alt="Dropdown Icon" width={16} height={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setCategory("All")}>All</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setCategory("Female")}>Female</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setCategory("Male")}>Male</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Size Dropdown */}
+            <div className="flex-1">
+              <Label>Select Size</Label>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center justify-between w-full">
+                    {size}
+                    <Image src="/images/chevron_down.svg" alt="Dropdown Icon" width={16} height={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setSize("All")}>All</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setSize("Small")}>Small</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setSize("Medium")}>Medium</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setSize("Extra Large")}>Extra Large</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
-          {/* Size Dropdown */}
-          <div className="flex flex-col gap-2">
-            <Label>Select Size</Label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center justify-between w-full">
-                  {size}
-                  <Image src="/images/chevron_down.svg" alt="Dropdown Icon" width={16} height={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onSelect={() => setSize("All")}>All</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSize("Small")}>Small</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSize("Medium")}>Medium</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSize("Extra Large")}>Extra Large</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
 
           {/* Color Picker */}
-          <div>
-            <Label>Select Color</Label>
-            <Input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="w-20 h-10"
-            />
+          <div className="flex items-center gap-4">
+            {/* Color Picker Input */}
+            <div className="flex-1">
+              <Label>Select Color</Label>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1"
+                  onClick={() => document.getElementById("colorPicker")?.click()}
+                >
+                  <Image src="/images/pencil.svg" alt="Color Picker Icon" width={20} height={20} />
+                </button>
+                <Input
+                  type="text"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-full pl-10 border rounded-md"
+                  placeholder="#FFFFFF"
+                />
+                <Input
+                  id="colorPicker"
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="absolute inset-0 w-0 h-0 opacity-0"
+                />
+              </div>
+            </div>
+
+            {/* Stock Quantity */}
+            <div className="flex-1">
+              <Label htmlFor="stockQuantity">Stock Quantity</Label>
+              <Input
+                id="stockQuantity"
+                type="number"
+                value={stockQuantity}
+                onChange={(e) => setStockQuantity(parseInt(e.target.value))}
+                required
+              />
+            </div>
           </div>
 
-          {/* Stock Quantity */}
-          <div>
-            <Label htmlFor="stockQuantity">Stock Quantity</Label>
-            <Input
-              id="stockQuantity"
-              type="number"
-              value={stockQuantity}
-              onChange={(e) => setStockQuantity(parseInt(e.target.value))}
-              required
-            />
-          </div>
+
+
 
           {/* Prices */}
           <div className="flex gap-4">
@@ -177,43 +205,16 @@ const ProductUploadForm = () => {
               Cancel
             </Button>
           </div>
-          </form> 
+        </form>
       </Card>
 
       {/* Right Side: Image Upload Section */}
       <Card className="flex-1 p-6">
-        <h2 className="text-xl font-bold mb-6">Product Gallery</h2>
-        <div className="space-y-4">
-          {/* Image Upload Input */}
-          <Input
-            type="file"
-            accept="image/jpeg, image/jpg, image/png"
-            multiple
-            onChange={handleImageUpload}
-          />
+        <ProductGallery />
 
-          {/* Image Preview */}
-          <div className="grid grid-cols-3 gap-4">
-            {images.map((image, index) => (
-              <div key={index} className="relative">
-                {typeof image === 'string' && (
-                  <img src={image} alt={`Uploaded ${index}`} className="w-full h-24 object-cover rounded" />
-                )}
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-1 right-1"
-                  onClick={() => handleRemoveImage(index)}
-                >
-                  Remove
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
       </Card>
     </div>
-    
+
   );
 };
 

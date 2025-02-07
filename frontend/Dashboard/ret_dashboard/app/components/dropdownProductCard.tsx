@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { MoreVertical, Trash2, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"; // Removed AlertDialogTrigger
+import { MoreVertical } from "lucide-react";
 
 interface ProductMenuProps {
   onDelete: () => void;

@@ -1,27 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { MailerService as NestMailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '../common/configs/config.service';
 
 @Injectable()
 export class MailerService {
-  private transporter;
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly mailerService: NestMailerService,
+  ) {}
 
-  constructor(private readonly configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: this.configService.get('EMAIL_USER'), 
-        pass: this.configService.get('EMAIL_PASS'),
-      },
-    });
-  }
-
-  async sendMail(to: string, subject: string, text: string) {
-    await this.transporter.sendMail({
-      from: this.configService.get('EMAIL_USER'),
-      to,
-      subject,
-      text,
-    });
+  async sendMail(to: string, subject: string, text: string): Promise<void> {
+    try {
+      await this.mailerService.sendMail({
+        to,
+        subject,
+        text,
+        // If needed, can also include HTML content:\n  // html: '<b>Your HTML content here</b>',\n });
+      });
+      console.log(`Email sent to ${to}`);
+    } catch (error) {
+      console.error('Error sending email:', error.message);
+      throw new Error('Failed to send email');
+    }
   }
 }
