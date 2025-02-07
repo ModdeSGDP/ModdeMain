@@ -1,0 +1,196 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+// Validation Schema
+const signUpSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters").max(50),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").max(50),
+  jobTitle: z.string().min(2, "Job title must be at least 2 characters").max(50),
+  email: z.string().email("Invalid email address"),
+  mobileNumber: z.string().regex(/^\d{10,15}$/, "Mobile number must be between 10-15 digits"),
+  companyName: z.string().min(2, "Company name is required").max(50),
+  companyWebsite: z.string().optional(), // Optional field
+  sriLankaBased: z.string().optional(), // Optional field
+  annualRevenue: z.string().optional(), // Optional field
+  privacyPolicy: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the Privacy Policy.",
+  }),
+});
+
+const SignUpPage = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.getItem("authenticated") === "true") {
+      router.push("/Dashboard");
+    }
+  }, []);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      jobTitle: "",
+      email: "",
+      mobileNumber: "",
+      companyName: "",
+      companyWebsite: "",
+      sriLankaBased: "",
+      annualRevenue: "",
+      privacyPolicy: false,
+    },
+  });
+
+  const onSubmit = (data: any) => {
+    console.log("User Signed Up:", data);
+    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem("authenticated", "true");
+    router.push("/Dashboard");
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* Header Section */}
+      <div className="w-full flex justify-between px-6 py-0">
+        <img src="/images/modde-logo.svg" alt="Modde Logo" className="w-40" />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-col md:flex-row items-center justify-center px-10">
+        {/* Left Section */}
+        <div className="md:w-1/2 text-left">
+          <h1 className="text-4xl font-bold">Get started with Modde!</h1>
+          <p className="text-gray-600 text-lg mt-2">Sign up to sell on Modde</p>
+          <p className="text-gray-500 mt-4">
+            We are looking for Sri Lankan brands and sellers who share our passion for delivering
+            quality products and exceptional customer experiences. If that sounds like you, we’d love
+            for you to apply!
+          </p>
+          <Button className="mt-6 bg-black text-white px-6 py-3 rounded-md">Learn More</Button>
+        </div>
+
+        {/* Right Section - Images Aligned */}
+        <div className="md:w-1/2 flex justify-center items-center relative">
+          <div className="absolute -top-8 right-6 shadow-lg">
+            <img src="/images/model1.svg" alt="Model 1" className="w-64 h-auto" />
+          </div>
+          <div className="absolute top-10 right-20 shadow-lg">
+            <img src="/images/model2.svg" alt="Model 2" className="w-48 h-auto" />
+          </div>
+        </div>
+      </div>
+
+      {/* Form Section */}
+      <div className="flex justify-center mt-12">
+        <div className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-4xl">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
+            {/* First Name */}
+            <div>
+              <label className="text-gray-700 font-medium">First Name *</label>
+              <Input {...register("firstName")} placeholder="Enter your first name here" />
+              {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
+            </div>
+
+            {/* Last Name */}
+            <div>
+              <label className="text-gray-700 font-medium">Last Name *</label>
+              <Input {...register("lastName")} placeholder="Enter your last name here" />
+              {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
+            </div>
+
+            {/* Job Title */}
+            <div>
+              <label className="text-gray-700 font-medium">Job Title *</label>
+              <Input {...register("jobTitle")} placeholder="Enter your position in your company" />
+              {errors.jobTitle && <p className="text-red-500 text-sm">{errors.jobTitle.message}</p>}
+            </div>
+
+            {/* Email Address */}
+            <div>
+              <label className="text-gray-700 font-medium">Email Address *</label>
+              <Input {...register("email")} type="email" placeholder="Enter your e-mail address" />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+            </div>
+
+            {/* Mobile Number */}
+            <div>
+              <label className="text-gray-700 font-medium">Mobile Number *</label>
+              <Input {...register("mobileNumber")} placeholder="Enter your mobile number" />
+              {errors.mobileNumber && <p className="text-red-500 text-sm">{errors.mobileNumber.message}</p>}
+            </div>
+
+            {/* Company Name */}
+            <div>
+              <label className="text-gray-700 font-medium">Company Name *</label>
+              <Input {...register("companyName")} placeholder="Enter your company name" />
+              {errors.companyName && <p className="text-red-500 text-sm">{errors.companyName.message}</p>}
+            </div>
+
+            {/* Optional Fields */}
+            <div className="col-span-2">
+              <label className="text-gray-700 font-medium">
+                Do you operate and fulfill your products from Sri Lanka?
+              </label>
+              <Input {...register("sriLankaBased")} placeholder="Answer here (optional)" />
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-gray-700 font-medium">
+                What is your company's annual revenue in Sri Lanka?
+              </label>
+              <Input {...register("annualRevenue")} placeholder="Enter revenue amount (optional)" />
+            </div>
+
+            {/* Privacy Policy */}
+            <div className="col-span-2 flex items-center">
+              <input type="checkbox" {...register("privacyPolicy")} className="mr-2" />
+              <span>
+                I have read and agree to{" "}
+                <Link href="#" className="text-blue-600 hover:underline">Modde’s Seller Privacy Notice</Link>.
+              </span>
+              {errors.privacyPolicy && <p className="text-red-500 text-sm">{errors.privacyPolicy.message}</p>}
+            </div>
+
+            {/* Submit Button */}
+            <div className="col-span-2 flex flex-col items-center">
+              <Button type="submit" className="bg-black hover:bg-gray-800">Submit</Button>
+
+              {/* Already have an account? */}
+              <p className="mt-4 text-gray-700">
+                Do you already have an account?{" "}
+                <Link href="/auth/login" className="text-blue-600 hover:underline">Login</Link>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <footer className="w-full bg-gray-900 text-white text-sm py-4 mt-10">
+        <div className="container mx-auto flex justify-between items-center px-6">
+          <span>© 2024 - Modde SellerHub Dashboard</span>
+          <div className="flex space-x-6">
+            <Link href="/about" className="hover:underline">About</Link>
+            <Link href="/policy" className="hover:underline">Policy</Link>
+            <Link href="/contact" className="hover:underline">Contact</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default SignUpPage;
