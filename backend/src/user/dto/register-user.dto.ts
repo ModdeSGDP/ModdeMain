@@ -7,7 +7,7 @@ export class RegisterUserDto {
   @Transform(({ value }) => value.trim())
   @IsString()
   @IsNotEmpty()
-  username: string;
+  email: string;
 
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })

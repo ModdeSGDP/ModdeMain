@@ -6,10 +6,6 @@ export class CreateProductDto {
   @IsNotEmpty()
   name: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  price: number;
-
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -18,8 +14,25 @@ export class CreateProductDto {
   @IsNotEmpty()
   category: string;
 
+  @IsString()
+  @IsNotEmpty()
+  size: string;
+
+  @IsString()
+  @IsNotEmpty()
+  color: string;
+
   @IsNumber()
-  stock: number;
+  @IsNotEmpty()
+  quantity: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  regularPrice: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  salePrice: number;
 
   @IsOptional()
   @IsString()
