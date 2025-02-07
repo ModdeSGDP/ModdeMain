@@ -20,6 +20,7 @@ import CheckoutScreen from './screens/orderPage/checkout';
 import Profile from './screens/profile/profilePage';
 import AccountInfo from './screens/profile/accountInfo';
 import SideMenu from './screens/sideBars/homeSideBar';
+import PromotionsPage from './screens/promotions/promotion';
 
 
 const Stack = createNativeStackNavigator();
@@ -44,6 +45,7 @@ export default function MyStack() {
       <Stack.Screen name="ProfilePage"component={Profile}/>
       <Stack.Screen name="AccountInfoPage"component={AccountInfo}/>
       <Stack.Screen name="HomeSideBar"component={SideMenu}/>
+      <Stack.Screen name="PromotionPage"component={PromotionsPage}/>
 
 
       
