@@ -11,44 +11,15 @@ const NotificationsPage = () => {
                 {`xplore the 2024's hottest fashion,`}
             </Text>
             
-            {/* Top Status Bar */}
-            <View style={styles.top}>
-                <View style={[styles.statusbar, styles.statusbarFlexBox]}>
-                    <View style={[styles.leftSide, styles.sideFlexBox]}>
-                        <View style={styles.statusbarTime}>
-                            <Text style={[styles.time, styles.timeClr]}>9:41</Text>
-                        </View>
-                    </View>
-                    <View style={[styles.dynamicIsland, styles.sideFlexBox]} />
-                    <View style={[styles.rightSide, styles.sideFlexBox]}>
-                        <View style={styles.signalWifiBattery}>
-                            <Image 
-                                style={styles.icon} 
-                                resizeMode="cover" 
-                                source={require("../assets/icon--mobile-signal.png")} 
-                            />
-                            <Image 
-                                style={styles.icon} 
-                                resizeMode="cover" 
-                                source={require("../assets/wifi.png")} 
-                            />
-                            <Image 
-                                style={styles.icon} 
-                                resizeMode="cover" 
-                                source={require("../assets/-statusbarbattery.png")} 
-                            />
-                        </View>
-                    </View>
-                </View>
-            </View>
+            
 
             {/* Messages Header */}
             <View style={styles.groupParent}>
-                <Image 
-                    style={styles.frameChild} 
-                    resizeMode="cover" 
-                    source={require("../assets/group-14.png")} 
-                />
+            <Pressable onPress={() => navigation.goBack()}>
+      <Image style={styles.frameChild} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
+    </Pressable>
+
+            
                 <Text style={styles.messages}>Messages</Text>
             </View>
 
@@ -58,7 +29,7 @@ const NotificationsPage = () => {
                     <Image 
                         style={styles.orderIcon} 
                         resizeMode="cover" 
-                        source={require("../assets/-order-icon.png")} 
+                        source={require("../../assets/order-icon.png")} 
                     />
                     <View style={styles.orders1}>
                         <Text style={[styles.orders2, styles.orders2Typo]}>Orders</Text>
@@ -72,7 +43,7 @@ const NotificationsPage = () => {
                     <Image 
                         style={styles.icon} 
                         resizeMode="cover" 
-                        source={require("../assets/-promotion-icon.png")} 
+                        source={require("../../assets/promotion-icon.png")} 
                     />
                     <View style={styles.promotions}>
                         <Text style={[styles.discountsSalesAnnouncement, styles.orderTypo]}>
@@ -94,7 +65,31 @@ const NotificationsPage = () => {
                         <Image 
                             style={styles.frameItem} 
                             resizeMode="cover" 
-                            source={require("../assets/Ellipse-18.png")} 
+                            source={require("../../assets/Ellipse30.png")} 
+                        />
+                        <Text style={[styles.offerAbove10000, styles.offerTypo]}>
+                            20% offer above 10000 and free shipping
+                        </Text>
+                    </View>
+                </View>
+                <View style={styles.promo2}>
+                    <View style={[styles.ellipseParent, styles.statusbarFlexBox]}>
+                        <Image 
+                            style={styles.frameItem} 
+                            resizeMode="cover" 
+                            source={require("../../assets/Ellipse30.png")} 
+                        />
+                        <Text style={[styles.offerAbove10000, styles.offerTypo]}>
+                            20% offer above 10000 and free shipping
+                        </Text>
+                    </View>
+                </View>
+                <View style={styles.promo2}>
+                    <View style={[styles.ellipseParent, styles.statusbarFlexBox]}>
+                        <Image 
+                            style={styles.frameItem} 
+                            resizeMode="cover" 
+                            source={require("../../assets/Ellipse30.png")} 
                         />
                         <Text style={[styles.offerAbove10000, styles.offerTypo]}>
                             20% offer above 10000 and free shipping
@@ -115,39 +110,40 @@ const NotificationsPage = () => {
                 <View style={[styles.homeNavigationBar, styles.barLayout]}>
                     <View style={styles.homeNavigationBarChild} />
                     <View style={styles.naviIcons}>
-                        <Pressable style={styles.smartHome}>
+                        <Pressable onPress={() => navigation.navigate("HomePage")}style={styles.smartHome}>
                             <Image 
-                                style={styles.icon} 
+                                style={styles.icon1} 
                                 resizeMode="cover" 
-                                source={require("../assets/smarthome.png")} 
+                                source={require("../../assets/smart_home1.png")} 
                             />
                         </Pressable>
-                        <Pressable style={[styles.shirt, styles.userPosition]}>
+                        <Pressable onPress={() => navigation.navigate("ShopPage")}style={[styles.shirt, styles.userPosition]}>
                             <Image 
-                                style={styles.icon} 
+                                style={styles.icon1} 
                                 resizeMode="cover" 
-                                source={require("../assets/shirt.png")} 
+                                source={require("../../assets/shirt.png")} 
                             />
                         </Pressable>
-                        <Pressable style={[styles.cameraPlus, styles.userPosition]}>
+                        <Pressable onPress={() => navigation.navigate("")} 
+                        style={[styles.cameraPlus, styles.userPosition]}>
                             <Image 
-                                style={styles.icon} 
+                                style={styles.icon1} 
                                 resizeMode="cover" 
-                                source={require("../assets/camera-plus.png")} 
+                                source={require("../../assets/cameraplus.png")} 
                             />
                         </Pressable>
-                        <Pressable style={[styles.shoppingCart, styles.userPosition]}>
+                        <Pressable onPress={() => navigation.navigate("CartPage")} style={[styles.shoppingCart, styles.userPosition]}>
                             <Image 
-                                style={styles.icon} 
+                                style={styles.icon1} 
                                 resizeMode="cover" 
-                                source={require("../assets/shopping-cart.png")} 
+                                source={require("../../assets/shopping_cart.png")} 
                             />
                         </Pressable>
-                        <Pressable style={[styles.user, styles.userPosition]}>
+                        <Pressable onPress={() => navigation.navigate("ProfilePage")} style={[styles.user, styles.userPosition]}>
                             <Image 
-                                style={styles.icon} 
+                                style={styles.icon1} 
                                 resizeMode="cover" 
-                                source={require("../assets/user.png")} 
+                                source={require("../../assets/user.png")} 
                             />
                         </Pressable>
                     </View>
@@ -180,9 +176,9 @@ const styles = StyleSheet.create({
         },
         orderTypo: {
         fontFamily: "Poppins-Regular",
-        top: 25,
+        top: 35,
         color: "#898989",
-        lineHeight: 12,
+        lineHeight: 10,
         fontSize: 10,
         left: 0,
         textAlign: "left",
@@ -260,74 +256,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         position: "absolute"
         },
-        time: {
-        fontSize: 17,
-        letterSpacing: 0,
-        fontFamily: "SF Pro Text",
-        height: 20,
-        textAlign: "center",
-        fontWeight: "600",
-        color: "#000",
-        width: 54,
-        left: 0,
-        top: 1
+        frameChild: {
+            width:30,
+            height:30,
+            top:-20,
+            left:10
         },
-        statusbarTime: {
-        borderRadius: 24,
-        height: 21,
-        width: 54
-        },
-        leftSide: {
-        alignItems: "center",
-        justifyContent: "center",
-        flex: 1,
-        alignSelf: "stretch"
-        },
-        dynamicIsland: {
-        width: 125,
-        alignItems: "center"
-        },
-        iconMobileSignal: {},
-        wifiIcon: {},
-        statusbarBatteryIcon: {},
-        signalWifiBattery: {
-        gap: 8,
-        flexDirection: "row"
-        },
-        rightSide: {
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "row",
-        flex: 1,
-        alignSelf: "stretch"
-        },
-        statusbar: {
-        height: 59,
-        justifyContent: "center",
-        width: 375
-        },
-        top: {
-        width: 375,
-        left: 0,
-        top: 1,
-        position: "absolute"
-        },
-        homeIndicator1: {
-        marginLeft: -66.5,
-        bottom: 8,
-        borderRadius: 100,
-        backgroundColor: "#000",
-        width: 134,
-        height: 5
-        },
-        homeIndicator: {
-        top: 778,
-        height: 34,
-        width: 375,
-        left: 0,
-        position: "absolute"
-        },
-        frameChild: {},
         messages: {
         lineHeight: 23,
         fontFamily: "Inter-SemiBold",
@@ -335,7 +269,9 @@ const styles = StyleSheet.create({
         color: "#321919",
         fontSize: 18,
         fontWeight: "600",
-        textAlign: "left"
+        textAlign: "left",
+        top:-20,
+        left:20,
         },
         groupParent: {
         top: 60,
@@ -346,7 +282,10 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         position: "absolute"
         },
-        orderIcon: {},
+        orderIcon: {
+            width:50,
+            height:50,
+        },
         orders2: {
         letterSpacing: -0.7,
         top: 0,
@@ -405,7 +344,7 @@ const styles = StyleSheet.create({
         },
         ellipseParent: {
         gap: 12,
-        top: 0,
+        top: 20,
         left: 0,
         position: "absolute"
         },
@@ -494,20 +433,33 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         backgroundColor: "#ffe2e6",
         left: "0%",
-        bottom: "0%",
+        bottom: 34,
         top: "0%",
         right: "0%",
         height: "100%",
         position: "absolute",
-        width: "100%"
+        width: "100%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
         },
         icon: {
-        maxWidth: "100%",
-        maxHeight: "100%",
-        height: "100%",
+        height: 50,
         overflow: "hidden",
-        width: "100%"
+        width: 50,
         },
+        icon1: {
+            maxWidth: "100%",
+            maxHeight: "100%",
+            height: "100%",
+            overflow: "hidden",
+            width: "100%"
+            },
         smartHome: {
         right: "91.79%",
         bottom: "7.69%",
@@ -550,7 +502,7 @@ const styles = StyleSheet.create({
         top: 694
         },
         notificationsPage: {
-        borderRadius: 30,
+        borderRadius: 0,
         backgroundColor: "#fff",
         height: 812,
         overflow: "hidden",
@@ -558,6 +510,5 @@ const styles = StyleSheet.create({
         flex: 1
         }
         });
-    // ... rest of the styles remain the same as in your original code
 
 export default NotificationsPage;
