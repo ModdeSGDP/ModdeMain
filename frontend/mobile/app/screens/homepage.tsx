@@ -33,7 +33,7 @@ const HomePage = () => {
         <Pressable onPress={() => {navigation.navigate("HomeSideBar")}}>
           <Image style={styles.menuIcon} resizeMode="cover" source={require("../assets/bars-from-left.png")} />
         </Pressable>
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={() => navigation.navigate("NotificationPage")}>
           <Image style={styles.bell} source={require("../assets/bell.png")} />
         </Pressable>
       </View>
