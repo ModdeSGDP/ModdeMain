@@ -1,3 +1,4 @@
+"Use clinet";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "../components/Productcard";
@@ -10,12 +11,17 @@ export default function Products() {
 
         <div className="pt-0 pl-64">
 
-            <div className="space-y-4 flex justify-end">
-                <Button className="mt-2 w-50% ml-auto bg-black text-white hover:bg-gray-800" variant="outline">
-                    <Link href="/AddProducts"><Plus className="mr-2 h-5 w-5" /> {/* Icon before text */}
-                    Add Products</Link>
-                </Button>
+            <div className="pt-0 pl-64">
+                <div className="flex justify-end">
+                    <Link href="/AddProducts">
+                        <Button className="bg-black text-white hover:bg-gray-800 px-4 py-2 flex items-center space-x-2">
+                            <Plus className="h-5 w-5" />
+                            <span>Add Products</span>
+                        </Button>
+                    </Link>
+                </div>
             </div>
+
 
             <h1 className="text-xl font-bold mb-0">Products</h1>
             <div className="flex">
@@ -33,8 +39,8 @@ export default function Products() {
                         </BreadcrumbList>
                     </Breadcrumb>
 
-                         {/* Horizontal Line */}
-        <hr className="my-4 border-gray-300" />
+                    {/* Horizontal Line */}
+                    <hr className="my-4 border-gray-300" />
 
                     <div className="grid grid-cols-4 gap-4">
                         <div>
@@ -110,32 +116,32 @@ export default function Products() {
                     </div>
 
                 </div>
-              
+
 
             </div>
-            
+
             <div className="mt-6 w-full flex">
-                      <div className="w-fit">
-                        <Pagination>
-                          <PaginationContent>
+                <div className="w-fit">
+                    <Pagination>
+                        <PaginationContent>
                             <PaginationItem>
-                              <PaginationPrevious href="#" />
+                                <PaginationPrevious href="#" />
                             </PaginationItem>
                             <PaginationItem>
-                              <PaginationLink href="#">1</PaginationLink>
+                                <PaginationLink href="#">1</PaginationLink>
                             </PaginationItem>
                             <PaginationItem>
-                              <PaginationEllipsis />
+                                <PaginationEllipsis />
                             </PaginationItem>
                             <PaginationItem>
-                              <PaginationNext href="#" />
+                                <PaginationNext href="#" />
                             </PaginationItem>
-                          </PaginationContent>
-                        </Pagination>
-                      </div>
-                    </div>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
+            </div>
 
         </div>
-        
+
     );
 }
