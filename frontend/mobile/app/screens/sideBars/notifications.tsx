@@ -4,22 +4,15 @@ import { useNavigation } from "@react-navigation/native";
 
 const NotificationsPage = () => {
     const navigation = useNavigation();
+    const [hasMessages, setHasMessages] = React.useState(false); // State to check if there are messages
 
     return (
         <View style={styles.notificationsPage}>
-            <Text style={styles.xploreThe2024s}>
-                {`xplore the 2024's hottest fashion,`}
-            </Text>
-            
-            
-
             {/* Messages Header */}
             <View style={styles.groupParent}>
-            <Pressable onPress={() => navigation.goBack()}>
-      <Image style={styles.frameChild} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
-    </Pressable>
-
-            
+                <Pressable onPress={() => navigation.goBack()}>
+                    <Image style={styles.frameChild} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
+                </Pressable>
                 <Text style={styles.messages}>Messages</Text>
             </View>
 
@@ -56,68 +49,54 @@ const NotificationsPage = () => {
                 </Pressable>
             </View>
 
-            {/* Past Messages Section */}
-            <Text style={[styles.pastMessages, styles.offerTypo]}>Past messages</Text>
-            <View style={styles.promo2Parent}>
-                {/* Promo Message Items */}
-                <View style={styles.promo2}>
-                    <View style={[styles.ellipseParent, styles.statusbarFlexBox]}>
-                        <Image 
-                            style={styles.frameItem} 
-                            resizeMode="cover" 
-                            source={require("../../assets/Ellipse30.png")} 
-                        />
-                        <Text style={[styles.offerAbove10000, styles.offerTypo]}>
-                            20% offer above 10000 and free shipping
-                        </Text>
+            {/* Past Messages Section or Illustration */}
+            {hasMessages ? (
+                <>
+                    <Text style={[styles.pastMessages]}>Past messages</Text>
+                    <View style={styles.promo2Parent}>
+                        {/* Promo Message Items */}
+                        <View style={styles.promo2}>
+                            <View style={[styles.ellipseParent, styles.statusbarFlexBox]}>
+                                <Image 
+                                    style={styles.frameItem} 
+                                    resizeMode="cover" 
+                                    source={require("../../assets/Ellipse30.png")} 
+                                />
+                                <Text style={[styles.offerAbove10000, styles.offerTypo]}>
+                                    20% offer above 10000 and free shipping
+                                </Text>
+                            </View>
+                        </View>
+                        {/* Add more promo items here if needed */}
                     </View>
+                    <Text style={[styles.noMoreMessages, styles.ordersParentPosition]}>
+                        No More Messages
+                    </Text>
+                </>
+            ) : (
+                <View style={styles.illustrationContainer}>
+                    <Image
+                        style={styles.illustration}
+                        resizeMode="contain"
+                        source={require("../../assets/illustration.png")}
+                    />
+                    <Text style={styles.noMessagesText}>No messages yet</Text>
                 </View>
-                <View style={styles.promo2}>
-                    <View style={[styles.ellipseParent, styles.statusbarFlexBox]}>
-                        <Image 
-                            style={styles.frameItem} 
-                            resizeMode="cover" 
-                            source={require("../../assets/Ellipse30.png")} 
-                        />
-                        <Text style={[styles.offerAbove10000, styles.offerTypo]}>
-                            20% offer above 10000 and free shipping
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.promo2}>
-                    <View style={[styles.ellipseParent, styles.statusbarFlexBox]}>
-                        <Image 
-                            style={styles.frameItem} 
-                            resizeMode="cover" 
-                            source={require("../../assets/Ellipse30.png")} 
-                        />
-                        <Text style={[styles.offerAbove10000, styles.offerTypo]}>
-                            20% offer above 10000 and free shipping
-                        </Text>
-                    </View>
-                </View>
-
-                {/* More Promo Items */}
-                {/* ... Similar structure for other promo items ... */}
-            </View>
-
-            <Text style={[styles.noMoreMessages, styles.ordersParentPosition]}>
-                No More Messages
-            </Text>
+            )}
 
             {/* Navigation Bar */}
             <View style={[styles.naviBar, styles.barLayout]}>
                 <View style={[styles.homeNavigationBar, styles.barLayout]}>
                     <View style={styles.homeNavigationBarChild} />
                     <View style={styles.naviIcons}>
-                        <Pressable onPress={() => navigation.navigate("HomePage")}style={styles.smartHome}>
+                        <Pressable onPress={() => navigation.navigate("HomePage")} style={styles.smartHome}>
                             <Image 
                                 style={styles.icon1} 
                                 resizeMode="cover" 
                                 source={require("../../assets/smart_home1.png")} 
                             />
                         </Pressable>
-                        <Pressable onPress={() => navigation.navigate("ShopPage")}style={[styles.shirt, styles.userPosition]}>
+                        <Pressable onPress={() => navigation.navigate("ShopPage")} style={[styles.shirt, styles.userPosition]}>
                             <Image 
                                 style={styles.icon1} 
                                 resizeMode="cover" 
@@ -153,7 +132,24 @@ const NotificationsPage = () => {
     );
 };
 
+
 const styles = StyleSheet.create({
+    illustrationContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 100,
+    },
+    illustration: {
+        width: 200,
+        height: 200,
+    },
+    noMessagesText: {
+        marginTop: 20,
+        fontSize: 18,
+        color: '#898989',
+        fontFamily: 'Inter-Medium',
+    },
     statusbarFlexBox: {
         alignItems: "flex-end",
         flexDirection: "row"
@@ -196,6 +192,7 @@ const styles = StyleSheet.create({
         fontFamily: "Inter-Regular",
         lineHeight: 12,
         fontSize: 10,
+        top:-5,
         textAlign: "left"
         },
         promo3Layout: {
@@ -308,7 +305,8 @@ const styles = StyleSheet.create({
         orders: {
         gap: 15,
         alignItems: "center",
-        flexDirection: "row"
+        flexDirection: "row",
+        top:-20,
         },
         discountsSalesAnnouncement: {
         color: "#898989"
@@ -330,7 +328,7 @@ const styles = StyleSheet.create({
         gap: 18
         },
         pastMessages: {
-        top: 276,
+        top: 270,
         left: 52,
         color: "#000",
         position: "absolute"
@@ -357,9 +355,9 @@ const styles = StyleSheet.create({
         left: 0
         },
         offerAbove100001: {
-        top: 17,
         color: "#898989",
         left: 0,
+        top:10,
         position: "absolute"
         },
         kellyFelderParent: {
@@ -439,14 +437,14 @@ const styles = StyleSheet.create({
         height: "100%",
         position: "absolute",
         width: "100%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+        shadowColor: "#000",
+        shadowOffset: {
+        width: 0,
+        height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
         },
         icon: {
         height: 50,
@@ -454,12 +452,12 @@ const styles = StyleSheet.create({
         width: 50,
         },
         icon1: {
-            maxWidth: "100%",
-            maxHeight: "100%",
-            height: "100%",
-            overflow: "hidden",
-            width: "100%"
-            },
+        maxWidth: "100%",
+        maxHeight: "100%",
+        height: "100%",
+        overflow: "hidden",
+        width: "100%"
+        },
         smartHome: {
         right: "91.79%",
         bottom: "7.69%",

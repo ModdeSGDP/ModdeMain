@@ -12,11 +12,9 @@ const SideMenu = () => {
       <Image style={styles.logoIcon} resizeMode="cover" source={require("../../assets/logo.png")} />
       <Pressable style={styles.top} onPress={() => navigation.navigate("SideMenu")}>
         <View style={styles.statusbar}>
-          <View style={[styles.leftSide, styles.sideFlexBox]}>
-          </View>
+          <View style={[styles.leftSide, styles.sideFlexBox]}></View>
           <View style={[styles.dynamicIsland, styles.sideFlexBox]} />
-          <View style={[styles.rightSide, styles.sideFlexBox]}>
-          </View>
+          <View style={[styles.rightSide, styles.sideFlexBox]}></View>
         </View>
       </Pressable>
       <Pressable style={styles.wrapper} onPress={() => {}}>
@@ -29,41 +27,57 @@ const SideMenu = () => {
           resizeMode="cover"
           source={require("../../assets/Ellipse2.png")}
         />
-        <Text style={[styles.myOrders, styles.helpLayout1]}>My Orders</Text>
-        <Image
-          style={[styles.truckIcon, styles.fireLayout]}
-          resizeMode="cover"
-          source={require("../../assets/truck.png")}
-        />
-        <Image
-          style={[styles.heartIcon, styles.helpLayout]}
-          resizeMode="cover"
-          source={require("../../assets/heart.png")}
-        />
-        <Text style={[styles.favorites, styles.helpClr]}>
-          <Text style={styles.favorites1}>Favorites</Text>
-          <Text style={styles.text}>{` `}</Text>
-        </Text>
-        <Image style={styles.shoppingBagIcon} resizeMode="cover" source={require("../../assets/shopping-bag.png")} />
-        <Text style={[styles.history, styles.historyTypo]}>History</Text>
-        <Image style={[styles.fire, styles.fireLayout]} resizeMode="cover" source={require("../../assets/fire.png")} />
-        <Pressable style={styles.promotions} onPress={() => navigation.navigate("PromotionPage")}>
-          <Text style={[styles.promotions1, styles.helpClr]}>Promotions</Text>
-        </Pressable>
-        <Image
-          style={[styles.cameraPhoto, styles.fireLayout]}
-          resizeMode="cover"
-          source={require("../../assets/camera-photo.png")}
-        />
-        <Pressable style={styles.camera} onPress={() => {}}>
-          <Text style={[styles.camera1, styles.helpClr]}>Camera</Text>
-        </Pressable>
-        <Text style={[styles.help, styles.helpClr]}>Help</Text>
-        <Image
-          style={[styles.questionCircleIcon, styles.iconLayout]}
-          resizeMode="cover"
-          source={require("../../assets/question-circle.png")}
-        />
+        <View style={styles.navigationItem}>
+          <Text style={[styles.myOrders, styles.helpLayout1]}>My Orders</Text>
+          <Image
+            style={[styles.truckIcon, styles.fireLayout]}
+            resizeMode="cover"
+            source={require("../../assets/truck.png")}
+          />
+        </View>
+        <View style={styles.navigationItem}>
+          <Image
+            style={[styles.heartIcon, styles.helpLayout]}
+            resizeMode="cover"
+            source={require("../../assets/heart.png")}
+          />
+          <Text style={[styles.favorites, styles.helpClr]}>
+            <Text style={styles.favorites1}>Favorites</Text>
+            <Text style={styles.text}>{` `}</Text>
+          </Text>
+        </View>
+        <View style={styles.navigationItem}>
+          <Image style={styles.shoppingBagIcon} resizeMode="cover" source={require("../../assets/shopping-bag.png")} />
+          <Text style={[styles.history, styles.historyTypo]}>History</Text>
+        </View>
+        <View style={styles.navigationItem}>
+          <Image
+            style={[styles.fire, styles.fireLayout]}
+            resizeMode="cover"
+            source={require("../../assets/fire.png")}
+          />
+          <Pressable style={styles.promotions} onPress={() => navigation.navigate("PromotionPage")}>
+            <Text style={[styles.promotions1, styles.helpClr]}>Promotions</Text>
+          </Pressable>
+        </View>
+        <View style={styles.navigationItem}>
+          <Image
+            style={[styles.cameraPhoto, styles.fireLayout]}
+            resizeMode="cover"
+            source={require("../../assets/camera-photo.png")}
+          />
+          <Pressable style={styles.camera} onPress={() => {}}>
+            <Text style={[styles.camera1, styles.helpClr]}>Camera</Text>
+          </Pressable>
+        </View>
+        <View style={styles.navigationItem}>
+          <Text style={[styles.help, styles.helpClr]}>Help</Text>
+          <Image
+            style={[styles.questionCircleIcon, styles.iconLayout]}
+            resizeMode="cover"
+            source={require("../../assets/question-circle.png")}
+          />
+        </View>
       </View>
       <Text style={[styles.anneFernando, styles.helpClr]}>{`Anne Fernando `}</Text>
     </View>
@@ -314,6 +328,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily: "Rosario-Bold",
     position: "absolute",
+  },
+  navigationItem: {
+    marginBottom: 20,
   },
 })
 

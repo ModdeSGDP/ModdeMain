@@ -15,7 +15,6 @@ export const filterProducts = (
     const sizeMatch = selectedSizes.length === 0 || product.sizes.some((size) => selectedSizes.includes(size))
     const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(product.material)
     const priceMatch = product.price >= priceRange.low && product.price <= priceRange.high
-
     return categoryMatch && sizeMatch && materialMatch && priceMatch
   })
 }
