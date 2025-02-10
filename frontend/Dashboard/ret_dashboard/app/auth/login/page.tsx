@@ -35,26 +35,39 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-6">
-      <div className="max-w-3xl w-full bg-white shadow-md rounded-lg p-8 flex flex-col items-center">
-        {/* Logo */}
-        <img src="/images/modde-logo.svg" alt="Modde Logo" className="w-24 mb-4" />
+    <div className="flex min-h-screen items-center justify-center  p-6 relative">
+      {/* Logo Positioned at Top Left */}
+      <div className="absolute top-0 left-6">
+        <img src="/images/modde-logo.svg" alt="Modde Logo" className="w-40" />
+      </div>
 
-        <h2 className="text-3xl font-bold text-center">Welcome back!</h2>
-        <p className="text-gray-600 text-center mb-6">Enter your credentials to access your account</p>
+      <div className="max-w-3xl w-full  rounded-lg p-8 flex flex-col items-center border border-gray-300 ">
+        <h1 className="text-4xl font-bold text-center">Welcome back!</h1>
+        <h2 className="text-gray-600 text-center mb-6">Enter your credentials to access your account</h2>
 
         {/* Form */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-4">
-          <Input label="Email Address" {...form.register("email")} />
-          <Input label="Password" type="password" {...form.register("password")} />
-          
+          {/* Email Input Field with Label */}
+          <div>
+            <label className="text-gray-700 font-medium">Email address</label>
+            <Input {...form.register("email")} placeholder="Enter your email" />
+          </div>
+
+          {/* Password Input Field with Label and Forgot Password */}
+          <div className="relative">
+            <label className="text-gray-700 font-medium">Password</label>
+            <Input {...form.register("password")} type="password" placeholder="Enter your password" />
+            <a href="#" className="absolute right-2 top-0 text-blue-600 text-sm hover:underline">
+              Forgot password?
+            </a>
+          </div>
+
           {/* Remember me & Forgot Password */}
           <div className="flex justify-between items-center text-sm">
             <label className="flex items-center space-x-2">
               <input type="checkbox" className="h-4 w-4" />
               <span>Remember me for 30 days</span>
             </label>
-            <a href="#" className="text-blue-600 hover:underline">Forgot password?</a>
           </div>
 
           {/* Submit Button */}
@@ -67,6 +80,16 @@ const Login = () => {
             Don’t have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign Up</a>
           </p>
         </form>
+      </div>
+
+      {/* Right Section - Images Aligned Correctly with Small Gap */}
+       <div className="md:w-1/2 flex justify-center items-start relative">
+        <div className="absolute -top-48 right-5">
+          <img src="/images/model1.svg" alt="Model 1" className="w-64 h-auto rounded-lg" />
+        </div>
+        <div className="absolute -top-48 left-20">
+          <img src="/images/model2.svg" alt="Model 2" className="w-52 h-auto rounded-lg" />
+        </div>
       </div>
     </div>
   );
