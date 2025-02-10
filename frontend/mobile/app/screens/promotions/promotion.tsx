@@ -53,7 +53,8 @@ const PromotionsPage = () => {
             <Image source={require("../../assets/Illustration2.png")} style={styles.noPromotionsImage} />
 
             <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
-              <Text style={styles.shopButtonText}>Go to Shop</Text>
+            <Text style={styles.shopButtonText}>Go to Shop</Text>
+            <Image style={styles.left} resizeMode="cover" source={require("../../assets/chevron-left.png")} />
             </Pressable>
           </View>
         )}
@@ -78,7 +79,7 @@ const PromotionsPage = () => {
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("CartPage")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping-cart.png")} />
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ProfilePage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
@@ -94,6 +95,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFF",
   },
+  left:{
+    width: 24,
+    height: 24,
+    left:90,
+    top:-13,
+
+  }
+  ,
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -159,7 +168,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     resizeMode: "contain",
-    marginBottom: 20,
+    marginBottom: 30,
   },
   noPromotionsText: {
     fontSize: 18,
@@ -169,14 +178,17 @@ const styles = StyleSheet.create({
   },
   shopButton: {
     backgroundColor: "#fba3a3",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 40,  // Reduced width
+    paddingVertical: 8,     // Reduced height
+    marginBottom: 100,       // Slightly reduced bottom margin
+    borderRadius: 8,        // Slightly smaller border radius
   },
+
   shopButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
+    top:10,
   },
   /* Custom Navigation Bar */
   navigationBar: {

@@ -5,7 +5,6 @@ import { useNavigation } from "@react-navigation/native";
 const NotificationsPage = () => {
     const navigation = useNavigation();
     const [hasMessages, setHasMessages] = React.useState(false); // State to check if there are messages
-
     return (
         <View style={styles.notificationsPage}>
             {/* Messages Header */}
@@ -15,7 +14,6 @@ const NotificationsPage = () => {
                 </Pressable>
                 <Text style={styles.messages}>Messages</Text>
             </View>
-
             {/* Orders and Promotions Section */}
             <View style={[styles.ordersParent, styles.ordersParentPosition]}>
                 <Pressable style={[styles.orders, styles.sideFlexBox]} onPress={() => {}}>
@@ -31,7 +29,6 @@ const NotificationsPage = () => {
                         </Text>
                     </View>
                 </Pressable>
-                
                 <Pressable style={[styles.orders, styles.sideFlexBox]} onPress={() => {}}>
                     <Image 
                         style={styles.icon} 
@@ -83,7 +80,6 @@ const NotificationsPage = () => {
                     <Text style={styles.noMessagesText}>No messages yet</Text>
                 </View>
             )}
-
             {/* Navigation Bar */}
             <View style={[styles.naviBar, styles.barLayout]}>
                 <View style={[styles.homeNavigationBar, styles.barLayout]}>
@@ -131,8 +127,6 @@ const NotificationsPage = () => {
         </View>
     );
 };
-
-
 const styles = StyleSheet.create({
     illustrationContainer: {
         flex: 1,

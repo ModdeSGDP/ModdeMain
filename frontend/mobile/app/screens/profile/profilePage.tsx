@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { View, Text, StyleSheet, Image, Pressable, ScrollView, TextInput } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -29,7 +28,7 @@ const Profile = () => {
       </Pressable>
       <Text style={styles.profileTitle}>Profile</Text>
 
-      <Pressable onPress={() => navigation.goBack()}>
+      <Pressable onPress={() => navigation.navigate("NotificationPage")}>
         <Image style={styles.bell} source={require("../../assets/bell.png")} />
       </Pressable>
 
@@ -118,7 +117,6 @@ const Profile = () => {
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
-            
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
           </Pressable>
           <Pressable onPress={() => {}}>
@@ -127,9 +125,9 @@ const Profile = () => {
           <Pressable onPress={() => navigation.navigate("CartPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
           </Pressable>
-          
+
           <Pressable onPress={() => navigation.navigate("ProfilePage")}>
-          <View style={styles.lineView} />
+            <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user1.png")} />
           </Pressable>
         </View>
@@ -154,8 +152,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   backButton: {
-    width: 27,
-    height: 27,
+    width: 32,
+    height: 32,
     position: "absolute",
     top: 20,
     left: 13,
@@ -165,7 +163,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#321919",
     textAlign: "center",
-    marginTop: 45,
+    marginTop: 50,
+    top:-10,
   },
   bell: {
     width: 22,
@@ -252,7 +251,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginRight: 10,
-    left: 100
+    left: 100,
   },
   deleteAccountText: {
     fontSize: 14,
@@ -321,3 +320,4 @@ const styles = StyleSheet.create({
 })
 
 export default Profile
+
