@@ -1,13 +1,15 @@
-import { Controller, Get, Query, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { RetailerService } from './retailer.service';
 import { CreateRetailerDto } from './dtos/create-retailer.dto';
 import { UpdateRetailerDto } from './dtos/update-retailer.dto';
 import { PaginationDto } from './dtos/pagination.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('retailers')
 export class RetailerController {
   constructor(private readonly retailerService: RetailerService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('register')
   create(@Body() createRetailerDto: CreateRetailerDto) {
     return this.retailerService.create(createRetailerDto);
@@ -34,6 +36,6 @@ export class RetailerController {
   @Get('test')
   test(): string {
     return 'Hello World!';
-}
+  }
   
 }
