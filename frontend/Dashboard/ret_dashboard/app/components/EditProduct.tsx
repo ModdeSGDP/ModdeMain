@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,20 +11,27 @@ interface EditProductModalProps {
   product: any;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (formData: any) => void;
+  onSave: (updatedProduct: any) => void;
 }
 
 export default function EditProductModal({ product, isOpen, onClose, onSave }: EditProductModalProps) {
   const [formData, setFormData] = useState(product);
 
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(product);
+    }
+  }, [isOpen, product]);
+
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = () => {
-    onSave(formData);
-    onClose();
+    onSave(formData); // Save the specific product
+    localStorage.setItem(`product-${formData.id}`, JSON.stringify(formData)); // Store specific product in local storage
+    onClose(); // Close modal
   };
 
   return (
@@ -32,32 +41,18 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }: E
           <DialogTitle className="text-lg font-semibold">Edit Product</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input name="name" value={formData.name} onChange={handleChange} placeholder="Product Name" />
+          <Input name="title" value={formData.title} onChange={handleChange} placeholder="Product Name" />
           <Textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" />
           <Select name="category" value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
             <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="clothing">Clothing</SelectItem>
-              <SelectItem value="electronics">Electronics</SelectItem>
+              <SelectItem value="Men">Men</SelectItem>
+              <SelectItem value="Women">Women</SelectItem>
             </SelectContent>
           </Select>
-          <Select name="size" value={formData.size} onValueChange={(value) => setFormData({ ...formData, size: value })}>
-            <SelectTrigger><SelectValue placeholder="Select Size" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="S">Small</SelectItem>
-              <SelectItem value="M">Medium</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select name="color" value={formData.color} onValueChange={(value) => setFormData({ ...formData, color: value })}>
-            <SelectTrigger><SelectValue placeholder="Select Color" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="red">Red</SelectItem>
-              <SelectItem value="blue">Blue</SelectItem>
-            </SelectContent>
-          </Select>
-          <Input name="stock" type="number" value={formData.stock} onChange={handleChange} placeholder="Stock Quantity" />
-          <Input name="regularPrice" type="number" value={formData.regularPrice} onChange={handleChange} placeholder="Regular Price" />
-          <Input name="salePrice" type="number" value={formData.salePrice} onChange={handleChange} placeholder="Sale Price" />
+          <Input name="price" type="text" value={formData.price} onChange={handleChange} placeholder="Price" />
+          <Input name="salesCount" type="number" value={formData.salesCount} onChange={handleChange} placeholder="Sales Count" />
+          <Input name="remainingCount" type="number" value={formData.remainingCount} onChange={handleChange} placeholder="Stock Quantity" />
         </div>
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="ghost" onClick={onClose} className="bg-gray-300">Cancel</Button>

@@ -24,11 +24,25 @@ const ProfileForm = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
-  // Load saved form values from localStorage (if available)
+  // Initialize the form with default values
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      jobTitle: "",
+      email: "",
+      mobileNumber: "",
+      companyName: "",
+      companyWebsite: "",
+    },
+  });
+
+  // Load saved user data from localStorage (Sign-Up Form Data)
   useEffect(() => {
-    const savedProfile = localStorage.getItem("profileData");
-    if (savedProfile) {
-      form.reset(JSON.parse(savedProfile));
+    const savedUser = localStorage.getItem("user"); // Fetch Sign-Up Data
+    if (savedUser) {
+      form.reset(JSON.parse(savedUser)); // Pre-fill form fields
     }
 
     // Load profile picture if saved
@@ -37,19 +51,6 @@ const ProfileForm = () => {
       setProfilePicture(savedProfilePic);
     }
   }, []);
-
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "John",
-      lastName: "Thilakarathne",
-      jobTitle: "Owner",
-      email: "caranage.info@gmail.com",
-      mobileNumber: "",
-      companyName: "Caranage",
-      companyWebsite: "",
-    },
-  });
 
   // Handle Profile Picture Upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,10 +65,10 @@ const ProfileForm = () => {
     }
   };
 
-  // Handle Form Submission
+  // Handle Form Submission (Update User Data)
   const onSubmit = (values: any) => {
     console.log("Updated values:", values);
-    localStorage.setItem("profileData", JSON.stringify(values)); // Save form data in localStorage
+    localStorage.setItem("user", JSON.stringify(values)); // Save updated data in localStorage
     setIsEditing(false);
   };
 
@@ -95,7 +96,6 @@ const ProfileForm = () => {
       {/* Form Fields */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4 mt-6">
-          {/* First Name */}
           <FormField control={form.control} name="firstName" render={({ field }) => (
             <FormItem>
               <FormLabel>First Name</FormLabel>
@@ -106,7 +106,6 @@ const ProfileForm = () => {
             </FormItem>
           )} />
 
-          {/* Last Name */}
           <FormField control={form.control} name="lastName" render={({ field }) => (
             <FormItem>
               <FormLabel>Last Name</FormLabel>
@@ -117,7 +116,6 @@ const ProfileForm = () => {
             </FormItem>
           )} />
 
-          {/* Job Title */}
           <FormField control={form.control} name="jobTitle" render={({ field }) => (
             <FormItem>
               <FormLabel>Job Title</FormLabel>
@@ -128,7 +126,6 @@ const ProfileForm = () => {
             </FormItem>
           )} />
 
-          {/* Email Address */}
           <FormField control={form.control} name="email" render={({ field }) => (
             <FormItem>
               <FormLabel>Email Address</FormLabel>
@@ -139,7 +136,6 @@ const ProfileForm = () => {
             </FormItem>
           )} />
 
-          {/* Mobile Number */}
           <FormField control={form.control} name="mobileNumber" render={({ field }) => (
             <FormItem>
               <FormLabel>Mobile Number</FormLabel>
@@ -150,7 +146,6 @@ const ProfileForm = () => {
             </FormItem>
           )} />
 
-          {/* Company Name */}
           <FormField control={form.control} name="companyName" render={({ field }) => (
             <FormItem>
               <FormLabel>Company Name</FormLabel>
@@ -161,7 +156,6 @@ const ProfileForm = () => {
             </FormItem>
           )} />
 
-          {/* Company Website (Optional) */}
           <FormField control={form.control} name="companyWebsite" render={({ field }) => (
             <FormItem>
               <FormLabel>Company Website (Optional)</FormLabel>
@@ -172,7 +166,6 @@ const ProfileForm = () => {
             </FormItem>
           )} />
 
-          {/* Buttons */}
           {isEditing && (
             <div className="col-span-2 flex justify-between mt-4">
               <Button type="submit" className="bg-red-500 hover:bg-red-600">Update</Button>

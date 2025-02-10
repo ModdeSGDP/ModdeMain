@@ -17,9 +17,9 @@ const signUpSchema = z.object({
   email: z.string().email("Invalid email address"),
   mobileNumber: z.string().regex(/^\d{10,15}$/, "Mobile number must be between 10-15 digits"),
   companyName: z.string().min(2, "Company name is required").max(50),
-  companyWebsite: z.string().optional(), // Optional field
-  sriLankaBased: z.string().optional(), // Optional field
-  annualRevenue: z.string().optional(), // Optional field
+  companyWebsite: z.string().optional(),
+  sriLankaBased: z.string().optional(),
+  annualRevenue: z.string().optional(),
   privacyPolicy: z.boolean().refine((val) => val === true, {
     message: "You must agree to the Privacy Policy.",
   }),
@@ -64,7 +64,7 @@ const SignUpPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header Section */}
-      <div className="w-full flex justify-between px-6 py-0">
+      <div className="w-full flex justify-between px-6 py-4">
         <img src="/images/modde-logo.svg" alt="Modde Logo" className="w-40" />
       </div>
 
@@ -82,13 +82,13 @@ const SignUpPage = () => {
           <Button className="mt-6 bg-black text-white px-6 py-3 rounded-md">Learn More</Button>
         </div>
 
-        {/* Right Section - Images Aligned */}
-        <div className="md:w-1/2 flex justify-center items-center relative">
-          <div className="absolute -top-8 right-6 shadow-lg">
-            <img src="/images/model1.svg" alt="Model 1" className="w-64 h-auto" />
+        {/* Right Section - Images Aligned (Updated) */}
+        <div className="md:w-1/2 flex justify-center items-start relative">
+          <div className="absolute -top-48 right-6">
+            <img src="/images/model1.svg" alt="Model 1" className="w-64 h-auto rounded-lg" />
           </div>
-          <div className="absolute top-10 right-20 shadow-lg">
-            <img src="/images/model2.svg" alt="Model 2" className="w-48 h-auto" />
+          <div className="absolute -top-48 left-12">
+            <img src="/images/model2.svg" alt="Model 2" className="w-52 h-auto rounded-lg" />
           </div>
         </div>
       </div>
@@ -141,26 +141,24 @@ const SignUpPage = () => {
 
             {/* Optional Fields */}
             <div className="col-span-2">
-              <label className="text-gray-700 font-medium">
-                Do you operate and fulfill your products from Sri Lanka?
-              </label>
+              <label className="text-gray-700 font-medium">Company Website</label>
+              <Input {...register("companyWebsite")} placeholder="Answer here (optional)" />
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-gray-700 font-medium">Do you operate and fulfill your products from Sri Lanka?</label>
               <Input {...register("sriLankaBased")} placeholder="Answer here (optional)" />
             </div>
 
             <div className="col-span-2">
-              <label className="text-gray-700 font-medium">
-                What is your company's annual revenue in Sri Lanka?
-              </label>
+              <label className="text-gray-700 font-medium">What is your company's annual revenue in Sri Lanka?</label>
               <Input {...register("annualRevenue")} placeholder="Enter revenue amount (optional)" />
             </div>
 
             {/* Privacy Policy */}
             <div className="col-span-2 flex items-center">
               <input type="checkbox" {...register("privacyPolicy")} className="mr-2" />
-              <span>
-                I have read and agree to{" "}
-                <Link href="#" className="text-blue-600 hover:underline">Modde’s Seller Privacy Notice</Link>.
-              </span>
+              <span>I have read and agree to Modde’s Seller Privacy Notice</span>
               {errors.privacyPolicy && <p className="text-red-500 text-sm">{errors.privacyPolicy.message}</p>}
             </div>
 
@@ -182,11 +180,6 @@ const SignUpPage = () => {
       <footer className="w-full bg-gray-900 text-white text-sm py-4 mt-10">
         <div className="container mx-auto flex justify-between items-center px-6">
           <span>© 2024 - Modde SellerHub Dashboard</span>
-          <div className="flex space-x-6">
-            <Link href="/about" className="hover:underline">About</Link>
-            <Link href="/policy" className="hover:underline">Policy</Link>
-            <Link href="/contact" className="hover:underline">Contact</Link>
-          </div>
         </div>
       </footer>
     </div>

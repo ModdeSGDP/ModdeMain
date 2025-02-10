@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useState } from "react";
 
 interface Order {
@@ -14,6 +15,7 @@ interface OrderListProps {
   orders: Order[];
 }
 
+// Define status options and colors
 const statuses = ["All", "Pending", "Confirmed", "Processing", "Picked", "Shipped", "Delivered", "Canceled"];
 const statusColors: { [key: string]: string } = {
   Pending: "bg-yellow-100 text-yellow-400",
@@ -26,13 +28,13 @@ const statusColors: { [key: string]: string } = {
 };
 
 const OrderList: React.FC<OrderListProps> = ({ orders }) => {
-  const [selectedStatus, setSelectedStatus] = useState<string>("All"); // Default "All"
+  const [selectedStatus, setSelectedStatus] = useState<string>("All");
   const [orderData, setOrderData] = useState<Order[]>(orders);
 
-  // Filter orders based on selected status; show all if "All" is selected
+  // Filter orders based on selected status
   const filteredOrders = selectedStatus === "All" ? orderData : orderData.filter(order => order.status === selectedStatus);
 
-  // Handle status change
+  // Handle order status update
   const handleStatusChange = (id: number, newStatus: string) => {
     const updatedOrders = orderData.map(order =>
       order.id === id ? { ...order, status: newStatus } : order
@@ -42,7 +44,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mt-4">
-      {/* Status Tabs */}
+      {/* Status Filter Tabs */}
       <div className="flex space-x-4 border-b pb-2 text-gray-500">
         {statuses.map(status => (
           <button
@@ -72,12 +74,17 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
           <tbody>
             {filteredOrders.map(order => (
               <tr key={order.id} className="border-b">
-                <td className="p-3 font-medium">#{order.id}</td>
+                {/* Link ORDER ID to specific OrderInfo Page */}
+                <td className="p-3 font-medium">
+                  <Link href={`/OrderInfo/${order.id}`} className="text-blue-600 hover:underline">
+                    #{order.id}
+                  </Link>
+                </td>
                 <td className="p-3">{order.customer}</td>
                 <td className="p-3">{order.total}</td>
                 <td className="p-3">{order.profit}</td>
 
-                {/* Show status dropdown only in "All" section */}
+                {/* Show Status Dropdown only in "All" section */}
                 {selectedStatus === "All" && (
                   <td className="p-3">
                     <select
@@ -99,7 +106,10 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
         </table>
       </div>
 
-      {filteredOrders.length === 0 && <p className="text-gray-500 text-center mt-4">No orders found for {selectedStatus}.</p>}
+      {/* No Orders Found Message */}
+      {filteredOrders.length === 0 && (
+        <p className="text-gray-500 text-center mt-4">No orders found for {selectedStatus}.</p>
+      )}
     </div>
   );
 };

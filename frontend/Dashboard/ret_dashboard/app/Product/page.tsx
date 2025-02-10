@@ -51,7 +51,7 @@ export default function Products() {
                                 price="LKR 4850"
                                 description="Lorem ipsum is placeholder text commonly used in the graphic."
                                 salesCount={1269}
-                                remainingCount={1269} />
+                                remainingCount={1269} id={""} />
                         </div>
 
                         <div>
@@ -62,7 +62,7 @@ export default function Products() {
                                 price="LKR 4850"
                                 description="Lorem ipsum is placeholder text commonly used in the graphic."
                                 salesCount={1269}
-                                remainingCount={1269} />
+                                remainingCount={1269} id={""} />
                         </div>
                         <ProductCard
                             image="/images/Productcard.svg"
@@ -71,8 +71,7 @@ export default function Products() {
                             price="LKR 4850"
                             description="Lorem ipsum is placeholder text commonly used in the graphic."
                             salesCount={1269}
-                            remainingCount={1269}
-                        />
+                            remainingCount={1269} id={""} />
                         <ProductCard
                             image="/images/Productcard.svg"
                             title="Hooded Long Sleeve - New York"
@@ -80,7 +79,7 @@ export default function Products() {
                             price="LKR 4850"
                             description="Lorem ipsum is placeholder text commonly used in the graphic."
                             salesCount={1269}
-                            remainingCount={1269} />
+                            remainingCount={1269} id={""} />
                         <ProductCard
                             image="/images/Productcard.svg"
                             title="Hooded Long Sleeve - New York"
@@ -88,7 +87,7 @@ export default function Products() {
                             price="LKR 4850"
                             description="Lorem ipsum is placeholder text commonly used in the graphic."
                             salesCount={1269}
-                            remainingCount={1269} />
+                            remainingCount={1269} id={""} />
                         <ProductCard
                             image="/images/Productcard.svg"
                             title="Hooded Long Sleeve - New York"
@@ -96,7 +95,7 @@ export default function Products() {
                             price="LKR 4850"
                             description="Lorem ipsum is placeholder text commonly used in the graphic."
                             salesCount={1269}
-                            remainingCount={1269} />
+                            remainingCount={1269} id={""} />
                         <ProductCard
                             image="/images/Productcard.svg"
                             title="Hooded Long Sleeve - New York"
@@ -104,7 +103,7 @@ export default function Products() {
                             price="LKR 4850"
                             description="Lorem ipsum is placeholder text commonly used in the graphic."
                             salesCount={1269}
-                            remainingCount={1269} />
+                            remainingCount={1269} id={""} />
                         <ProductCard
                             image="/images/Productcard.svg"
                             title="Hooded Long Sleeve - New York"
@@ -112,7 +111,7 @@ export default function Products() {
                             price="LKR 4850"
                             description="Lorem ipsum is placeholder text commonly used in the graphic."
                             salesCount={1269}
-                            remainingCount={1269} />
+                            remainingCount={1269} id={""} />
                     </div>
 
                 </div>
