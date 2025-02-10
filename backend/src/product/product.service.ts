@@ -68,8 +68,9 @@ export class ProductService {
     return savedProduct;
   }
 
-  async getProductsByRetailer(retailerId: string): Promise<Product[]> {
-    return this.productModel.find({ retailerId }).exec();
+  async getProductsByRetailer(retailerId: string, page: number, limit: number): Promise<Product[]> {
+    const skip = (page - 1) * limit;
+    return this.productModel.find({ retailerId }).skip(skip).limit(limit).exec();
   }
 
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {

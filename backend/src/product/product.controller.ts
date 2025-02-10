@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Query, Body, UploadedFile, UseInterceptors, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
@@ -6,6 +6,7 @@ import { UpdateProductDto } from './dtos/update-product.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('product')
 export class ProductController {
@@ -31,8 +32,13 @@ export class ProductController {
   }
 
   @Get('retailer/:retailerId')
-  async getProducts(@Param('retailerId') retailerId: string) {
-    return this.productService.getProductsByRetailer(retailerId);
+  @UseGuards(JwtAuthGuard)
+  async getProductsByRetailer(
+    @Param('retailerId') retailerId: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.productService.getProductsByRetailer(retailerId, Number(page), Number(limit));
   }
 
   @Patch(':id')
