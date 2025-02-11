@@ -19,8 +19,11 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('product')
+@UseGuards(JwtAuthGuard)
+@Roles('PO', 'RETAILER', 'ADMIN')
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
