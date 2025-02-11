@@ -7,7 +7,9 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Product } from './schema/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 import { ConfigService } from '../common/configs/config.service';
+import { S3Service } from '../common/aws/s3.service';
 
 @Injectable()
 export class ProductService {
@@ -18,7 +20,10 @@ export class ProductService {
     @InjectModel(Product.name) private productModel: Model<Product>,
     private readonly configService: ConfigService,
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
+    private readonly s3Service: S3Service, // Using isolated AWS functionality
   ) {
+    // Although S3 functionality is now handled by AwsService, we still initialize s3 here if needed.
+    // Alternatively, you can remove these lines if you solely rely on s3Service.uploadFile().
     this.s3 = new S3Client({
       region: this.configService.get('AWS_REGION'),
       credentials: {
@@ -26,23 +31,12 @@ export class ProductService {
         secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
       },
     });
-
     this.bucketName = this.configService.get('AWS_S3_BUCKET_NAME');
   }
 
+  // Use AwsService's uploadFile() for file uploads
   private async uploadToS3(file: Express.Multer.File): Promise<string> {
-    const fileKey = `products/${Date.now()}-${file.originalname}`;
-
-    const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: fileKey,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    });
-
-    await this.s3.send(command);
-
-    return `https://${this.bucketName}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${fileKey}`;
+    return this.s3Service.uploadFile(file);
   }
 
   async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File): Promise<Product> {
@@ -56,9 +50,9 @@ export class ProductService {
       ...createProductDto,
       image: imageUrl,
     });
-
     const savedProduct = await newProduct.save();
 
+    // Queue an email notification for product creation
     await this.emailQueue.add('sendEmail', {
       to: this.configService.get('ADMIN_EMAIL'),
       subject: `New Product Added: ${savedProduct.name}`,
@@ -77,8 +71,8 @@ export class ProductService {
     return this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
   }
 
-  async updateProductStatus(id: string, updateProduct: UpdateProductDto): Promise<Product> {
-    return this.productModel.findByIdAndUpdate(id, { isListed: updateProduct.isListed }, { new: true });
+  async updateProductStatus(id: string, updateStatusDto: UpdateProductStatusDto): Promise<Product> {
+    return this.productModel.findByIdAndUpdate(id, { isListed: updateStatusDto.isListed }, { new: true });
   }
 
   async deleteProduct(id: string): Promise<Product> {
