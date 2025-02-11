@@ -3,22 +3,19 @@ import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/clie
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 
-
-
-
 @Injectable()
 export class S3Service {
   private readonly s3: S3Client;
-  private readonly bucketName: string;
+  private readonly bucketName: string; 
 
   constructor(private readonly configService: ConfigService) {
-    this.bucketName = this.configService.get("AWS_S3_BUCKET_NAME");
-
+    // Use ConfigService to retrieve AWS configuration
+    this.bucketName = this.configService.get("modde");
     this.s3 = new S3Client({
-      region: this.configService.get("AWS_REGION"),
+      region: this.configService.get("us-east-1"),
       credentials: {
-        accessKeyId: this.configService.get("AWS_ACCESS_KEY_ID"),
-        secretAccessKey: this.configService.get("AWS_SECRET_ACCESS_KEY"),
+        accessKeyId: this.configService.get("AKIAWAA66M7MMESEDSVC"),
+        secretAccessKey: this.configService.get("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"),
       },
     });
   }
@@ -35,7 +32,7 @@ export class S3Service {
 
     await this.s3.send(new PutObjectCommand(params));
 
-    // Return the public URL
-    return fileKey;
+    // Return the full public URL of the uploaded file
+    return `https://${this.bucketName}.s3.${this.configService.get("us-east-1")}.amazonaws.com/${fileKey}`;
   }
 }
