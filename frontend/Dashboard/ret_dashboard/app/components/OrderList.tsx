@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Order {
   id: number;
@@ -29,18 +29,34 @@ const statusColors: { [key: string]: string } = {
 
 const OrderList: React.FC<OrderListProps> = ({ orders }) => {
   const [selectedStatus, setSelectedStatus] = useState<string>("All");
-  const [orderData, setOrderData] = useState<Order[]>(orders);
+  const [orderData, setOrderData] = useState<Order[]>([]);
 
-  // Filter orders based on selected status
-  const filteredOrders = selectedStatus === "All" ? orderData : orderData.filter(order => order.status === selectedStatus);
+  // Load order data from localStorage or use default orders
+  useEffect(() => {
+    const savedOrders = localStorage.getItem("orderData");
+    if (savedOrders) {
+      setOrderData(JSON.parse(savedOrders));
+    } else {
+      setOrderData(orders);
+    }
+  }, [orders]);
 
-  // Handle order status update
+  // Save updated orders to localStorage
+  const saveOrdersToLocalStorage = (updatedOrders: Order[]) => {
+    localStorage.setItem("orderData", JSON.stringify(updatedOrders));
+  };
+
+  // Handle order status update and persist it in localStorage
   const handleStatusChange = (id: number, newStatus: string) => {
     const updatedOrders = orderData.map(order =>
       order.id === id ? { ...order, status: newStatus } : order
     );
     setOrderData(updatedOrders);
+    saveOrdersToLocalStorage(updatedOrders);
   };
+
+  // Filter orders based on selected status
+  const filteredOrders = selectedStatus === "All" ? orderData : orderData.filter(order => order.status === selectedStatus);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mt-4">

@@ -7,6 +7,7 @@ interface CustomerInfoProps {
     name: string;
     email: string;
     phone: string;
+    
   };
 }
 
@@ -19,7 +20,7 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold mb-2">Customer</h3>
+     
       <p><strong>Full Name:</strong> {customer?.name || "Not Available"}</p>
       <p><strong>Email:</strong> {customer?.email || "Not Available"}</p>
       <p><strong>Phone:</strong> {customer?.phone || "Not Available"}</p>
