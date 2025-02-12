@@ -16,7 +16,7 @@ const NotificationsPage = () => {
             </View>
             {/* Orders and Promotions Section */}
             <View style={[styles.ordersParent, styles.ordersParentPosition]}>
-                <Pressable style={[styles.orders, styles.sideFlexBox]} onPress={() => {}}>
+                <Pressable style={[styles.orders, styles.sideFlexBox]} onPress={() => navigation.navigate("OrdersPage")}>
                     <Image 
                         style={styles.orderIcon} 
                         resizeMode="cover" 
@@ -29,7 +29,7 @@ const NotificationsPage = () => {
                         </Text>
                     </View>
                 </Pressable>
-                <Pressable style={[styles.orders, styles.sideFlexBox]} onPress={() => {}}>
+                <Pressable style={[styles.orders, styles.sideFlexBox]} onPress={() => navigation.navigate("PromotionPage")}>
                     <Image 
                         style={styles.icon} 
                         resizeMode="cover" 
@@ -45,7 +45,6 @@ const NotificationsPage = () => {
                     </View>
                 </Pressable>
             </View>
-
             {/* Past Messages Section or Illustration */}
             {hasMessages ? (
                 <>
@@ -82,47 +81,6 @@ const NotificationsPage = () => {
             )}
             {/* Navigation Bar */}
             <View style={[styles.naviBar, styles.barLayout]}>
-                <View style={[styles.homeNavigationBar, styles.barLayout]}>
-                    <View style={styles.homeNavigationBarChild} />
-                    <View style={styles.naviIcons}>
-                        <Pressable onPress={() => navigation.navigate("HomePage")} style={styles.smartHome}>
-                            <Image 
-                                style={styles.icon1} 
-                                resizeMode="cover" 
-                                source={require("../../assets/smart_home1.png")} 
-                            />
-                        </Pressable>
-                        <Pressable onPress={() => navigation.navigate("ShopPage")} style={[styles.shirt, styles.userPosition]}>
-                            <Image 
-                                style={styles.icon1} 
-                                resizeMode="cover" 
-                                source={require("../../assets/shirt.png")} 
-                            />
-                        </Pressable>
-                        <Pressable onPress={() => navigation.navigate("")} 
-                        style={[styles.cameraPlus, styles.userPosition]}>
-                            <Image 
-                                style={styles.icon1} 
-                                resizeMode="cover" 
-                                source={require("../../assets/cameraplus.png")} 
-                            />
-                        </Pressable>
-                        <Pressable onPress={() => navigation.navigate("CartPage")} style={[styles.shoppingCart, styles.userPosition]}>
-                            <Image 
-                                style={styles.icon1} 
-                                resizeMode="cover" 
-                                source={require("../../assets/shopping_cart.png")} 
-                            />
-                        </Pressable>
-                        <Pressable onPress={() => navigation.navigate("ProfilePage")} style={[styles.user, styles.userPosition]}>
-                            <Image 
-                                style={styles.icon1} 
-                                resizeMode="cover" 
-                                source={require("../../assets/user.png")} 
-                            />
-                        </Pressable>
-                    </View>
-                </View>
             </View>
         </View>
     );
@@ -250,18 +208,18 @@ const styles = StyleSheet.create({
         frameChild: {
             width:30,
             height:30,
-            top:-20,
+            top:-30,
             left:10
         },
         messages: {
-        lineHeight: 23,
+        lineHeight: 19,
         fontFamily: "Inter-SemiBold",
-        width: 89,
+        width: 100,
         color: "#321919",
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: "600",
         textAlign: "left",
-        top:-20,
+        top:-30,
         left:20,
         },
         groupParent: {

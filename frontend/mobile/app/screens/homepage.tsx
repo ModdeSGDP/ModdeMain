@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     width: 30,
-    height: 30,
+    height: 20,
     left: -320,
     top: -50,
   },

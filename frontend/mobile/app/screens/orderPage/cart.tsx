@@ -23,7 +23,7 @@ const Cart = () => {
   }
 
   const calculateTotalPrice = (itemsToCalculate) => {
-    return itemsToCalculate.reduce((sum, item) => {
+    return itemsToCalculate.reduce((sum,item) => {
       const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""))
       return sum + price * item.quantity
     }, 0)
@@ -87,7 +87,7 @@ const Cart = () => {
       <View style={styles.cart1}>
         <Text style={styles.headerTitle}>Cart {items.length > 0 ? `(${items.length})` : ""}</Text>
         <View style={styles.groupParent}>
-          <Pressable onPress={() => navigation.goBack()}>
+          <Pressable onPress={() => navigation.navigate("NotificationPage")}>
             <Image style={styles.bellIcon} resizeMode="cover" source={require("../../assets/bell.png")} />
           </Pressable>
         </View>
@@ -128,7 +128,6 @@ const Cart = () => {
           </View>
         </View>
       )}
-
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
@@ -281,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#321919",
-    left: 150,
+    left: 170,
   },
   groupParent: {
     flexDirection: "row",
@@ -289,7 +288,7 @@ const styles = StyleSheet.create({
   },
   bellIcon: {
     width: 22,
-    height: 23,
+    height: 24,
     left: -20,
   },
   carangeCartClothParent: {
