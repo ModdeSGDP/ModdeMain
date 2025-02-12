@@ -15,7 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { UpdateProductStatusDto } from '../product/dtos/update-product-status.dto';
+import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
