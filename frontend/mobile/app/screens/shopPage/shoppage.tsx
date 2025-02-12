@@ -206,9 +206,7 @@ const ShopsPageInfinityScroll = () => {
           <Image style={styles.searchIcon} resizeMode="cover" source={require("../../assets/vector.png")} />
         </Pressable>
       </View>
-
       <Image style={styles.bannerImage} resizeMode="cover" source={require("../../assets/Rectangle41.png")} />
-
       <View style={styles.filterBar}>
         <View style={styles.sortOptions}>
           <Pressable onPress={() => setSelectedSort("all")}>
@@ -239,7 +237,6 @@ const ShopsPageInfinityScroll = () => {
           <Text style={styles.filterText}>Filters</Text>
         </Pressable>
       </View>
-
       <FlatList
         data={filteredProducts}
         renderItem={renderItem}
@@ -248,7 +245,6 @@ const ShopsPageInfinityScroll = () => {
         contentContainerStyle={styles.productGrid}
         columnWrapperStyle={styles.columnWrapper}
       />
-
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
@@ -269,7 +265,6 @@ const ShopsPageInfinityScroll = () => {
         </View>
         <View style={styles.activeIndicator} />
       </View>
-
       <FilterMenu
         isVisible={isFilterMenuVisible}
         onClose={() => setIsFilterMenuVisible(false)}

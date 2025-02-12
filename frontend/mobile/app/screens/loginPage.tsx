@@ -55,7 +55,7 @@ const LoginPage = () => {
       </View>
       
       <View style={[styles.loginButtonParent, styles.entryFiledPosition]}>
-        <Pressable style={styles.loginButton} onPress={() => navigation.navigate("registration" as never)}>
+        <Pressable style={styles.loginButton} onPress={() => navigation.navigate("Registration" as never)}>
           <View style={[styles.loginButtonChild, styles.entryChildLayout]} />
           <Text style={[styles.login1, styles.loginTypo]}>Login</Text>
         </Pressable>
