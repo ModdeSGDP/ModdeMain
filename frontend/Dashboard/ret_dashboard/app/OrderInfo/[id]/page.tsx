@@ -8,6 +8,7 @@ import CustomerInfo from "../../components/orderinfocomponents/CustomerInfo";
 import OrderInfo from "../../components/orderinfocomponents/OrderInfo";
 import DeliveryInfo from "../../components/orderinfocomponents/DeliveryInfo";
 import PaymentInfo from "../../components/orderinfocomponents/PaymentInfo";
+import { Badge } from "@/components/ui/badge";
 
 interface Product {
   id: number;
@@ -15,6 +16,16 @@ interface Product {
   quantity: number;
   total: string;
 }
+
+const statusColors: { [key: string]: string } = {
+  Pending: "bg-yellow-100 text-yellow-600",
+  Confirmed: "bg-green-100 text-green-600",
+  Processing: "bg-blue-100 text-blue-600",
+  Picked: "bg-purple-100 text-purple-600",
+  Shipped: "bg-pink-100 text-pink-600",
+  Delivered: "bg-green-400 text-white",
+  Canceled: "bg-red-100 text-red-600",
+};
 
 const OrderInfoPage = () => {
   const router = useRouter();
@@ -26,9 +37,11 @@ const OrderInfoPage = () => {
   useEffect(() => {
     if (!orderId) return;
 
-    // Full list of orders (Expanded from OrderList)
     const orders = [
-      { id: "25426", customer: "Komal", total: "LKR 4500.00", status: "Delivered", phone: "+94 774 231 121", address: "No 123, Duplication Rd, Colombo, Sri Lanka",
+      { id: "25426", customer: "Komal", total: "LKR 4500.00", status: "Pending", phone: "+94 774 231 121", address: "No 123, Duplication Rd, Colombo, Sri Lanka",
+        products: [{ id: 101, name: "T-Shirt", quantity: 2, total: "LKR 2000" }, { id: 102, name: "Jeans", quantity: 1, total: "LKR 2500" }] 
+      },
+       { id: "25426", customer: "Komal", total: "LKR 4500.00", status: "Delivered", phone: "+94 774 231 121", address: "No 123, Duplication Rd, Colombo, Sri Lanka",
         products: [{ id: 101, name: "T-Shirt", quantity: 2, total: "LKR 2000" }, { id: 102, name: "Jeans", quantity: 1, total: "LKR 2500" }] 
       },
       { id: "25425", customer: "Nikhil", total: "LKR 4500.00", status: "Canceled", phone: "+94 774 232 222", address: "No 45, Main St, Kandy, Sri Lanka",
@@ -62,12 +75,8 @@ const OrderInfoPage = () => {
         products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }] 
       },
       { id: "254", customer: "Dumal", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
-        products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }] 
-      },
-      
-      
-      
-
+        products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
+      }
     ];
 
     const order = orders.find((o) => o.id === orderId);
@@ -99,12 +108,63 @@ const OrderInfoPage = () => {
 
       <hr className="my-4 border-gray-300" />
 
-      {/* Order Information Components */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <CustomerInfo customer={{ name: orderDetails.customer, phone: orderDetails.phone }} />
-        <OrderInfo order={{ shipping: "Next express", paymentMethod: "Credit Card", status: orderDetails.status }} />
-        <DeliveryInfo delivery={{ address: orderDetails.address }} />
-        <PaymentInfo payment={{ method: "MasterCard", businessName: orderDetails.customer, phone: orderDetails.phone }} />
+      {/* Order Title Section - Order ID & Status */}
+      <div className="flex items-center space-x-3 p-0">
+        <h2 className="font-semibold text-lg">Orders ID: #{orderDetails.id}</h2>
+        <Badge className={`px-3 py-1 rounded-lg ${statusColors[orderDetails.status]}`}>
+          {orderDetails.status}
+        </Badge>
+      </div>
+
+      {/* Order Information Components - First Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        {/* Customer Info */}
+        <div className=" p-6 rounded-lg ">
+          <div className="flex items-center mb-2">
+            <img src="/images/Customer.svg" alt="Customer Icon" className="h-6 w-6 mr-2" />
+            <h3 className="text-lg font-semibold">Customer</h3>
+          </div>
+          <CustomerInfo customer={{ name: orderDetails.customer, phone: orderDetails.phone }} />
+        </div>
+
+        {/* Order Info */}
+        <div className="p-6 rounded-lg ">
+          <div className="flex items-center mb-2">
+            <img src="/images/order.svg" alt="Order Icon" className="h-6 w-6 mr-2" />
+            <h3 className="text-lg font-semibold">Order Info</h3>
+          </div>
+          <OrderInfo order={{ shipping: "Next express", paymentMethod: "Credit Card", status: orderDetails.status }} />
+        </div>
+
+        {/* Delivery Info */}
+        <div className=" p-6 rounded-lg ">
+          <div className="flex items-center mb-2">
+            <img src="/images/order.svg" alt="Delivery Icon" className="h-6 w-6 mr-2" />
+            <h3 className="text-lg font-semibold">Deliver To</h3>
+          </div>
+          <DeliveryInfo delivery={{ address: orderDetails.address }} />
+        </div>
+      </div>
+
+      {/* Second Row - Payment & Note Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {/* Payment Info */}
+        <div className=" p-6 rounded-lg">
+          <div className="flex items-center mb-2">
+            <img src="/images/order.svg" alt="Payment Icon" className="h-6 w-6 mr-2" />
+            <h3 className="text-lg font-semibold">Payment Info</h3>
+          </div>
+          <PaymentInfo payment={{ method: "MasterCard", businessName: orderDetails.customer, phone: orderDetails.phone }} />
+        </div>
+
+        {/* Notes Section */}
+        <div className=" p-6 rounded-lg ">
+          <h3 className="text-lg font-semibold mb-2">Note</h3>
+          <textarea
+            className="w-full h-20 p-2 border border-gray-300 rounded-md"
+            placeholder="Type some notes"
+          ></textarea>
+        </div>
       </div>
 
       {/* Products Table */}

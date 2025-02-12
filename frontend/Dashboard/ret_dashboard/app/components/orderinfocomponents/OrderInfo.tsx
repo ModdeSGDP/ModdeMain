@@ -19,7 +19,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold mb-2">Order Info</h3>
+      
       <p><strong>Shipping:</strong> {order?.shipping || "Not Available"}</p>
       <p><strong>Payment Method:</strong> {order?.paymentMethod || "Not Available"}</p>
       <p><strong>Status:</strong> {order?.status || "Not Available"}</p>
