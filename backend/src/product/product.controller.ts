@@ -15,6 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import { UpdateProductStatusDto } from '../product/dtos/update-product-status.dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
@@ -38,7 +39,7 @@ export class ProductController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const product = await this.productService.createProduct(createProductDto, file);
-    // Optionally, you could add an email notification here, but it's already queued in the service
+    // Optionally, we could add an email notification here, but it's already queued in the service
     return product;
   }
 
