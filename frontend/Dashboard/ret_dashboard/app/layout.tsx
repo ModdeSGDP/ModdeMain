@@ -26,7 +26,7 @@ export default function RootLayout({
 
     // Redirect unauthenticated users trying to access protected pages
     if (!authStatus && !isAuthPage) {
-      router.push("/auth/signin");
+      router.push("/auth/signup");
     }
 
     // Redirect authenticated users away from sign-in/sign-up pages
