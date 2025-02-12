@@ -20,8 +20,11 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('product')
+@UseGuards(JwtAuthGuard)
+@Roles('PO', 'RETAILER', 'ADMIN')
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -58,13 +61,13 @@ export class ProductController {
   @Patch(':id/status')
   async updateProductStatus(
     @Param('id') id: string,
-    @Body() updateProductStatusDto: UpdateProductStatusDto,
+    @Body() updateProductDto: UpdateProductDto,
   ) {
-    const updatedProduct = await this.productService.updateProductStatus(id, updateProductStatusDto);
+    const updatedProduct = await this.productService.updateProduct(id, updateProductDto);
     await this.emailQueue.add('sendEmail', {
       to: this.configService.get('ADMIN_EMAIL'),
       subject: `Product Status Updated`,
-      message: `<h3>Product ID: ${id} status changed to ${updateProductStatusDto.isListed}</h3>`,
+      message: `<h3>Product ID: ${id} status changed to ${updateProductDto.isListed}</h3>`,
     });
     return updatedProduct;
   }

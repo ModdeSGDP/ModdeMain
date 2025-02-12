@@ -7,7 +7,6 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Product } from './schema/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { UpdateProductStatusDto } from './dtos/update-product-status.dto';
 import { ConfigService } from '../common/configs/config.service';
 import { S3Service } from '../common/aws/s3.service';
 
@@ -69,10 +68,6 @@ export class ProductService {
 
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
     return this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
-  }
-
-  async updateProductStatus(id: string, updateStatusDto: UpdateProductStatusDto): Promise<Product> {
-    return this.productModel.findByIdAndUpdate(id, { isListed: updateStatusDto.isListed }, { new: true });
   }
 
   async deleteProduct(id: string): Promise<Product> {

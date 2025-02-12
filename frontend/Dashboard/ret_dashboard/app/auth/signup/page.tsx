@@ -28,11 +28,11 @@ const signUpSchema = z.object({
 const SignUpPage = () => {
   const router = useRouter();
 
-  useEffect(() => {
-    if (localStorage.getItem("authenticated") === "true") {
-      router.push("/Dashboard");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem("authenticated") === "true") {
+  //     router.push("/Dashboard");
+  //   }
+  // }, []);
 
   const {
     register,

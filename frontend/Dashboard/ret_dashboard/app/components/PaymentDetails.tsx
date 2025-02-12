@@ -34,6 +34,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
 }) => {
   const [bankDetails, setBankDetails] = useState<BankDetails>(defaultBankDetails);
   const [isDeactivated, setIsDeactivated] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Load bank details from localStorage or sessionStorage
   useEffect(() => {
@@ -51,14 +52,24 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
     }
   }, [bankDetails]);
 
-  // Handle account deactivation (delete stored bank details)
+  // Handle account deactivation toggle
   const handleDeactivate = () => {
-    setIsDeactivated(!isDeactivated);
     if (!isDeactivated) {
-      setBankDetails(defaultBankDetails);
-      localStorage.removeItem("bankDetails");
-      sessionStorage.removeItem("bankDetails");
+      // Instead of immediately deleting, prompt for confirmation.
+      setShowConfirmation(true);
+    } else {
+      // If already deactivated, simply toggle off.
+      setIsDeactivated(false);
     }
+  };
+
+  // Confirm deletion of bank details when user clicks "Yes"
+  const confirmDeletion = () => {
+    setIsDeactivated(true);
+    setBankDetails(defaultBankDetails);
+    localStorage.removeItem("bankDetails");
+    sessionStorage.removeItem("bankDetails");
+    setShowConfirmation(false);
   };
 
   return (
@@ -127,6 +138,29 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
           <Switch checked={isDeactivated} onCheckedChange={handleDeactivate} />
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-md shadow-lg">
+            <p className="mb-4">Are you sure you want to delete the Bank account details?</p>
+            <div className="flex justify-end">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                onClick={confirmDeletion}
+              >
+                Yes
+              </button>
+              <button
+                className="bg-gray-300 text-black px-4 py-2 rounded"
+                onClick={() => setShowConfirmation(false)}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
