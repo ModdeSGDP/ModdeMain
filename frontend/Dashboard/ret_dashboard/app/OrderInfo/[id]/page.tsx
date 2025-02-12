@@ -51,7 +51,23 @@ const OrderInfoPage = () => {
       },
       { id: "25419", customer: "Kishan", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
         products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }] 
-      }
+      },
+      { id: "25417", customer: "Kumal", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }] 
+      },
+      { id: "25412", customer: "Priyanka", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }] 
+      },
+      { id: "25413", customer: "Nuwan", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }] 
+      },
+      { id: "254", customer: "Dumal", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }] 
+      },
+      
+      
+      
+
     ];
 
     const order = orders.find((o) => o.id === orderId);
