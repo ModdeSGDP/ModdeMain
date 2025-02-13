@@ -16,10 +16,6 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty()
-  size: string;
-
-  @IsString()
-  @IsNotEmpty()
   color: string;
 
   @IsNumber()

@@ -14,19 +14,7 @@ export class Product {
   category: string;
 
   @Prop({ required: true })
-  size: string;
-
-  @Prop({ required: true })
   color: string;
-
-  @Prop({ required: true })
-  quantity: number;
-
-  @Prop({ required: true })
-  regularPrice: number;
-
-  @Prop({ required: true })
-  salePrice: number;
 
   @Prop()
   image?: string; // field for storing the image URL
@@ -35,7 +23,7 @@ export class Product {
   isListed: boolean;
 
   @Prop({type: Types.ObjectId, ref: 'Retailer', required:true })
-  retailerId: Types.ObjectId
+  retailerId: Types.ObjectId;
 }
 
 export type ProductDocument = HydratedDocument<Product>;
