@@ -1,41 +1,73 @@
-import { useState } from "react"
+"use client"
+
+import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, Image, Pressable, Dimensions, PanResponder } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
+import * as ImagePicker from "expo-image-picker"
 import SideMenu from "./sideBars/homeSideBar"
 
 const { width } = Dimensions.get("window")
 
 const HomePage = () => {
   const navigation = useNavigation()
+  const route = useRoute()
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
+  const [uploadedImage, setUploadedImage] = useState(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+
+  useEffect(() => {
+    if (route.params?.capturedImage) {
+      setUploadedImage(route.params.capturedImage)
+      simulateUpload()
+    }
+  }, [route.params?.capturedImage])
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (evt, gestureState) => {
-      if (gestureState.dx < -50) { // Dragging left
-        setIsSideMenuOpen(false);
+      if (gestureState.dx < -50) {
+        setIsSideMenuOpen(false)
       }
     },
-  });
-  const handleTakePhoto = async () => {
-    const options = {
-      mediaType: "photo",
-      cameraType: "back",
-      saveToPhotos: true,
+  })
+
+  const handleUploadImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!")
+      return
     }
-    // Commented out for now as per original code
-    // launchCamera(options, response => {
-    //   if (response.didCancel) {
-    //     Alert.alert('Action canceled', 'You canceled the photo capture.');
-    //   } else if (response.errorCode) {
-    //     Alert.alert('Error', `Camera error: ${response.errorMessage}`);
-    //   } else {
-    //     const photo = response.assets[0];
-    //     console.log('Photo captured:', photo);
-    //     // Navigate to another screen or use the photo
-    //   }
-    // });
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    })
+
+    if (!result.canceled) {
+      setUploadedImage(result.assets[0].uri)
+      simulateUpload()
+    }
+  }
+
+  const simulateUpload = () => {
+    setUploadProgress(0)
+    const interval = setInterval(() => {
+      setUploadProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          clearInterval(interval)
+          return 100
+        }
+        return prevProgress + 10
+      })
+    }, 500)
+  }
+
+  const handleTakePhoto = () => {
+    navigation.navigate("Camera")
   }
 
   return (
@@ -54,12 +86,12 @@ const HomePage = () => {
         <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/Rectangle23.png")} />
 
         <View style={[styles.mainButtons, styles.buttonPosition]}>
-          <Pressable style={styles.uploadButton} onPress={() => {}}>
+          <Pressable style={styles.uploadButton} onPress={handleUploadImage}>
             <Image style={styles.buttonBg} resizeMode="cover" source={require("../assets/ellipse16.png")} />
             <Image style={styles.uploadIcon} resizeMode="cover" source={require("../assets/upload.png")} />
             <Text style={styles.uploadText}>Upload File</Text>
           </Pressable>
-          <Pressable style={styles.photoButton} onPress={() => navigation.navigate("ImageSearch")}>
+          <Pressable style={styles.photoButton} onPress={handleTakePhoto}>
             <Image style={styles.buttonBg} resizeMode="cover" source={require("../assets/ellipse17.png")} />
             <Image style={styles.cameraIcon} resizeMode="cover" source={require("../assets/camera.png")} />
             <Text style={styles.photoText}>Take Photo</Text>
@@ -70,14 +102,16 @@ const HomePage = () => {
             <Image style={styles.arrowIcon} resizeMode="cover" source={require("../assets/chevron-left1.png")} />
           </Pressable>
         </View>
-        
-        <View style={styles.uploadingBar}>
-          <View style={styles.uploadingBarBg} />
-          <View style={styles.uploadingBarFill} />
-          <Image style={styles.fileIcon} resizeMode="cover" source={require("../assets/image.png")} />
-          <Text style={styles.uploadingText}>Uploading</Text>
-          <Text style={styles.percentageText}>69%</Text>
-        </View>
+
+        {uploadedImage && (
+          <View style={styles.uploadingBar}>
+            <View style={styles.uploadingBarBg} />
+            <View style={[styles.uploadingBarFill, { width: `${uploadProgress}%` }]} />
+            <Image style={styles.fileIcon} resizeMode="cover" source={{ uri: uploadedImage }} />
+            <Text style={styles.uploadingText}>Uploading</Text>
+            <Text style={styles.percentageText}>{`${uploadProgress}%`}</Text>
+          </View>
+        )}
 
         <View style={styles.navigationBar}>
           <View style={styles.navBarBg} />
@@ -134,7 +168,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: -2, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 5, // Ensure sidebar is not transparent
+    elevation: 5,
   },
   overlay: {
     position: "absolute",
@@ -185,8 +219,8 @@ const styles = StyleSheet.create({
   menuIcon: {
     width: 30,
     height: 20,
-    left: -320,
-    top: -50,
+    left: -290,
+    top: -45,
   },
   mainImage: {
     marginLeft: -160,
@@ -196,39 +230,21 @@ const styles = StyleSheet.create({
     height: 295,
     borderRadius: 30,
     position: "absolute",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   mainButtons: {
     top: 533,
     width: 316,
     height: 142,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   uploadButton: {
     position: "absolute",
     left: 56,
     alignItems: "center",
-    shadowColor: "#000",
   },
   photoButton: {
     position: "absolute",
     right: 56,
     alignItems: "center",
-    shadowColor: "#000",
   },
   buttonBg: {
     width: 50,
@@ -268,14 +284,6 @@ const styles = StyleSheet.create({
     height: 46,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   nextButtonBg: {
     position: "absolute",
@@ -319,7 +327,6 @@ const styles = StyleSheet.create({
     top: 3,
     left: 3,
     bottom: 3,
-    width: "25%",
     backgroundColor: "#f97c7c",
     borderRadius: 100,
   },
@@ -363,14 +370,6 @@ const styles = StyleSheet.create({
     height: 69,
     backgroundColor: "#fff",
     borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   navBarBg: {
     position: "absolute",

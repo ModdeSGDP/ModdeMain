@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#321919",
-    left: 170,
+    left: 150,
   },
   groupParent: {
     flexDirection: "row",
