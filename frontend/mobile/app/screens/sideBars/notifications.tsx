@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         frameChild: {
             width:30,
             height:30,
-            top:-30,
+            top:-32,
             left:10
         },
         messages: {

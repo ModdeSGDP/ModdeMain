@@ -161,7 +161,6 @@ const ShopsPageInfinityScroll = () => {
       </Pressable>
     )
   }
-
   const handleApplyFilters = useCallback(
     (filters: {
       categories: string[]
@@ -177,13 +176,11 @@ const ShopsPageInfinityScroll = () => {
     },
     [],
   )
-
   return (
     <View style={styles.shopsPageInfinityScroll}>
       <Pressable style={styles.backButton} onPress={() => navigation.navigate("HomePage")}>
         <Image style={styles.backButtonIcon} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
       </Pressable>
-
       <View style={styles.searchBar}>
         <Pressable
           onPress={() => {
@@ -292,19 +289,21 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   backButtonIcon: {
-    width: 27,
+    width: 37,
     height: 27,
+    top:12
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    width:340,
-    left:30,
+    width:290,
+    left:50,
     height:50,
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
     margin: 10,
     marginTop: 5,
+    top:10,
     padding: 6,
     shadowColor: "#000",
     shadowOffset: {

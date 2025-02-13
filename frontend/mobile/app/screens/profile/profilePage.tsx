@@ -1,6 +1,9 @@
+"use client"
+
 import { useState } from "react"
 import { View, Text, StyleSheet, Image, Pressable, ScrollView, TextInput } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import * as ImagePicker from "expo-image-picker"
 
 const Profile = () => {
   const navigation = useNavigation()
@@ -11,6 +14,8 @@ const Profile = () => {
     address: "No:123 Milepost Avenue, Colombo, Sri Lanka",
     gender: "Female",
   })
+  const [profileImage, setProfileImage] = useState(require("../../assets/ellipse-20.png"))
+
   const handleEdit = () => {
     if (isEditing) {
       // Here you would typically save the changes to a backend
@@ -18,9 +23,24 @@ const Profile = () => {
     }
     setIsEditing(!isEditing)
   }
+
   const handleChange = (key, value) => {
     setProfileData((prev) => ({ ...prev, [key]: value }))
   }
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    })
+
+    if (!result.canceled) {
+      setProfileImage({ uri: result.assets[0].uri })
+    }
+  }
+
   return (
     <View style={styles.profile}>
       <Pressable onPress={() => navigation.goBack()}>
@@ -31,14 +51,12 @@ const Profile = () => {
       <Pressable onPress={() => navigation.navigate("NotificationPage")}>
         <Image style={styles.bell} source={require("../../assets/bell.png")} />
       </Pressable>
-
       <View style={styles.profilePhotoContainer}>
-        <Image style={styles.profilePhoto} source={require("../../assets/ellipse-20.png")} />
-        <Pressable style={styles.editPhotoButton}>
+        <Image style={styles.profilePhoto} source={profileImage} />
+        <Pressable style={styles.editPhotoButton} onPress={pickImage}>
           <Text style={styles.editPhotoText}>Edit Photo</Text>
         </Pressable>
       </View>
-
       <ScrollView style={styles.profileOptions}>
         <View style={styles.accountInfo}>
           <View style={styles.sectionHeader}>
@@ -83,18 +101,7 @@ const Profile = () => {
               <Text style={styles.infoValue}>{profileData.address}</Text>
             )}
           </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Gender</Text>
-            {isEditing ? (
-              <TextInput
-                style={styles.input}
-                value={profileData.gender}
-                onChangeText={(text) => handleChange("gender", text)}
-              />
-            ) : (
-              <Text style={styles.infoValue}>{profileData.gender}</Text>
-            )}
-          </View>
+
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Password</Text>
             <Text style={styles.changePassword}>change password</Text>
@@ -164,7 +171,7 @@ const styles = StyleSheet.create({
     color: "#321919",
     textAlign: "center",
     marginTop: 50,
-    top:-10,
+    top: -10,
   },
   bell: {
     width: 22,
@@ -287,7 +294,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: "#ffe2e6",
     borderRadius: 20,
-    // Add shadow effect
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -295,7 +301,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // for Android
+    elevation: 5,
   },
   navIcons: {
     flexDirection: "row",

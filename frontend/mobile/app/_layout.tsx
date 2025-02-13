@@ -24,6 +24,7 @@ import PromotionsPage from './screens/promotions/promotion';
 import NotificationsPage from './screens/sideBars/notifications';
 import OrdersPage from './screens/orderPage2/orderPage';
 import OrderSettings from './screens/orderPage2/orderSettings';
+import CameraScreen from './screens/cameraScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -102,6 +103,8 @@ export default function MyStack() {
       <Stack.Screen name="NotificationPage" component={NotificationsPage}/>
       <Stack.Screen name="OrdersPage" component={OrdersPage}/>
       <Stack.Screen name="OrderSettingsPage" component={OrderSettings}/>
+      <Stack.Screen name="Camera" component={CameraScreen} />
+
 
       {/* 👇 Main Tab Navigator */}
       <Stack.Screen name="Main" component={BottomTabs} />
