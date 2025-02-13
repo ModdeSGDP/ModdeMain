@@ -10,7 +10,7 @@ export class User  {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ default: ROLES.ADMIN, enum:[ROLES.ADMIN,ROLES.PO,ROLES.RETAILER] }) // roles: 'user', 'admin'
+  @Prop({ default: ROLES.CONSUMER, enum:[ROLES.ADMIN,ROLES.PO,ROLES.CONSUMER] }) // roles: 'user', 'admin'
   role: string;
 
   @Prop({ required: true, trim:true })
