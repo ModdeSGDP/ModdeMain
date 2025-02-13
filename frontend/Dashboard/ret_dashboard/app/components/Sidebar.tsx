@@ -45,7 +45,7 @@ export default function Sidebar() {
   return (
     <div className="w-64 h-screen bg-gray-800 text-white flex flex-col fixed top-0 left-0 shadow-md">
       <div className="border-b border-gray-700 flex justify-center">
-        <Link href="/">
+        <Link href="/Dashboard">
           <Image
             src="/sidebar-icons/logo.svg"
             alt="App Logo"

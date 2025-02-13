@@ -23,6 +23,9 @@ function Page() {
         </BreadcrumbList>
       </Breadcrumb>
 
+      {/* Horizontal Line */}
+      <hr className="my-4 border-gray-300" />
+
       {/* Profile Form Component */}
       <ProfileForm />
     </div>
