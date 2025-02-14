@@ -47,6 +47,15 @@ export class UserService {
     return newUser.save();
   }
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    // If email is being updated, check if it's unique
+    if (updateUserDto.email) {
+      const existingUser = await this.userModel.findOne({ email: updateUserDto.email });
+
+      // If another user already has this email, and it's not the current user
+      if (existingUser && existingUser._id.toString() !== id) {
+        throw new ConflictException('Email is already taken');
+      }
+    }
     return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
   }
   

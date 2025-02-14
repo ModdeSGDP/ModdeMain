@@ -1,9 +1,11 @@
-import { Controller, Post, Body, Put, Param } from '@nestjs/common';
+import { Controller, Body, Param, Post,  Put, Get } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { InviteAdminDto } from './dto/invite-admin.dto';
 import { EmailService } from 'src/common/email/email.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Types } from 'mongoose';
+import { BadRequestException } from '@nestjs/common';
 
 @Controller('user')
 export class UserController {
@@ -24,6 +26,19 @@ export class UserController {
 
   @Put('update/:id')
   async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid user ID format');
+    }
     return this.userService.updateUser(id, updateUserDto);
+  }
+
+  // Find user by email
+  @Get('email/:email')
+  async findUserByEmail(@Param('email') email: string) {
+    const user = await this.userService.findUserByUsername(email);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return user;
   }
 }
