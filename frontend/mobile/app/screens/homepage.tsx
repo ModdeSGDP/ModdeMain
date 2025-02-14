@@ -238,12 +238,12 @@ const styles = StyleSheet.create({
   },
   uploadButton: {
     position: "absolute",
-    left: 56,
+    left: 70,
     alignItems: "center",
   },
   photoButton: {
     position: "absolute",
-    right: 56,
+    right: 50,
     alignItems: "center",
   },
   buttonBg: {
@@ -297,6 +297,7 @@ const styles = StyleSheet.create({
   nextText: {
     fontSize: 14,
     lineHeight: 19,
+    right:10,
     fontFamily: "Inter-SemiBold",
     color: "#fff",
   },
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
     width: 27,
     height: 27,
     position: "absolute",
-    right: 100,
+    right: 120,
   },
   uploadingBar: {
     position: "absolute",
@@ -370,6 +371,15 @@ const styles = StyleSheet.create({
     height: 69,
     backgroundColor: "#fff",
     borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    
   },
   navBarBg: {
     position: "absolute",

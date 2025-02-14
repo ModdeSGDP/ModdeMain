@@ -4,10 +4,6 @@ import { useState, useEffect } from "react"
 import { StyleSheet, Text, View, Image, ScrollView, Pressable } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 
-const OnceYouReceive = () => {
-  return <Text style={styles.onceYouReceive}>Once you receive a new message, you'll see it listed here</Text>
-}
-
 const OrdersPage = () => {
   const navigation = useNavigation()
   const route = useRoute()
@@ -22,7 +18,6 @@ const OrdersPage = () => {
   const deleteAllMessages = () => {
     setOrders([])
   }
-
   return (
     <View style={styles.ordersPage}>
       {/* Status Bar */}
@@ -66,15 +61,10 @@ const OrdersPage = () => {
       ) : (
         <View style={styles.noOrdersContainer}>
           <Image source={require("../../assets/orderillu.png")} style={styles.noOrdersImage} />
-          <OnceYouReceive />
-          <View style={styles.buttonContainer}>
-            <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
-              <Text style={styles.shopButtonText}>Go to Shop</Text>
-            </Pressable>
-            <Pressable style={styles.navigateButton} onPress={() => navigation.navigate("HomePage")}>
-              <Text style={styles.navigateButtonText}>Navigate</Text>
-            </Pressable>
-          </View>
+          <Text style={styles.noOrdersText}>Once you receive a new message, you'll see it listed here</Text>
+          <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
+            <Text style={styles.shopButtonText}>Go to Shop</Text>
+          </Pressable>
         </View>
       )}
 
@@ -104,24 +94,23 @@ const OrdersPage = () => {
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   ordersPage: {
     flex: 1,
-    backgroundColor: "#FFF5F7", // Light pink background
+    backgroundColor: "#FFFFFF", // Light pink background
   },
   statusBar: {
     height: 44,
-    backgroundColor: "#FFF5F7",
+    backgroundColor: "#FFFFFF",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
+    bottom:50,
     backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#FFE2E6",
+    borderBottomWidth: 0,
   },
   headerButton: {
     padding: 8,
@@ -129,12 +118,13 @@ const styles = StyleSheet.create({
   headerIcon: {
     width: 24,
     height: 24,
-    tintColor: "#FF6B8A", // Soft pink color for icons
+    // tintColor: "#FF6B8A", // Soft pink color for icons
   },
   title: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#FF4D6D", // Vibrant pink for title
+    // color: "#FF4D6D", 
+    // Vibrant pink for title
   },
   orderList: {
     flex: 1,
@@ -145,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: "#FFB3C1",
+    shadowColor: "#111111",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -159,7 +149,7 @@ const styles = StyleSheet.create({
   orderTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#FF4D6D",
+    color: "#000000",
   },
   orderDate: {
     fontSize: 14,
@@ -176,6 +166,7 @@ const styles = StyleSheet.create({
   },
   orderDetails: {
     flex: 1,
+    
   },
   orderDescription: {
     fontSize: 14,
@@ -185,7 +176,7 @@ const styles = StyleSheet.create({
   },
   seeDetails: {
     fontSize: 14,
-    color: "#FF4D6D",
+    color: "#0000FF",
     fontWeight: "600",
   },
   noMoreMessages: {
@@ -194,6 +185,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginVertical: 16,
     fontStyle: "italic",
+    bottom:200,
   },
   noOrdersContainer: {
     flex: 1,
@@ -206,20 +198,12 @@ const styles = StyleSheet.create({
     height: 200,
     marginBottom: 24,
   },
-  onceYouReceive: {
-    alignSelf: "stretch",
-    fontSize: 16,
-    lineHeight: 24,
-    fontFamily: "Rosario-Regular",
+  noOrdersText: {
+    fontSize: 18,
+    fontWeight: "600",
     textAlign: "center",
     color: "#FF4D6D",
     marginBottom: 24,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 16,
   },
   shopButton: {
     backgroundColor: "#FF4D6D",
@@ -232,68 +216,62 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
-  navigateButton: {
-    backgroundColor: "#FFB3C1",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
-  navigateButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-    fontSize: 16,
-  },
   navigationBar: {
     position: "absolute",
-    bottom: 24,
-    left: 24,
-    right: 24,
-    height: 64,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 32,
-    shadowColor: "#FFB3C1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    bottom: 34,
+    left: "50%",
+    marginLeft: -158,
+    width: 316,
+    height: 69,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
   },
   navBarBg: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#FFF5F7",
-    borderRadius: 32,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#ffe2e6",
+    borderRadius: 20,
   },
   navIcons: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     alignItems: "center",
-    height: "100%",
-  },
-  navItem: {
-    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingTop: 22,
   },
   navIcon: {
-    width: 24,
+    width: 23,
     height: 24,
-    tintColor: "#FF6B8A",
   },
   activeIndicator: {
     position: "absolute",
-    left: 28,
-    bottom: 8,
-    width: 32,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "#FF4D6D",
+    left: 26,
+    bottom: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#fba3a3",
   },
   lineView: {
-    position: "absolute",
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    flex: 1,
+    width: "100%",
+    height: 1,
     top: -20,
-    left: -16,
-    right: -16,
-    height: 2,
-    backgroundColor: "#FF4D6D",
   },
 })
-
 export default OrdersPage
 
