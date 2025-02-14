@@ -9,7 +9,7 @@ import { ROLES } from 'src/common/constants/roles';
 
 @Controller('retailers')
 @UseGuards(JwtAuthGuard)
-@Roles(ROLES.ADMIN, ROLES.PO, ROLES.RETAILER)
+@Roles(ROLES.ADMIN, ROLES.PO)
 export class RetailerController {
   constructor(private readonly retailerService: RetailerService) {}
 
