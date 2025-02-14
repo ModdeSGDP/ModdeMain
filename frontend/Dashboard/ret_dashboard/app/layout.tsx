@@ -35,12 +35,7 @@ export default function RootLayout({
     }
   }, [pathname]);
 
-  const retailorData = {
-    name: "Incarange",
-    avatar: "/images/maleavatar.svg",
-    greeting: "Hi, Joel !",
-  };
-
+  
   return (
     <html lang="en">
       <body className="min-h-screen flex">
@@ -57,7 +52,7 @@ export default function RootLayout({
 
                 {/* Retailor Section */}
                 <div className="absolute top-0 left-64 z-12 p-4 w-[calc(100%-18rem)]">
-                  <Retailor {...retailorData} />
+                  <Retailor />
                 </div>
 
                 <main className="flex-grow p-4">{children}</main>
