@@ -6,7 +6,6 @@ import { GlobalAccelerator } from 'aws-sdk';
 
 
 
-
 @Global()
 @Module({
   imports: [
