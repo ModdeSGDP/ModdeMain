@@ -1,27 +1,50 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
-interface RetailorProps {
-  name: string;
-  avatar: string;
-  greeting: string;
-}
+const Retailor = () => {
+  const [retailorData, setRetailorData] = useState({
+    name: "InCaranage",
+    avatar: "/images/maleavatar.svg",
+    greeting: "Hi, Joel!",
+  });
 
-const Retailor: React.FC<RetailorProps> = ({ name, avatar, greeting }) => {
+  // Fetch data from localStorage on mount and listen for changes
+  useEffect(() => {
+    const fetchRetailorData = () => {
+      const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const savedProfilePic = localStorage.getItem("profilePicture");
+
+      setRetailorData({
+        name: savedUser.companyName || "InCaranage",
+        avatar: savedProfilePic || "/images/maleavatar.svg",
+        greeting: `Hi, ${savedUser.firstName || "Joel"}!`,
+      });
+    };
+
+    fetchRetailorData();
+
+    // Listen for updates when ProfileForm updates localStorage
+    window.addEventListener("storage", fetchRetailorData);
+
+    return () => {
+      window.removeEventListener("storage", fetchRetailorData);
+    };
+  }, []);
+
   return (
     <div className="flex items-center space-x-4">
       <Image
-        src={avatar}
-        alt={`${name}'s Avatar`}
+        src={retailorData.avatar}
+        alt="Retailor Avatar"
         width={60}
         height={60}
-        className="rounded-full object-contain"
+        className="rounded-full object-cover border-2 border-gray-300"
       />
       <div>
-        <p className="text-sm text-gray-500">{greeting}</p>
-        <h1 className="text-xl font-bold text-gray-900">Welcome Back! {name}</h1>
+        <p className="text-sm text-gray-500">{retailorData.greeting}</p>
+        <h1 className="text-xl font-bold text-gray-900">Welcome Back! {retailorData.name}</h1>
       </div>
     </div>
   );

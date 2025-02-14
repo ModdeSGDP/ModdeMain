@@ -40,7 +40,7 @@ const Summary: React.FC<SummaryProps> = ({ completedOrders, pendingOrders, cance
       <div className="flex items-center space-x-3 bg-red-100 p-3 rounded-lg shadow-md w-30">
         <Image src="/images/cancel.svg" alt="Orders Cancelled" width={30} height={40} />
         <div>
-          <p className="text-gray-500 text-xs">Orders Cancelled</p>
+          <p className="text-gray-500">Orders Cancelled</p>
           <h1 className="text-lg font-bold">{cancelledOrders}K</h1>
         </div>
       </div>
