@@ -1,35 +1,33 @@
-"use client"
-
-import { useState, useEffect, useRef } from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { Camera } from "expo-camera"
-import { useNavigation } from "@react-navigation/native"
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Camera, CameraType } from "expo-camera";
+import { useNavigation } from "@react-navigation/native";
 
 const CameraScreen = () => {
-  const [hasPermission, setHasPermission] = useState(null)
-  const [type, setType] = useState(Camera.Constants.Type.back)
-  const cameraRef = useRef(null)
-  const navigation = useNavigation()
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [type, setType] = useState<CameraType>(CameraType.back);
+  const cameraRef = useRef<Camera | null>(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    ;(async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync()
-      setHasPermission(status === "granted")
-    })()
-  }, [])
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync()
-      navigation.navigate("HomePage", { capturedImage: photo.uri })
+      const photo = await cameraRef.current.takePictureAsync();
+      navigation.navigate("HomePage", { capturedImage: photo.uri });
     }
-  }
+  };
 
   if (hasPermission === null) {
-    return <View />
+    return <View />;
   }
   if (hasPermission === false) {
-    return <Text>No access to camera</Text>
+    return <Text>No access to camera</Text>;
   }
 
   return (
@@ -39,7 +37,7 @@ const CameraScreen = () => {
           <TouchableOpacity
             style={styles.flipButton}
             onPress={() => {
-              setType(type === Camera.Constants.Type.back ? Camera.Constants.Type.front : Camera.Constants.Type.back)
+              setType(type === CameraType.back ? CameraType.front : CameraType.back);
             }}
           >
             <Text style={styles.buttonText}>Flip</Text>
@@ -50,8 +48,8 @@ const CameraScreen = () => {
         </View>
       </Camera>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -85,7 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "white",
   },
-})
+});
 
-export default CameraScreen
-
+export default CameraScreen;
