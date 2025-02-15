@@ -16,6 +16,9 @@ export class Product {
   @Prop({ required: true })
   color: string;
 
+  @Prop({ type: [String], required: true })
+  sizes: string[]; //  ["XS", "S", "M", "L", "XL"]
+
   @Prop()
   image?: string; // field for storing the image URL
 
