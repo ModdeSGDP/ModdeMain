@@ -14,7 +14,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
-import { UpdateProductDto } from './dtos/update-product.dto'; 
+import { UpdateProductDto } from './dtos/update-product.dto';
+import { FilterProductDto } from "./dtos/filter-product.dto";
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
@@ -50,6 +51,12 @@ export class ProductController {
     @Query('limit') limit = 10,
   ) {
     return this.productService.getProductsByRetailer(retailerId, Number(page), Number(limit));
+  }
+
+
+  @Get("filter")
+  async filterProducts(@Query() filterDto: FilterProductDto) {
+    return this.productService.filterProducts(filterDto);
   }
 
   @Patch(':id')
