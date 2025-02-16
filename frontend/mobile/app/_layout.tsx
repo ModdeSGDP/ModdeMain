@@ -25,6 +25,7 @@ import NotificationsPage from './screens/sideBars/notifications';
 import OrdersPage from './screens/orderPage2/orderPage';
 import OrderSettings from './screens/orderPage2/orderSettings';
 import CameraScreen from './screens/cameraScreen';
+import SignupPage from './screens/signUpPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +94,7 @@ export default function MyStack() {
       <Stack.Screen name="CartPage" component={Cart} />
       <Stack.Screen name="ProfilePage" component={Profile} />
       <Stack.Screen name="Login" component={LoginPage}/>
+      <Stack.Screen name="SignUpPage" component={SignupPage} />
       <Stack.Screen name="Registration" component={RegistrationComplete}/>
       <Stack.Screen name="ProductDetail" component={ProductDetailPage}/>
       <Stack.Screen name="ImageSearch" component={VisualSearch}/>
@@ -104,6 +106,8 @@ export default function MyStack() {
       <Stack.Screen name="OrdersPage" component={OrdersPage}/>
       <Stack.Screen name="OrderSettingsPage" component={OrderSettings}/>
       <Stack.Screen name="Camera" component={CameraScreen} />
+      
+
       {/*  Main Tab Navigator */}
       <Stack.Screen name="Main" component={BottomTabs} />
     </Stack.Navigator>

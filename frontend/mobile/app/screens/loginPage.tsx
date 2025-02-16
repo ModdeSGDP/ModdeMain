@@ -1,20 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+"use client"
+
+import { useState } from "react"
+import { View, Text, TextInput, StyleSheet, Image, Pressable, Alert } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 
 const LoginPage = () => {
-  const navigation = useNavigation<any>();
-  const [rememberMe, setRememberMe] = useState(false);
+  const navigation = useNavigation<any>()
+  const [rememberMe, setRememberMe] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [username, setUsername] = useState("")
 
+  const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields")
+      return
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert("Error", "Please enter a valid email address")
+      return
+    }
+    if (password.length < 8) {
+      Alert.alert("Error", "Password must be at least 6 characters long")
+      return
+    }
+    // Implement actual login logic here
+    setUsername(email.split("@")[0]) // Set username for welcome message
+    Alert.alert("Success", "Login successful")
+  }
   return (
     <View style={styles.loginPage}>
       <Image style={styles.loginPageChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
       <Image style={styles.loginPageItem} resizeMode="cover" source={require("../assets/Ellipse2.png")} />
-      <Image style={[styles.logoIcon, styles.loginPosition]} resizeMode="cover" source={require("../assets/logo2.png")} />
-      
+      <Image
+        style={[styles.logoIcon, styles.loginPosition]}
+        resizeMode="cover"
+        source={require("../assets/logo2.png")}
+      />
+
       <View style={[styles.loginParent, styles.loginPosition]}>
         <Text style={[styles.login, styles.loginTypo]}>Login</Text>
-        <Text style={styles.welcomeBackAnne}>Welcome back, <Text style={styles.boldText}>Anne</Text>.</Text>
+        <Text style={styles.welcomeBackAnne}>
+          Welcome back, <Text style={styles.boldText}>{username || "User"}</Text>.
+        </Text>
       </View>
       <View style={[styles.entryFiled, styles.entryFiledPosition]}>
         <View style={styles.eMailAddressParent}>
@@ -24,6 +53,9 @@ const LoginPage = () => {
               style={[styles.emailEntryChild, styles.entryChildBorder]}
               placeholder="Enter your email here"
               placeholderTextColor="#898989"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
             />
           </View>
         </View>
@@ -36,45 +68,53 @@ const LoginPage = () => {
               style={[styles.passwordEntryChild, styles.entryChildBorder]}
               placeholder="Enter your password"
               placeholderTextColor="#898989"
-              secureTextEntry={true}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
             />
-            <Image style={[styles.eyeIcon, styles.iconLayout]} resizeMode="cover" source={require("../assets/eye.png")} />
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
+              <Image
+                style={[styles.eyeIcon, styles.iconLayout]}
+                resizeMode="cover"
+                source={showPassword ? require("../assets/eye-off.png") : require("../assets/eye.png")}
+              />
+            </Pressable>
           </View>
-          <Pressable 
-            style={styles.rememberMeButton} 
-            onPress={() => setRememberMe(!rememberMe)}
-          >
-            <View style={[
-              styles.checkbox, 
-              rememberMe && styles.checkboxChecked
-            ]} />
+          <Pressable style={styles.rememberMeButton} onPress={() => setRememberMe(!rememberMe)}>
+            <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]} />
             <Text style={styles.rememberMeText}>Remember me</Text>
           </Pressable>
           <Text style={[styles.forgotPassword, styles.passwordPosition]}>Forgot Password</Text>
         </View>
       </View>
-      
+
       <View style={[styles.loginButtonParent, styles.entryFiledPosition]}>
-        <Pressable style={styles.loginButton} onPress={() => navigation.navigate("Registration" as never)}>
+        <Pressable style={styles.loginButton} onPress={handleLogin}>
           <View style={[styles.loginButtonChild, styles.entryChildLayout]} />
           <Text style={[styles.login1, styles.loginTypo]}>Login</Text>
         </Pressable>
         <View style={styles.loginButton}>
           <View style={[styles.signInButtonChild, styles.entryChildBorder]} />
           <View style={styles.signInGoo}>
-            <Image style={[styles.googleIcon, styles.iconLayout]} resizeMode="cover" source={require("../assets/Google.png")} />
+            <Image
+              style={[styles.googleIcon, styles.iconLayout]}
+              resizeMode="cover"
+              source={require("../assets/Google.png")}
+            />
             <Text style={styles.signInWith}>Sign in with Google</Text>
           </View>
         </View>
         <Text style={styles.dontHaveAnContainer}>
           <Text style={[styles.dontHaveAn, styles.signInLayout]}>Don't have an account?</Text>
           <Text style={styles.text}> </Text>
-          <Text style={[styles.signIn, styles.signInLayout]}>Sign in</Text>
+          <Pressable onPress={() => navigation.navigate("SignUpPage")}>
+            <Text style={[styles.signIn, styles.signInLayout]}>Sign up</Text>
+          </Pressable>
         </Text>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   loginPosition: {
@@ -123,6 +163,7 @@ const styles = StyleSheet.create({
   },
   signInLayout: {
     lineHeight: 21,
+    top:4.5,
     fontSize: 14
   },
   loginPageChild: {
@@ -142,7 +183,7 @@ const styles = StyleSheet.create({
   },
   logoIcon: {
     marginLeft: -86.5,
-    top: 89,
+    top: 60,
     width: 174,
     height: 100,
     shadowColor: "#000",

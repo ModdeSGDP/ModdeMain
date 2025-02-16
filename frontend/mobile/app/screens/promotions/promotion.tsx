@@ -96,11 +96,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
   },
   left:{
-    width: 24,
-    height: 24,
-    left:90,
-    top:-13,
-
+    width: 18,
+    height: 16,
+    left:80,
+    bottom:6,
   }
   ,
   header: {
@@ -180,7 +179,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fba3a3",
     paddingHorizontal: 40,  // Reduced width
     paddingVertical: 8,     // Reduced height
-    marginBottom: 100,       // Slightly reduced bottom margin
+    marginBottom: 90,       // Slightly reduced bottom margin
     borderRadius: 8,        // Slightly smaller border radius
   },
 

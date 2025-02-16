@@ -1,13 +1,55 @@
 "use client"
 
+import type React from "react"
 import { useState } from "react"
-import { View, Text, StyleSheet, Image, Pressable, ScrollView, TextInput } from "react-native"
+import { View, Text, StyleSheet, Image, Pressable, ScrollView, TextInput, ActivityIndicator, Modal } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import * as ImagePicker from "expo-image-picker"
+
+// Mock API function (in a real app, this would be in a separate file)
+const deleteAccount = async (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const success = Math.random() > 0.1 // 90% success rate for demonstration
+      if (success) {
+        resolve()
+      } else {
+        reject(new Error("Failed to delete account"))
+      }
+    }, 2000) // Simulate a 2-second delay
+  })
+}
+
+// ConfirmationModal component
+const ConfirmationModal: React.FC<{
+  visible: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}> = ({ visible, onConfirm, onCancel }) => {
+  return (
+    <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onCancel}>
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Are you sure you want to delete your account?</Text>
+          <View style={styles.buttonContainer}>
+            <Pressable style={[styles.button, styles.buttonCancel]} onPress={onCancel}>
+              <Text style={styles.textStyle}>Cancel</Text>
+            </Pressable>
+            <Pressable style={[styles.button, styles.buttonConfirm]} onPress={onConfirm}>
+              <Text style={styles.textStyle}>Confirm</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  )
+}
 
 const Profile = () => {
   const navigation = useNavigation()
   const [isEditing, setIsEditing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
   const [profileData, setProfileData] = useState({
     name: "Anne Smith",
     email: "anne@gmail.com",
@@ -38,6 +80,19 @@ const Profile = () => {
 
     if (!result.canceled) {
       setProfileImage({ uri: result.assets[0].uri })
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true)
+    try {
+      await deleteAccount()
+      setIsDeleting(false)
+      alert("Account deleted successfully")
+      navigation.navigate("Login")
+    } catch (error) {
+      setIsDeleting(false)
+      alert("Error deleting account. Please try again.")
     }
   }
 
@@ -107,7 +162,7 @@ const Profile = () => {
             <Text style={styles.changePassword}>change password</Text>
           </View>
         </View>
-        <Pressable style={styles.deleteAccount} onPress={() => console.log("Delete account pressed")}>
+        <Pressable style={styles.deleteAccount} onPress={() => setShowConfirmation(true)}>
           <Image source={require("../../assets/user.png")} style={styles.trashIcon} />
           <Text style={styles.deleteAccountText}>Delete Account</Text>
         </Pressable>
@@ -140,6 +195,18 @@ const Profile = () => {
         </View>
         <View style={styles.activeIndicator} />
       </View>
+
+      <ConfirmationModal
+        visible={showConfirmation}
+        onConfirm={handleDeleteAccount}
+        onCancel={() => setShowConfirmation(false)}
+      />
+
+      {isDeleting && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#FBA3A3" />
+        </View>
+      )}
     </View>
   )
 }
@@ -322,6 +389,62 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: "#fba3a3",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginHorizontal: 10,
+  },
+  buttonCancel: {
+    backgroundColor: "#FBA3A3",
+  },
+  buttonConfirm: {
+    backgroundColor: "#FF0000",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
   },
 })
 
