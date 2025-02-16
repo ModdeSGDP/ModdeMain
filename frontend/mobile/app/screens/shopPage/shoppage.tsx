@@ -88,7 +88,6 @@ const ShopsPageInfinityScroll = () => {
       material: "Denim",
     },
   ])
-
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product) => {
       const categoryMatch =
@@ -98,7 +97,6 @@ const ShopsPageInfinityScroll = () => {
       const sizeMatch = selectedSizes.length === 0 || product.sizes.some((size) => selectedSizes.includes(size))
       const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(product.material)
       const priceMatch = product.price >= priceRange.low && product.price <= priceRange.high
-
       return categoryMatch && sizeMatch && materialMatch && priceMatch
     })
 
@@ -107,7 +105,6 @@ const ShopsPageInfinityScroll = () => {
     } else if (selectedSort === "recommended") {
       filtered = filtered.filter((product) => product.tag === "recommended")
     }
-
     return filtered
   }, [products, selectedSort, selectedCategories, selectedSizes, selectedMaterials, priceRange])
 
