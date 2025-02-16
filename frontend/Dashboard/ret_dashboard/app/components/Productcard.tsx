@@ -1,29 +1,32 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EditProductModal from "../components/EditProduct";
+import ImageCarousel from "./ImageCarousel";
 
 interface ProductCardProps {
   id: string;
-  image: string;
+  image: string[];
   title: string;
   category: string;
   price: string;
   description: string;
   salesCount: number;
   remainingCount: number;
+  onDelete: (id: string) => void;  // Accepts a delete function from the parent
+  onUpdate: (updatedProduct: ProductCardProps) => void;
 }
 
 const ProductMenu: React.FC<{ product: ProductCardProps; onDelete: () => void; onUpdate: (updatedProduct: ProductCardProps) => void }> = ({ product, onDelete, onUpdate }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSave = (updatedProduct: ProductCardProps) => {
-    localStorage.setItem(`product-${product.id}`, JSON.stringify(updatedProduct));
-    onUpdate(updatedProduct);
+    localStorage.setItem(`product-${product.id}`, JSON.stringify(updatedProduct)); // Save only this product
+    onUpdate(updatedProduct); // Update UI state
     setIsOpen(false);
   };
 
@@ -64,6 +67,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   description,
   salesCount,
   remainingCount,
+  onDelete,
+  onUpdate,
 }) => {
   const [product, setProduct] = useState<ProductCardProps>({
     id,
@@ -74,13 +79,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     description,
     salesCount,
     remainingCount,
+    onDelete,
+    onUpdate,
   });
 
-  // Load from local storage on mount (specific product only)
+  // Load only the specific product from localStorage on mount
   useEffect(() => {
     const storedProduct = localStorage.getItem(`product-${id}`);
     if (storedProduct) {
-      setProduct(JSON.parse(storedProduct));
+      setProduct(JSON.parse(storedProduct)); // Load the stored product
     }
   }, [id]);
 
@@ -88,16 +95,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     setProduct(updatedProduct);
   };
 
-  const handleDelete = () => {
-    console.log("Delete product:", title);
-    localStorage.removeItem(`product-${id}`);
-  };
-
   return (
     <Card className="w-full md:w-[300px] rounded-xl shadow-md hover:shadow-lg transition-shadow bg-white p-4">
       <div className="relative">
-        <Image src={product.image} alt={product.title} width={200} height={100} className="w-full h-48 object-cover rounded-lg" />
-        <ProductMenu product={product} onDelete={handleDelete} onUpdate={handleUpdate} />
+        <ImageCarousel images={product.image} />
+        <ProductMenu product={product} onDelete={() => onDelete(id)} onUpdate={handleUpdate} />
       </div>
 
       <CardContent className="mt-2">

@@ -30,6 +30,7 @@ const Login = () => {
     console.log("User Logged In:", data);
     setLoading(true);
     setTimeout(() => {
+      localStorage.setItem("authenticated", "true");
       router.push("/Dashboard"); // Redirect to dashboard upon successful login
     }, 1500);
   };
@@ -83,7 +84,7 @@ const Login = () => {
       </div>
 
       {/* Right Section - Images Aligned Correctly with Small Gap */}
-       <div className="md:w-1/2 flex justify-center items-start relative">
+      <div className="md:w-1/2 flex justify-center items-start relative">
         <div className="absolute -top-48 right-5">
           <img src="/images/model1.svg" alt="Model 1" className="w-64 h-auto rounded-lg" />
         </div>

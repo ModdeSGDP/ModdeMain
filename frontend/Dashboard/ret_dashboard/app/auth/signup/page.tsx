@@ -180,6 +180,11 @@ const SignUpPage = () => {
       <footer className="w-full bg-gray-900 text-white text-sm py-4 mt-10">
         <div className="container mx-auto flex justify-between items-center px-6">
           <span>© 2024 - Modde SellerHub Dashboard</span>
+          <div className="flex space-x-6">
+            <Link href="/about" className="hover:underline">About</Link>
+            <Link href="/policy" className="hover:underline">Policy</Link>
+            <Link href="/contact" className="hover:underline">Contact</Link>
+          </div>
         </div>
       </footer>
     </div>

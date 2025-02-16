@@ -18,7 +18,7 @@ function Page() {
   };
 
   return (
-    <div className="pt-0 pl-64">
+    <div className="pt-0 pl-4">
       {/* Payment Heading */}
       <h1 className="font-bold text-2xl mb-2">Payment</h1>
 
