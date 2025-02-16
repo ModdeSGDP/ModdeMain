@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
 import Image from 'next/image';
+import { useRouter } from "next/navigation";
 import ProductGallery from "./ProductGallery";
 
 const ProductUploadForm = () => {
+  const router = useRouter();
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("All");
@@ -17,7 +19,7 @@ const ProductUploadForm = () => {
   const [stockQuantity, setStockQuantity] = useState(0);
   const [regularPrice, setRegularPrice] = useState(0);
   const [salePrice, setSalePrice] = useState(0);
-  const [images, setImages] = useState<(string | ArrayBuffer | null)[]>([]);
+  const [images, setImages] = useState<string[]>([]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -25,12 +27,12 @@ const ProductUploadForm = () => {
     const validTypes = ["image/jpeg", "image/jpg", "image/png"];
 
     files.forEach((file) => {
-      if (validTypes.includes((file as File).type)) {
+      if (validTypes.includes(file.type)) {
         const reader = new FileReader();
         reader.onload = () => {
-          setImages((prev) => [...prev, reader.result]);
+          setImages((prev) => [...prev, reader.result as string]);
         };
-        reader.readAsDataURL(file as Blob);
+        reader.readAsDataURL(file);
       } else {
         alert("Invalid file type. Only JPG, JPEG, and PNG are allowed.");
       }
@@ -43,17 +45,27 @@ const ProductUploadForm = () => {
 
   const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    console.log({
-      productName,
-      description,
+
+    const newProduct = {
+      id: Date.now().toString(), // Unique ID for the product
+      image: images,
+      title: productName,
       category,
-      size,
-      color,
-      stockQuantity,
-      regularPrice,
-      salePrice,
-      images,
-    });
+      price: `LKR ${salePrice}`,
+      description,
+      salesCount: 0,
+      remainingCount: stockQuantity,
+    };
+
+    // Retrieve existing products from localStorage
+    const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
+    const updatedProducts = [...storedProducts, newProduct];
+
+    // Save updated products in localStorage
+    localStorage.setItem("products", JSON.stringify(updatedProducts));
+
+    // Redirect to product page after adding
+    router.push("/Product");
   };
 
   return (
@@ -125,7 +137,6 @@ const ProductUploadForm = () => {
             </div>
           </div>
 
-
           {/* Color Picker */}
           <div className="flex items-center gap-4">
             {/* Color Picker Input */}
@@ -169,9 +180,6 @@ const ProductUploadForm = () => {
             </div>
           </div>
 
-
-
-
           {/* Prices */}
           <div className="flex gap-4">
             <div>
@@ -211,10 +219,8 @@ const ProductUploadForm = () => {
       {/* Right Side: Image Upload Section */}
       <Card className="flex-1 p-6">
         <ProductGallery />
-
       </Card>
     </div>
-
   );
 };
 
