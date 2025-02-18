@@ -1,22 +1,23 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, Image, Pressable, ScrollView, TextInput, ActivityIndicator, Modal } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import * as ImagePicker from "expo-image-picker"
+import { useAsyncStorage } from "../AsyncStorage/useAsyncStorage"
 
 // Mock API function (in a real app, this would be in a separate file)
 const deleteAccount = async (): Promise<void> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const success = Math.random() > 0.1 // 90% success rate for demonstration
+      const success = Math.random() > 0.1
       if (success) {
         resolve()
       } else {
         reject(new Error("Failed to delete account"))
       }
-    }, 2000) // Simulate a 2-second delay
+    }, 2000)
   })
 }
 
@@ -46,27 +47,55 @@ const ConfirmationModal: React.FC<{
 }
 
 const Profile = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<any>()
+  const { storeData, getData } = useAsyncStorage()
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [profileData, setProfileData] = useState({
-    name: "Anne Smith",
-    email: "anne@gmail.com",
-    address: "No:123 Milepost Avenue, Colombo, Sri Lanka",
-    gender: "Female",
-  })
-  const [profileImage, setProfileImage] = useState(require("../../assets/ellipse-20.png"))
 
-  const handleEdit = () => {
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    address: "",
+    password: "",
+  })
+
+  const [profileImage, setProfileImage] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      const userData = await getData("userData")
+      if (userData) {
+        setProfileData({
+          name: userData.username || "",
+          email: userData.email || "",
+          address: userData.address || "",
+          password: userData.password || "",
+        })
+        if (userData.profilePicture) {
+          setProfileImage(userData.profilePicture)
+        }
+      }
+    }
+    loadUserData()
+  }, [getData])
+
+  const handleEdit = async () => {
     if (isEditing) {
-      // Here you would typically save the changes to a backend
+      // Save changes to AsyncStorage
+      await storeData("userData", {
+        username: profileData.name,
+        email: profileData.email,
+        address: profileData.address,
+        password: profileData.password,
+        profilePicture: profileImage,
+      })
       console.log("Saving changes:", profileData)
     }
     setIsEditing(!isEditing)
   }
 
-  const handleChange = (key, value) => {
+  const handleChange = (key: string, value: string) => {
     setProfileData((prev) => ({ ...prev, [key]: value }))
   }
 
@@ -79,7 +108,12 @@ const Profile = () => {
     })
 
     if (!result.canceled) {
-      setProfileImage({ uri: result.assets[0].uri })
+      const newImageUri = result.assets[0].uri
+      setProfileImage(newImageUri)
+      await storeData("userData", {
+        ...profileData,
+        profilePicture: newImageUri,
+      })
     }
   }
 
@@ -106,12 +140,17 @@ const Profile = () => {
       <Pressable onPress={() => navigation.navigate("NotificationPage")}>
         <Image style={styles.bell} source={require("../../assets/bell.png")} />
       </Pressable>
+
       <View style={styles.profilePhotoContainer}>
-        <Image style={styles.profilePhoto} source={profileImage} />
+        <Image
+          style={styles.profilePhoto}
+          source={profileImage ? { uri: profileImage } : require("../../assets/ellipse-20.png")}
+        />
         <Pressable style={styles.editPhotoButton} onPress={pickImage}>
           <Text style={styles.editPhotoText}>Edit Photo</Text>
         </Pressable>
       </View>
+
       <ScrollView style={styles.profileOptions}>
         <View style={styles.accountInfo}>
           <View style={styles.sectionHeader}>
@@ -120,6 +159,7 @@ const Profile = () => {
               <Text style={styles.editButton}>{isEditing ? "Save" : "Edit"}</Text>
             </Pressable>
           </View>
+
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Name</Text>
             {isEditing ? (
@@ -132,6 +172,7 @@ const Profile = () => {
               <Text style={styles.infoValue}>{profileData.name}</Text>
             )}
           </View>
+
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Email address</Text>
             {isEditing ? (
@@ -139,11 +180,13 @@ const Profile = () => {
                 style={styles.input}
                 value={profileData.email}
                 onChangeText={(text) => handleChange("email", text)}
+                keyboardType="email-address"
               />
             ) : (
               <Text style={styles.infoValue}>{profileData.email}</Text>
             )}
           </View>
+
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Address</Text>
             {isEditing ? (
@@ -151,6 +194,7 @@ const Profile = () => {
                 style={styles.input}
                 value={profileData.address}
                 onChangeText={(text) => handleChange("address", text)}
+                multiline
               />
             ) : (
               <Text style={styles.infoValue}>{profileData.address}</Text>
@@ -159,9 +203,12 @@ const Profile = () => {
 
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Password</Text>
-            <Text style={styles.changePassword}>change password</Text>
+            <Pressable onPress={() => navigation.navigate("ChangePassword")}>
+              <Text style={styles.changePassword}>change password</Text>
+            </Pressable>
           </View>
         </View>
+
         <Pressable style={styles.deleteAccount} onPress={() => setShowConfirmation(true)}>
           <Image source={require("../../assets/user.png")} style={styles.trashIcon} />
           <Text style={styles.deleteAccountText}>Delete Account</Text>
@@ -187,7 +234,6 @@ const Profile = () => {
           <Pressable onPress={() => navigation.navigate("CartPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
           </Pressable>
-
           <Pressable onPress={() => navigation.navigate("ProfilePage")}>
             <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user1.png")} />

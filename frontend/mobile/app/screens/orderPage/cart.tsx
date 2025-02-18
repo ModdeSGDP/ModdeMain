@@ -21,7 +21,6 @@ const Cart = () => {
       setDisplayTotal(calculateTotalPrice(selectedItemsArray))
     }
   }
-
   const calculateTotalPrice = (itemsToCalculate) => {
     return itemsToCalculate.reduce((sum,item) => {
       const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""))
@@ -280,7 +279,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#321919",
-    left: 150,
+    left: 160,
   },
   groupParent: {
     flexDirection: "row",

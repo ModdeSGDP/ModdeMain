@@ -3,15 +3,21 @@
 import React, { useState } from "react"
 import { View, Text, TextInput, StyleSheet, Image, Pressable, Alert, Animated } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage"
+import * as ImagePicker from "expo-image-picker"
 
 const SignupPage = () => {
   const navigation = useNavigation<any>()
+  const { storeData } = useAsyncStorage()
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [address, setAddress] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [fadeAnim] = useState(new Animated.Value(0))
+  const [image, setImage] = useState<string | null>(null)
 
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -21,8 +27,21 @@ const SignupPage = () => {
     }).start()
   }, [fadeAnim])
 
-  const handleSignup = () => {
-    if (!email || !password || !confirmPassword) {
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    })
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri)
+    }
+  }
+
+  const handleSignup = async () => {
+    if (!username || !email || !password || !confirmPassword || !address) {
       Alert.alert("Error", "Please fill in all fields")
       return
     }
@@ -38,23 +57,58 @@ const SignupPage = () => {
       Alert.alert("Error", "Passwords do not match")
       return
     }
-    // Implement actual signup logic here
-    Alert.alert("Success", "Signup successful")
-  }
 
+    const userData = {
+      username,
+      email,
+      address,
+      password,
+      profilePicture: image,
+    }
+
+    // Save user data to AsyncStorage
+    await storeData("userData", userData)
+
+    Alert.alert("Success", "Signup successful", [
+      {
+        text: "OK",
+        onPress: () => navigation.navigate("ProfilePage"),
+      },
+    ])
+  }
   return (
     <View style={styles.signupPage}>
       <Image style={styles.signupPageChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
       <Image style={styles.signupPageItem} resizeMode="cover" source={require("../assets/Ellipse2.png")} />
       <Animated.View style={[styles.contentContainer, { opacity: fadeAnim }]}>
         <Image style={styles.logoIcon} resizeMode="cover" source={require("../assets/logo2.png")} />
-
-        <View style={styles.signupParent}>
+        {/* <View style={styles.signupParent}>
           <Text style={styles.signup}>Sign Up</Text>
           <Text style={styles.createYourAccount}>Create your account</Text>
-        </View>
-
+        </View> */}
+        <Pressable style={styles.profileImageContainer} onPress={pickImage}>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.cameraIconContainer}>
+              <Image source={require("../assets/camera.png")} style={styles.cameraIcon} resizeMode="contain" />
+            </View>
+          )}
+        </Pressable>
         <View style={styles.entryFiled}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>First Name</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your First Name"
+                placeholderTextColor="#898989"
+                value={username}
+                onChangeText={setUsername}
+              />
+            </View>
+          </View>
+
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>E-mail address</Text>
             <View style={styles.inputWrapper}>
@@ -65,6 +119,20 @@ const SignupPage = () => {
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
+              />
+            </View>
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Address</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.addressInput}
+                placeholder="Enter your address"
+                placeholderTextColor="#898989"
+                value={address}
+                onChangeText={setAddress}
+                multiline
+                numberOfLines={3}
               />
             </View>
           </View>
@@ -88,6 +156,7 @@ const SignupPage = () => {
               </Pressable>
             </View>
           </View>
+
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Confirm Password</Text>
             <View style={styles.inputWrapper}>
@@ -109,7 +178,6 @@ const SignupPage = () => {
             </View>
           </View>
         </View>
-
         <View style={styles.signupButtonParent}>
           <Pressable style={styles.signupButton} onPress={handleSignup}>
             <Text style={styles.signupButtonText}>Sign Up</Text>
@@ -129,7 +197,6 @@ const SignupPage = () => {
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   signupPage: {
     flex: 1,
@@ -140,14 +207,14 @@ const styles = StyleSheet.create({
     top: -10,
     left: -20,
     width: 619,
-    height: 427,
+    height: 350,
   },
   signupPageItem: {
     position: "absolute",
     top: 503,
     left: -14,
-    width: 441,
-    height: 406,
+    width: 450,
+    height: 470,
   },
   contentContainer: {
     flex: 1,
@@ -158,7 +225,7 @@ const styles = StyleSheet.create({
   logoIcon: {
     width: 150,
     height: 86,
-    bottom:50,
+    bottom:10,
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -171,9 +238,9 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   signup: {
-    fontSize: 28,
+    fontSize: 1,
     fontWeight: "600",
-    color: "#fba3a3",
+    color: "#000",
     textAlign: "center",
     fontFamily: "Inter-SemiBold",
   },
@@ -183,6 +250,32 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Rosario-SemiBold",
     marginTop: 5,
+  },
+  profileImageContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 60,
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    overflow: "hidden",
+  },
+  profileImage: {
+    width: "100%",
+    height: "100%",
+  },
+  cameraIconContainer: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fba3a3",
+  },
+  cameraIcon: {
+    width: 40,
+    height: 40,
+    tintColor: "#fff",
   },
   entryFiled: {
     width: "100%",
@@ -212,6 +305,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: "#000",
+  },
+  addressInput: {
+    flex: 1,
+    height: 40,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
+    color: "#000",
+    textAlignVertical: "top",
   },
   eyeIconWrapper: {
     padding: 8,
@@ -284,9 +386,9 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Medium",
   },
   signIn: {
-    color: "#fba3a3",
+    color: "#000",
     fontSize: 12,
-    top:4.5,
+    top: 4.5,
     fontWeight: "700",
     fontFamily: "Inter-Bold",
   },
