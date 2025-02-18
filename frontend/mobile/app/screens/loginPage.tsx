@@ -22,12 +22,17 @@ const LoginPage = () => {
       return
     }
     if (password.length < 8) {
-      Alert.alert("Error", "Password must be at least 6 characters long")
+      Alert.alert("Error", "Password must be at least 8 characters long")
       return
     }
     // Implement actual login logic here
     setUsername(email.split("@")[0]) // Set username for welcome message
-    Alert.alert("Success", "Login successful")
+    Alert.alert("Success", "Login successful", [
+      {
+        text: "OK",
+        onPress: () => navigation.navigate("HomePage"),
+      },
+    ])
   }
   return (
     <View style={styles.loginPage}>
@@ -87,7 +92,6 @@ const LoginPage = () => {
           <Text style={[styles.forgotPassword, styles.passwordPosition]}>Forgot Password</Text>
         </View>
       </View>
-
       <View style={[styles.loginButtonParent, styles.entryFiledPosition]}>
         <Pressable style={styles.loginButton} onPress={handleLogin}>
           <View style={[styles.loginButtonChild, styles.entryChildLayout]} />
@@ -119,22 +123,22 @@ const LoginPage = () => {
 const styles = StyleSheet.create({
   loginPosition: {
     left: "50%",
-    position: "absolute"
+    position: "absolute",
   },
   loginTypo: {
     fontFamily: "Inter-SemiBold",
     textAlign: "center",
-    fontWeight: "600"
+    fontWeight: "600",
   },
   entryFiledPosition: {
     left: 35,
-    position: "absolute"
+    position: "absolute",
   },
   eMailAddressTypo: {
     lineHeight: 24,
     fontSize: 12,
     fontFamily: "Rosario-Regular",
-    textAlign: "left"
+    textAlign: "left",
   },
   entryChildBorder: {
     borderWidth: 1,
@@ -148,30 +152,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#000",
     textAlign: "center",
-    position: "absolute"
+    position: "absolute",
   },
   iconLayout: {
     maxHeight: "100%",
     maxWidth: "100%",
     position: "absolute",
-    overflow: "hidden"
+    overflow: "hidden",
   },
   entryChildLayout: {
     borderRadius: 10,
     top: 0,
-    height: 40
+    height: 40,
   },
   signInLayout: {
     lineHeight: 21,
-    top:4.5,
-    fontSize: 14
+    top: 4.5,
+    fontSize: 14,
   },
   loginPageChild: {
     top: -10,
     left: -20,
     width: 619,
     height: 427,
-    position: "absolute"
+    position: "absolute",
   },
   loginPageItem: {
     top: 503,
@@ -179,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 150,
     width: 441,
     height: 406,
-    position: "absolute"
+    position: "absolute",
   },
   logoIcon: {
     marginLeft: -86.5,
@@ -200,7 +204,7 @@ const styles = StyleSheet.create({
     lineHeight: 40,
     textAlign: "center",
     color: "#fff",
-    alignSelf: "stretch"
+    alignSelf: "stretch",
   },
   welcomeBackAnne: {
     fontSize: 18,
@@ -209,38 +213,38 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontFamily: "Rosario-SemiBold",
     fontWeight: "600",
-    alignSelf: "stretch"
+    alignSelf: "stretch",
   },
   loginParent: {
     marginLeft: -80.5,
     top: 176,
     width: 162,
-    alignItems: "center"
+    alignItems: "center",
   },
   eMailAddress: {
     color: "#000",
-    alignSelf: "stretch"
+    alignSelf: "stretch",
   },
   emailEntryChild: {
     height: 40,
     width: 331,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   emailEntry: {
     height: 40,
-    width: 331
+    width: 331,
   },
   eMailAddressParent: {
     gap: 5,
-    alignSelf: "stretch"
+    alignSelf: "stretch",
   },
   password: {
     fontFamily: "Rosario-Regular",
-    left: -2
+    left: -2,
   },
   passwordWrapper: {
     width: 58,
-    height: 18
+    height: 18,
   },
   passwordEntryChild: {
     height: 40,
@@ -252,43 +256,43 @@ const styles = StyleSheet.create({
     top: "20%",
     right: "5.99%",
     bottom: "20%",
-    left: "86.76%"
+    left: "86.76%",
   },
   rememberMeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 10,
   },
   checkbox: {
     width: 20,
     height: 20,
     borderWidth: 1,
-    borderColor: '#898989',
+    borderColor: "#898989",
     borderRadius: 4,
     marginRight: 8,
   },
   checkboxChecked: {
-    backgroundColor: '#fba3a3',
-    borderColor: '#fba3a3',
+    backgroundColor: "#fba3a3",
+    borderColor: "#fba3a3",
   },
   rememberMeText: {
     fontFamily: "Rosario-Regular",
     fontSize: 12,
-    color: '#000',
+    color: "#000",
   },
   forgotPassword: {
     left: 234,
     fontFamily: "Rosario-SemiBold",
-    fontWeight: "600"
+    fontWeight: "600",
   },
   groupParent: {
     gap: 7,
-    alignSelf: "stretch"
+    alignSelf: "stretch",
   },
   entryFiled: {
     top: 312,
     width: 332,
-    gap: 19
+    gap: 19,
   },
   loginButtonChild: {
     backgroundColor: "#fba3a3",
@@ -313,11 +317,11 @@ const styles = StyleSheet.create({
     width: 50,
     textAlign: "center",
     left: "50%",
-    position: "absolute"
+    position: "absolute",
   },
   loginButton: {
     width: 327,
-    height: 40
+    height: 40,
   },
   signInButtonChild: {
     marginLeft: -163.5,
@@ -354,7 +358,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold",
     fontWeight: "600",
     left: "50%",
-    position: "absolute"
+    position: "absolute",
   },
   signInGoo: {
     height: "63%",
@@ -363,30 +367,30 @@ const styles = StyleSheet.create({
     right: "28.44%",
     bottom: "19.5%",
     left: "21.1%",
-    position: "absolute"
+    position: "absolute",
   },
   dontHaveAn: {
     fontWeight: "500",
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Medium",
   },
   text: {
     fontSize: 13,
-    fontFamily: "JejuGothic"
+    fontFamily: "JejuGothic",
   },
   signIn: {
     fontWeight: "700",
-    fontFamily: "Inter-Bold"
+    fontFamily: "Inter-Bold",
   },
   dontHaveAnContainer: {
     color: "#000",
     textAlign: "center",
-    alignSelf: "stretch"
+    alignSelf: "stretch",
   },
   loginButtonParent: {
     top: 558,
     gap: 22,
     width: 327,
-    alignItems: "center"
+    alignItems: "center",
   },
   loginPage: {
     width: "100%",
@@ -396,9 +400,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   boldText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-});
+})
 
-export default LoginPage;
+export default LoginPage
 
