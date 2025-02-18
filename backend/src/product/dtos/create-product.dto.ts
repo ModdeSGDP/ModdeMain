@@ -18,25 +18,9 @@ export class CreateProductDto {
   @IsNotEmpty()
   color: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  quantity: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  regularPrice: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  salePrice: number;
-
   @IsOptional()
   @IsString()
   image?: string; // Optional field for the product image URL
-
-  @IsBoolean()
-  @IsOptional()
-  isListed?: boolean = true;
 
   @IsMongoId()
   retailerId: Types.ObjectId;
