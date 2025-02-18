@@ -48,6 +48,7 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }: E
             <SelectContent>
               <SelectItem value="Men">Men</SelectItem>
               <SelectItem value="Women">Women</SelectItem>
+              <SelectItem value="Women">Unisex</SelectItem>
             </SelectContent>
           </Select>
           <Input name="price" type="text" value={formData.price} onChange={handleChange} placeholder="Price" />

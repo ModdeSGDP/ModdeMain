@@ -7,11 +7,13 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Product } from './schema/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
+import { FilterProductDto } from "./dtos/filter-product.dto";
 import { ConfigService } from '../common/configs/config.service';
 import { S3Service } from '../common/aws/s3.service';
 
 @Injectable()
 export class ProductService {
+  
   private readonly s3: S3Client;
   private readonly bucketName: string;
 
@@ -61,6 +63,10 @@ export class ProductService {
     return savedProduct;
   }
 
+  async getProductById(id: string): Promise<Product> {
+    return this.productModel.findById(id).exec();
+  }
+
   async getProductsByRetailer(retailerId: string, page: number, limit: number): Promise<Product[]> {
     const skip = (page - 1) * limit;
     return this.productModel.find({ retailerId }).skip(skip).limit(limit).exec();
@@ -73,4 +79,21 @@ export class ProductService {
   async deleteProduct(id: string): Promise<Product> {
     return this.productModel.findByIdAndDelete(id);
   }
+
+  async filterProducts(filterDto: FilterProductDto) {
+    const { category, size } = filterDto;
+
+    const filterConditions: any = {};
+    
+    if (category) {
+      filterConditions.category = category;
+    }
+    
+    if (size) {
+      filterConditions.sizes = size; // Check if size exists in the sizes array
+    }
+
+    return this.productModel.find(filterConditions);
+  }
 }
+

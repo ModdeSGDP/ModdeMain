@@ -16,7 +16,7 @@ function page() {
     totalUsers: 350
   };
 
-   // Dynamic retailer data
+  // Dynamic retailer data
   const retailerOrders = [
     { id: 25426, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Komal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
     { id: 25425, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Nikhil", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
@@ -27,53 +27,53 @@ function page() {
     { id: 25420, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Priyantha", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
     { id: 25419, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kishan", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
     { id: 25417, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kumal", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
-    { id: 25412, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer:{ name: "Priyanka", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
-    { id: 25413, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer:{ name: "Nuwan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
-    { id: 254, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer:{ name: "Dumal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" }
+    { id: 25412, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Priyanka", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
+    { id: 25413, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Nuwan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
+    { id: 254, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Dumal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" }
   ];
 
-  
+
 
 
   return (
-    <div className="pt-0 pl-64">
-     
-      <div>
-            <h1 className="font-bold text-2xl mb-2">Orders List</h1><Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink href="/Analytics">Analytics</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+    <div className="pt-0 pl-4">
 
-            {/* Horizontal Line */}
+      <div>
+        <h1 className="font-bold text-2xl mb-2">Orders List</h1><Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/Analytics">Analytics</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+
+            <BreadcrumbItem>
+              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        {/* Horizontal Line */}
         <hr className="my-4 border-gray-300" />
 
 
-      {/* Summary Section */}
-      <div className="mt-4"> {/* Added margin-top */}
-        <Summary
-          completedOrders={dashboardData.completedOrders}
-          pendingOrders={dashboardData.pendingOrders}
-          cancelledOrders={dashboardData.cancelledOrders}
-          totalUsers={dashboardData.totalUsers}
-        />
-      </div>
+        {/* Summary Section */}
+        <div className="mt-4"> {/* Added margin-top */}
+          <Summary
+            completedOrders={dashboardData.completedOrders}
+            pendingOrders={dashboardData.pendingOrders}
+            cancelledOrders={dashboardData.cancelledOrders}
+            totalUsers={dashboardData.totalUsers}
+          />
+        </div>
 
-      {/* Date & Status Filter Section */}
-      <DateStatusFilter />
+        {/* Date & Status Filter Section */}
+        <DateStatusFilter />
 
         {/* Orders Table */}
-      <RecentPurchases orders={retailerOrders} />
+        <RecentPurchases orders={retailerOrders} />
 
-      
-               {/* Pagination (Move to Left Side) */}
+
+        {/* Pagination (Move to Left Side) */}
         <div className="mt-6 w-full flex">
           <div className="w-fit">
             <Pagination>
@@ -97,18 +97,18 @@ function page() {
 
 
 
-      
-
-   
 
 
-           
 
 
-        </div>
 
-        
-      
+
+
+
+      </div>
+
+
+
     </div>
   )
 }

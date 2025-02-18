@@ -88,7 +88,6 @@ const ShopsPageInfinityScroll = () => {
       material: "Denim",
     },
   ])
-
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product) => {
       const categoryMatch =
@@ -98,7 +97,6 @@ const ShopsPageInfinityScroll = () => {
       const sizeMatch = selectedSizes.length === 0 || product.sizes.some((size) => selectedSizes.includes(size))
       const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(product.material)
       const priceMatch = product.price >= priceRange.low && product.price <= priceRange.high
-
       return categoryMatch && sizeMatch && materialMatch && priceMatch
     })
 
@@ -107,7 +105,6 @@ const ShopsPageInfinityScroll = () => {
     } else if (selectedSort === "recommended") {
       filtered = filtered.filter((product) => product.tag === "recommended")
     }
-
     return filtered
   }, [products, selectedSort, selectedCategories, selectedSizes, selectedMaterials, priceRange])
 
@@ -161,7 +158,6 @@ const ShopsPageInfinityScroll = () => {
       </Pressable>
     )
   }
-
   const handleApplyFilters = useCallback(
     (filters: {
       categories: string[]
@@ -177,13 +173,11 @@ const ShopsPageInfinityScroll = () => {
     },
     [],
   )
-
   return (
     <View style={styles.shopsPageInfinityScroll}>
       <Pressable style={styles.backButton} onPress={() => navigation.navigate("HomePage")}>
         <Image style={styles.backButtonIcon} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
       </Pressable>
-
       <View style={styles.searchBar}>
         <Pressable
           onPress={() => {
@@ -292,19 +286,21 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   backButtonIcon: {
-    width: 27,
+    width: 37,
     height: 27,
+    top:12
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    width:340,
-    left:30,
+    width:290,
+    left:50,
     height:50,
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
     margin: 10,
     marginTop: 5,
+    top:10,
     padding: 6,
     shadowColor: "#000",
     shadowOffset: {

@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 import Retailor from "./components/retailor";
+import { orders } from "./data/orders"
 
 export default function RootLayout({
   children,
@@ -15,9 +16,9 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const router = useRouter();
-  const isAuthPage = pathname.startsWith("/auth");
+  const isAuthPage = pathname.startsWith("/auth");  // State to track authentication status
+  const isBasePath = pathname.endsWith("/");
 
-  // State to track authentication status
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -33,17 +34,23 @@ export default function RootLayout({
     if (authStatus && isAuthPage) {
       router.push("/Dashboard");
     }
+
+    if (authStatus && isBasePath) {
+      router.push("/Dashboard")
+    }
   }, [pathname]);
 
-  const retailorData = {
-    name: "Incarange",
-    avatar: "/images/maleavatar.svg",
-    greeting: "Hi, Joel !",
-  };
+  // Load the sample data into localStorage if not already loaded
+  useEffect(() => {
+    const localData = localStorage.getItem("orderData");
+    if (!localData) {
+      localStorage.setItem("orderData", JSON.stringify(orders));
+    }
+  }, [])
 
   return (
     <html lang="en">
-      <body className="min-h-screen flex">
+      <body className={`flex !pointer-events-auto ${isAuthenticated ? "overflow-hidden" : ""}`}>
         {!isAuthPage ? (
           isAuthenticated ? (
             <>
@@ -51,26 +58,34 @@ export default function RootLayout({
               <Sidebar />
 
               {/* Main Content */}
-              <div className="flex-1 flex flex-col">
-                {/* Header */}
-                <Header />
+              <div className="overflow-y-scroll h-screen flex-grow">
+                <div className="flex flex-col w-full">
+                  {/* Header */}
+                  <div className="flex flex-column">
+                    <div className="p-4">
+                      <Retailor />
+                    </div>
 
-                {/* Retailor Section */}
-                <div className="absolute top-0 left-64 z-12 p-4 w-[calc(100%-18rem)]">
-                  <Retailor {...retailorData} />
+                    <div className="flex-grow">
+                      <Header />
+                    </div>
+                  </div>
+
+                  {/* Retailor Section */}
+
+                  <main className="flex-grow p-4">{children}</main>
+
+                  {/* Footer */}
+                  <Footer />
                 </div>
-
-                <main className="flex-grow p-4">{children}</main>
-
-                {/* Footer */}
-                <Footer />
               </div>
             </>
           ) : null
         ) : (
           <main className="w-full">{children}</main>
-        )}
-      </body>
-    </html>
+        )
+        }
+      </body >
+    </html >
   );
 }

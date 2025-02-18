@@ -8,6 +8,8 @@ import { mongooseModuleAsyncOptions } from './common/configs/mongodb.config';
 import { ConfigModule } from '@nestjs/config';
 import { EmailModule } from './common/email/email.module';
 import { RetailerModule } from './retailer/retailer.module';
+import { StocksModule } from './stocks/stocks.module';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { RetailerModule } from './retailer/retailer.module';
     UserModule,
     AuthModule,
     EmailModule,
-    RetailerModule],
+    RetailerModule,
+    ProductModule,
+    StocksModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { EmailService } from 'src/common/email/email.service';
 import { InviteAdminDto } from './dto/invite-admin.dto';
 import { AdminInvite } from './schemas/admin-invite.schema';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,7 @@ export class UserService {
   async createUser(registerUserDto: RegisterUserDto): Promise<User> {
     const { email, password, firstName, lastName, role, address, gender, retailerId } = registerUserDto;
 
+  
     // Check if the username already exists
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
@@ -44,7 +46,19 @@ export class UserService {
     });
     return newUser.save();
   }
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    // If email is being updated, check if it's unique
+    if (updateUserDto.email) {
+      const existingUser = await this.userModel.findOne({ email: updateUserDto.email });
 
+      // If another user already has this email, and it's not the current user
+      if (existingUser && existingUser._id.toString() !== id) {
+        throw new ConflictException('Email is already taken');
+      }
+    }
+    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
+  }
+  
   async findUserByUsername(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email });
   }
@@ -56,6 +70,8 @@ export class UserService {
   // Invite Admin Logic
   async inviteAdmin(inviteAdminDto: InviteAdminDto): Promise<{ message: string }> {
     const { email } = inviteAdminDto;
+
+    
 
     // Check if an invitation already exists
     const existingInvite = await this.inviteModel.findOne({ email });

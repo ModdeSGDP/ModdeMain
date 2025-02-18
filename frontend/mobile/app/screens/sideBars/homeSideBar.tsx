@@ -1,26 +1,12 @@
-import { Image, StyleSheet, Text, View, Pressable } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import type { ParamListBase } from "@react-navigation/native";
-import { useState } from "react";
-import { Ionicons } from '@expo/vector-icons';
+"use client"
 
-type RootStackParamList = ParamListBase & {
-  SideMenu: undefined;
-  MyOrders: undefined;
-  Favorites: undefined;
-  History: undefined;
-  PromotionPage: undefined;
-  Camera: undefined;
-  Help: undefined;
-};
-
-type NavigationProp = {
-  navigate: (screen: keyof RootStackParamList) => void;
-};
+import { useState } from "react"
+import { View, Text, StyleSheet, Image, Pressable } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 
 const SideMenu = () => {
-  const navigation = useNavigation<NavigationProp>();
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const navigation = useNavigation()
+  const [selectedItem, setSelectedItem] = useState(null)
 
   const menuItems = [
     { name: "OrdersPage", label: "My Orders", icon: require("../../assets/truck.png") },
@@ -28,50 +14,44 @@ const SideMenu = () => {
     { name: "History", label: "History", icon: require("../../assets/shopping-bag.png") },
     { name: "PromotionPage", label: "Promotions", icon: require("../../assets/fire.png") },
     { name: "Camera", label: "Camera", icon: require("../../assets/camera-photo.png") },
-  ];
+  ]
 
-  const NavigationItem = ({ name, label, icon }: { name: keyof RootStackParamList; label: string; icon: any }) => (
+  const NavigationItem = ({ name, label, icon }) => (
     <Pressable
       style={[styles.navigationItem, selectedItem === name && styles.selectedItem]}
       onPress={() => {
-        setSelectedItem(name);
-        navigation.navigate(name);
+        setSelectedItem(name)
+        navigation.navigate(name)
       }}
     >
       <Image style={styles.icon} resizeMode="cover" source={icon} />
       <Text style={styles.navText}>{label}</Text>
     </Pressable>
-  );
+  )
 
   return (
     <View style={styles.sideMenu}>
-      {/* Background and Close Button */}
       <Image style={styles.background} resizeMode="cover" source={require("../../assets/Ellipse1.png")} />
       <Pressable style={styles.closeButton} onPress={() => navigation.navigate("HomePage")}>
-  <Image style={styles.closeIcon} source={require("../../assets/close.png")} />
-</Pressable>
-      
-      {/* Logo */}
+        <Image style={styles.closeIcon} source={require("../../assets/close.png")} />
+      </Pressable>
+
       <Image style={styles.logoIcon} resizeMode="cover" source={require("../../assets/logo.png")} />
-      
-      {/* Profile Section */}
+
       <Pressable style={styles.profileWrapper}>
         <Image style={styles.profileImage} resizeMode="cover" source={require("../../assets/ellipse-20.png")} />
         <Text style={styles.username}>Anne Fernando</Text>
       </Pressable>
-      
-      {/* Navigation Items */}
+
       <View style={styles.navigationBar}>
         {menuItems.map((item) => (
           <NavigationItem key={item.name} {...item} />
         ))}
       </View>
-      
-      {/* Bottom Decoration */}
       <Image style={styles.background2} resizeMode="cover" source={require("../../assets/Ellipse2.png")} />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   sideMenu: {
@@ -97,7 +77,7 @@ const styles = StyleSheet.create({
   logoIcon: {
     width: 66,
     height: 44,
-    top:-60,
+    top: -60,
     marginTop: 70,
     marginBottom: 20,
   },
@@ -150,13 +130,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
   },
-  
   closeIcon: {
     width: 24,
     height: 24,
     resizeMode: "contain",
   },
-  
-});
+})
 
-export default SideMenu;
+export default SideMenu
+

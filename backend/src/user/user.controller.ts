@@ -1,14 +1,11 @@
-import { Controller, Post, Body, Inject, forwardRef } from '@nestjs/common';
+import { Controller, Body, Param, Post,  Put, Get } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthService } from '../auth/auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
-import { EmailService } from 'src/common/email/email.service';
 import { InviteAdminDto } from './dto/invite-admin.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { ROLES } from 'src/common/constants/roles';
-
-
+import { EmailService } from 'src/common/email/email.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { Types } from 'mongoose';
+import { BadRequestException } from '@nestjs/common';
 
 @Controller('user')
 export class UserController {
@@ -19,16 +16,45 @@ export class UserController {
 
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
-    // The DTO is automatically validated here
     return this.userService.createUser(registerUserDto);
   }
 
   @Post('invite-admin')
-  async inviteAdmin(@Body() InviteAdminDto: InviteAdminDto){
-    return this.userService.inviteAdmin(InviteAdminDto);
+  async inviteAdmin(@Body() inviteAdminDto: InviteAdminDto) {
+    return this.userService.inviteAdmin(inviteAdminDto);
   }
 
+  @Put('update/:id')
+  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid user ID format');
+    }
+    return this.userService.updateUser(id, updateUserDto);
+  }
+
+  // Find user by email
+  @Get('email/:email')
+  async findUserByEmail(@Param('email') email: string) {
+    const user = await this.userService.findUserByUsername(email);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return user;
+  }
+
+  // Verify password
+  @Post('verify-password')
+  async verifyPassword(@Body() body: { email: string; password: string }) {
+    const user = await this.userService.findUserByUsername(body.email);
+    if (!user) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    const isPasswordValid = await this.userService.verifyPassword(body.password, user.password);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    return { message: 'Password is correct' };
+  }
 }
-
-
-

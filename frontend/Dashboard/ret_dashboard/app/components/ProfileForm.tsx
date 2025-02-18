@@ -40,12 +40,11 @@ const ProfileForm = () => {
 
   // Load saved user data from localStorage (Sign-Up Form Data)
   useEffect(() => {
-    const savedUser = localStorage.getItem("user"); // Fetch Sign-Up Data
+    const savedUser = localStorage.getItem("user");
     if (savedUser) {
       form.reset(JSON.parse(savedUser)); // Pre-fill form fields
     }
 
-    // Load profile picture if saved
     const savedProfilePic = localStorage.getItem("profilePicture");
     if (savedProfilePic) {
       setProfilePicture(savedProfilePic);
@@ -62,6 +61,11 @@ const ProfileForm = () => {
         localStorage.setItem("profilePicture", imgData); // Save image in localStorage
       };
       reader.readAsDataURL(event.target.files[0]);
+
+      // Trigger event to update Retailor dynamically
+      setTimeout(() => {
+        window.dispatchEvent(new Event("storage"));
+      }, 500);
     }
   };
 
@@ -70,6 +74,11 @@ const ProfileForm = () => {
     console.log("Updated values:", values);
     localStorage.setItem("user", JSON.stringify(values)); // Save updated data in localStorage
     setIsEditing(false);
+
+    // ✅ Trigger event to update Retailor dynamically
+    setTimeout(() => {
+      window.dispatchEvent(new Event("storage"));
+    }, 500);
   };
 
   return (
@@ -87,7 +96,7 @@ const ProfileForm = () => {
           <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
           <span className="text-sm text-gray-500">Upload New Photo</span>
         </label>
-        <span className="text-xl font-semibold">InCaranage</span>
+        <span className="text-xl font-semibold">{form.watch("companyName") || "InCaranage"}</span>
         <button onClick={() => setIsEditing(!isEditing)} className="ml-auto p-2 border rounded-lg hover:bg-gray-100">
           <Pencil className="w-4 h-4 text-gray-500" />
         </button>
@@ -169,7 +178,7 @@ const ProfileForm = () => {
           {isEditing && (
             <div className="col-span-2 flex justify-between mt-4">
               <Button type="submit" className="bg-red-500 hover:bg-red-600">Update</Button>
-              <Button onClick={() => setIsEditing(false)}>Cancel</Button>
+              <Button type="button" onClick={() => setIsEditing(false)}>Cancel</Button>
             </div>
           )}
         </form>
