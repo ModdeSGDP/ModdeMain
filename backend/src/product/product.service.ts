@@ -63,6 +63,10 @@ export class ProductService {
     return savedProduct;
   }
 
+  async getProductById(id: string): Promise<Product> {
+    return this.productModel.findById(id).exec();
+  }
+
   async getProductsByRetailer(retailerId: string, page: number, limit: number): Promise<Product[]> {
     const skip = (page - 1) * limit;
     return this.productModel.find({ retailerId }).skip(skip).limit(limit).exec();

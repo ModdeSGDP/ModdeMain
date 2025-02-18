@@ -41,4 +41,20 @@ export class UserController {
     }
     return user;
   }
+
+  // Verify password
+  @Post('verify-password')
+  async verifyPassword(@Body() body: { email: string; password: string }) {
+    const user = await this.userService.findUserByUsername(body.email);
+    if (!user) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    const isPasswordValid = await this.userService.verifyPassword(body.password, user.password);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    return { message: 'Password is correct' };
+  }
 }
