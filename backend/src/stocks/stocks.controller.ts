@@ -1,20 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Query, Delete } from '@nestjs/common';
 import { StocksService } from './stocks.service';
 import { CreateStocksDto } from './dtos/create-stocks.dto';
 import { UpdateStocksDto } from './dtos/update-stocks.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Controller('stocks')
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
-  @Post()
+  @Post('add')
   async create(@Body() createStocksDto: CreateStocksDto) {
     return this.stocksService.create(createStocksDto);
   }
 
   @Get()
-  async findAll() {
-    return this.stocksService.findAll();
+  async findAll(@Query() paginationDto: PaginationDto) {
+    return this.stocksService.findAll(paginationDto);
   }
 
   @Get(':id')

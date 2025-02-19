@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Retailer } from './schemas/retailer.schema';
 import { CreateRetailerDto } from './dtos/create-retailer.dto';
 import { UpdateRetailerDto } from './dtos/update-retailer.dto';
-import { PaginationDto } from './dtos/pagination.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Injectable()
 export class RetailerService {

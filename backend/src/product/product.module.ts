@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BullModule } from '@nestjs/bull';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { Product, ProductSchema } from './schema/product.schema';
+import { Product, ProductSchema } from './schemas/product.schema';
 import { CommonModule } from '../common/common.module'; 
 
 @Module({
@@ -14,6 +14,6 @@ import { CommonModule } from '../common/common.module';
   ],
   controllers: [ProductController],
   providers: [ProductService],
-  exports: [ProductService],
+  exports: [ProductService, MongooseModule],
 })
 export class ProductModule {}

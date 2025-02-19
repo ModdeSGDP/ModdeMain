@@ -21,6 +21,7 @@ import { Queue } from 'bull';
 import { ConfigService } from '../common/configs/config.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Controller('product')
 // @UseGuards(JwtAuthGuard)
@@ -41,6 +42,11 @@ export class ProductController {
     const product = await this.productService.createProduct(createProductDto, file);
     // Optionally, we could add an email notification here, but it's already queued in the service
     return product;
+  }
+
+  @Get()
+  async getAllProducts(@Query() paginationDto: PaginationDto) {
+    return this.productService.getAllProducts(paginationDto);
   }
 
   @Get(':id')

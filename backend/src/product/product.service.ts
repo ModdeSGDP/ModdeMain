@@ -4,12 +4,13 @@ import { InjectQueue } from '@nestjs/bull';
 import { Model } from 'mongoose';
 import { Queue } from 'bull';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { Product } from './schema/product.schema';
+import { Product } from './schemas/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { FilterProductDto } from "./dtos/filter-product.dto";
 import { ConfigService } from '../common/configs/config.service';
 import { S3Service } from '../common/aws/s3.service';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 
 @Injectable()
 export class ProductService {
@@ -71,6 +72,24 @@ export class ProductService {
     const skip = (page - 1) * limit;
     return this.productModel.find({ retailerId }).skip(skip).limit(limit).exec();
   }
+
+  async getAllProducts(paginationDto: PaginationDto) {
+    const { page = 1, limit = 10 } = paginationDto;
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      this.productModel.find().skip(skip).limit(limit).exec(),
+      this.productModel.countDocuments().exec(),
+    ]);
+
+    return {
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+  
 
   async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
     return this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
