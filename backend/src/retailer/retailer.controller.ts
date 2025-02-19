@@ -2,7 +2,7 @@ import { Controller, Get, Query, Post, Body, Patch, Param, Delete, UseGuards } f
 import { RetailerService } from './retailer.service';
 import { CreateRetailerDto } from './dtos/create-retailer.dto';
 import { UpdateRetailerDto } from './dtos/update-retailer.dto';
-import { PaginationDto } from './dtos/pagination.dto';
+import { PaginationDto } from '../common/dtos/pagination.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ROLES } from 'src/common/constants/roles';
