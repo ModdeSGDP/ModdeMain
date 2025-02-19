@@ -12,7 +12,7 @@ const HomePage = () => {
   const navigation = useNavigation()
   const route = useRoute()
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
-  const [uploadedImage, setUploadedImage] = useState(null)
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
 
   useEffect(() => {
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   nextText: {
     fontSize: 14,
     lineHeight: 19,
-    right:10,
+    right: 10,
     fontFamily: "Inter-SemiBold",
     color: "#fff",
   },
@@ -379,7 +379,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    
   },
   navBarBg: {
     position: "absolute",
@@ -413,4 +412,3 @@ const styles = StyleSheet.create({
 })
 
 export default HomePage
-

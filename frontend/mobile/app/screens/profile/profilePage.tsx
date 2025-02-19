@@ -284,13 +284,13 @@ const styles = StyleSheet.create({
     color: "#321919",
     textAlign: "center",
     marginTop: 50,
-    top: -10,
+    top: -30,
   },
   bell: {
     width: 22,
     height: 24,
     position: "absolute",
-    top: -50,
+    top: -55,
     right: 20,
   },
   profilePhotoContainer: {
