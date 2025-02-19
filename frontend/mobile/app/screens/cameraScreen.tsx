@@ -1,26 +1,39 @@
-import { useState, useRef } from "react"
-import { StyleSheet, Text, TouchableOpacity, View, Button, Image } from "react-native"
+import React, { useState, useRef, useEffect } from "react"
+import { StyleSheet, Text, TouchableOpacity, View, Image, ActivityIndicator } from "react-native"
 import { CameraView, type CameraType, useCameraPermissions } from "expo-camera"
 import { useNavigation } from "@react-navigation/native"
+import { MaterialIcons, Ionicons } from '@expo/vector-icons'
 
 const CameraScreen = () => {
   const [facing, setFacing] = useState<CameraType>("back")
   const [permission, requestPermission] = useCameraPermissions()
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
   const cameraRef = useRef<CameraView | null>(null)
   const navigation = useNavigation()
 
+  useEffect(() => {
+    if (capturedImage) {
+      setIsProcessing(true)
+      // Simulating AI processing time
+      const timer = setTimeout(() => {
+        setIsProcessing(false)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [capturedImage])
+
   if (!permission) {
-    // Camera permissions are still loading
-    return <View />
+    return <View style={styles.container} />
   }
 
   if (!permission.granted) {
-    // Camera permissions are not granted yet
     return (
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="Grant permission" />
+        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+          <Text style={styles.permissionButtonText}>Grant permission</Text>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -48,14 +61,23 @@ const CameraScreen = () => {
     return (
       <View style={styles.container}>
         <Image source={{ uri: capturedImage }} style={styles.preview} />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={retakePicture}>
-            <Text style={styles.text}>Retake</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={savePicture}>
-            <Text style={styles.text}>Save</Text>
-          </TouchableOpacity>
-        </View>
+        {isProcessing ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#FF69B4" />
+            <Text style={styles.loaderText}>Magic in progress... Your image is getting ready!</Text>
+          </View>
+        ) : (
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.iconButton} onPress={retakePicture}>
+              <MaterialIcons name="replay" size={30} color="white" />
+              <Text style={styles.buttonText}>Retake</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={savePicture}>
+              <MaterialIcons name="file-upload" size={30} color="white" />
+              <Text style={styles.buttonText}>Upload</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     )
   }
@@ -64,11 +86,12 @@ const CameraScreen = () => {
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
+          <TouchableOpacity style={styles.iconButton} onPress={toggleCameraFacing}>
+            <MaterialIcons name="flip-camera-ios" size={30} color="white" />
+            <Text style={styles.buttonText}>Flip</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={takePicture}>
-            <Text style={styles.text}>Take Picture</Text>
+          <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
+            <Ionicons name="camera" size={40} color="white" />
           </TouchableOpacity>
         </View>
       </CameraView>
@@ -80,35 +103,73 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    backgroundColor: '#FFB6C1',
   },
   message: {
     textAlign: "center",
-    paddingBottom: 10,
+    paddingBottom: 20,
+    fontSize: 18,
+    color: 'white',
   },
   camera: {
     flex: 1,
   },
   buttonContainer: {
-    flex: 1,
     flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 30,
+    left: 0,
+    right: 0,
   },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center",
+  iconButton: {
+    alignItems: 'center',
   },
-  text: {
-    fontSize: 24,
+  captureButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: '#FF69B4',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 14,
     fontWeight: "bold",
     color: "white",
+    marginTop: 5,
   },
   preview: {
     flex: 1,
     resizeMode: "cover",
   },
+  permissionButton: {
+    backgroundColor: '#FF69B4',
+    padding: 15,
+    borderRadius: 25,
+    marginHorizontal: 50,
+  },
+  permissionButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loaderText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#FF69B4',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
 })
 
 export default CameraScreen
-
