@@ -2,6 +2,7 @@ import { Controller, Post, Get, Patch, Delete, Param, Body } from '@nestjs/commo
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
+import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('order')
 export class OrderController {

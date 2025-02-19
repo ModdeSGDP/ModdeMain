@@ -3,22 +3,31 @@ import { StocksService } from './stocks.service';
 import { CreateStocksDto } from './dtos/create-stocks.dto';
 import { UpdateStocksDto } from './dtos/update-stocks.dto';
 import { PaginationDto } from '../common/dtos/pagination.dto';
+import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('Stocks') // Grouping under "Stocks"
 @Controller('stocks')
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
   @Post('add')
+  @ApiOperation({ summary: 'Create a new stock entry' })
+  @ApiResponse({ status: 201, description: 'Stock created successfully' })
   async create(@Body() createStocksDto: CreateStocksDto) {
     return this.stocksService.create(createStocksDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all stocks with pagination' })
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, example: 10 })
   async findAll(@Query() paginationDto: PaginationDto) {
     return this.stocksService.findAll(paginationDto);
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get stock by ID' })
+  @ApiParam({ name: 'id', required: true, example: '65d3f8b62a52c3c9e6a3f5a1' })
   async findOne(@Param('id') id: string) {
     return this.stocksService.findOne(id);
   }
