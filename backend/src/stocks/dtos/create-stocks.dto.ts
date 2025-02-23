@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateStocksDto {
-    @ApiProperty({ example: '65d2e9b62a52c3c9e6a3f5a0', description: 'Product ID' })
+    @ApiProperty({ example: '65d2e9b62a52c3c9e6a3f5a0', description: 'Product ID of the relevant product' })
     @IsMongoId()
     productId: Types.ObjectId;
 
