@@ -33,16 +33,22 @@ export class StocksController {
   }
 
   @Get('product/:productId')
+  @ApiOperation({ summary: 'Get stock by product ID' })
+  @ApiParam({ name: 'productId', required: true, example: '65d2e9b62a52c3c9e6a3f5a0' })
   async findByProduct(@Param('productId') productId: string) {
     return this.stocksService.findByProduct(productId);
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update stock by ID' })
+  @ApiParam({ name: 'id', required: true, example: '65d3f8b62a52c3c9e6a3f5a1' })
   async update(@Param('id') id: string, @Body() updateStocksDto: UpdateStocksDto) {
     return this.stocksService.update(id, updateStocksDto);
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete stock by ID' })
+  @ApiParam({ name: 'id', required: true, example: '65d3f8b62a52c3c9e6a3f5a1' })
   async remove(@Param('id') id: string) {
     return this.stocksService.remove(id);
   }
