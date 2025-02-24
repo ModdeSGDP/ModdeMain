@@ -38,9 +38,9 @@ const Retailor = () => {
       <Image
         src={retailorData.avatar}
         alt="Retailor Avatar"
-        width={60}
-        height={60}
-        className="rounded-full object-cover border-2 border-gray-300"
+        width={80}
+        height={80}
+        className="rounded-full w-12 h-12 object-cover border-2 border-gray-300"
       />
       <div>
         <p className="text-sm text-gray-500">{retailorData.greeting}</p>
