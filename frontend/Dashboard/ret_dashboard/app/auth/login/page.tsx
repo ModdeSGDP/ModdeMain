@@ -26,14 +26,34 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     console.log("User Logged In:", data);
     setLoading(true);
-    setTimeout(() => {
-      localStorage.setItem("authenticated", "true");
-      router.push("/Dashboard"); // Redirect to dashboard upon successful login
-    }, 1500);
+
+    const response = await fetch('localhost:38108/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      console.error("Login failed:", response);
+      setLoading(false);
+      return;
+    }
+
+    const responseData = await response.json();
+    localStorage.setItem("token", responseData.token);
+
+    // setTimeout(() => {
+    //   localStorage.setItem("authenticated", "true");
+    //   router.push("/Dashboard"); // Redirect to dashboard upon successful login
+    // }, 1500);
   };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center  p-6 relative">

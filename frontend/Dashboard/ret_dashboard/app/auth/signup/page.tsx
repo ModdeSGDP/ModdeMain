@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,23 +11,37 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 // Validation Schema
-const signUpSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters").max(50),
-  lastName: z.string().min(2, "Last name must be at least 2 characters").max(50),
-  jobTitle: z.string().min(2, "Job title must be at least 2 characters").max(50),
-  email: z.string().email("Invalid email address"),
-  mobileNumber: z.string().regex(/^\d{10,15}$/, "Mobile number must be between 10-15 digits"),
-  companyName: z.string().min(2, "Company name is required").max(50),
-  companyWebsite: z.string().optional(),
-  sriLankaBased: z.string().optional(),
-  annualRevenue: z.string().optional(),
-  privacyPolicy: z.boolean().refine((val) => val === true, {
-    message: "You must agree to the Privacy Policy.",
-  }),
-});
+const signUpSchema = z
+  .object({
+    firstName: z.string().min(2, "First name must be at least 2 characters").max(50),
+    lastName: z.string().min(2, "Last name must be at least 2 characters").max(50),
+    jobTitle: z.string().min(2, "Job title must be at least 2 characters").max(50),
+    email: z.string().email("Invalid email address"),
+    mobileNumber: z.string().regex(/^\d{10,15}$/, "Mobile number must be between 10-15 digits"),
+    companyName: z.string().min(2, "Company name is required").max(50),
+    companyWebsite: z.string().optional(),
+    companyRegisterNumber: z
+      .string()
+      .min(1, "Company Register Number is required")
+      .regex(/^[a-zA-Z0-9]+$/, "Only letters and numbers are allowed"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/\d.*\d/, "Password must include at least 2 numbers")
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must include at least 1 symbol"),
+    confirmPassword: z.string(),
+    privacyPolicy: z.boolean().refine((val) => val === true, {
+      message: "You must agree to the Privacy Policy.",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const SignUpPage = () => {
   const router = useRouter();
+  const [serverError, setServerError] = useState<string | null>(null);
 
   // useEffect(() => {
   //   if (localStorage.getItem("authenticated") === "true") {
@@ -48,17 +63,68 @@ const SignUpPage = () => {
       mobileNumber: "",
       companyName: "",
       companyWebsite: "",
-      sriLankaBased: "",
-      annualRevenue: "",
+      companyRegisterNumber: "",
+      password: "",
+      confirmPassword: "",
       privacyPolicy: false,
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log("User Signed Up:", data);
-    localStorage.setItem("user", JSON.stringify(data));
-    localStorage.setItem("authenticated", "true");
-    router.push("/Dashboard");
+  const onSubmit = async (data: any) => {
+    setServerError(null);
+    try {
+      console.log("Submitting Data:", data); // Debugging step
+
+      const formattedData = {
+        firstName: data?.firstName || "",
+        lastName: data?.lastName || "",
+        jobTitle: data?.jobTitle || "",
+        email: data?.email || "",
+        mobileNumber: data?.mobileNumber || "",
+        companyName: data?.companyName || "",
+        companyWebsite: data?.companyWebsite || "",
+        companyRegisterNumber: data?.companyRegisterNumber || "",
+        password: data?.password || "",
+        role: "USER", // Default role assigned
+      };
+
+      console.log("Sending formatted data:", formattedData); // Debugging Step
+      const response = await fetch("http://localhost:3000/api/user/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          formattedData,
+
+        ),
+      });
+
+      // Check if response is valid JSON
+      const contentType = response.headers.get("content-type");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed. Please try again.");
+      }
+
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Received unexpected response format. Expected JSON.");
+      }
+
+      const result = await response.json();
+
+
+
+      console.log("User Signed Up:", result);
+
+      localStorage.setItem("user", JSON.stringify(result));
+      localStorage.setItem("authenticated", "true");
+
+      router.push("/Dashboard");
+    } catch (error: any) {
+      setServerError(error.message);
+      console.error("Error during registration:", error);
+    }
   };
 
   return (
@@ -111,6 +177,18 @@ const SignUpPage = () => {
               {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
             </div>
 
+            {/* <div className="col-span-2">
+              <label className="text-gray-700 font-medium">Password *</label>
+              <Input type="password" {...register("password")} placeholder="Enter a strong password" />
+              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-gray-700 font-medium">Confirm Password *</label>
+              <Input type="password" {...register("confirmPassword")} placeholder="Re-enter your password" />
+              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
+            </div> */}
+
             {/* Job Title */}
             <div>
               <label className="text-gray-700 font-medium">Job Title *</label>
@@ -132,6 +210,18 @@ const SignUpPage = () => {
               {errors.mobileNumber && <p className="text-red-500 text-sm">{errors.mobileNumber.message}</p>}
             </div>
 
+            <div className="col-span-2">
+              <label className="text-gray-700 font-medium">Password *</label>
+              <Input type="password" {...register("password")} placeholder="Enter a strong password" />
+              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-gray-700 font-medium">Confirm Password *</label>
+              <Input type="password" {...register("confirmPassword")} placeholder="Re-enter your password" />
+              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
+            </div>
+
             {/* Company Name */}
             <div>
               <label className="text-gray-700 font-medium">Company Name *</label>
@@ -145,15 +235,23 @@ const SignUpPage = () => {
               <Input {...register("companyWebsite")} placeholder="Answer here (optional)" />
             </div>
 
+            {/* Optional Fields */}
             <div className="col-span-2">
-              <label className="text-gray-700 font-medium">Do you operate and fulfill your products from Sri Lanka?</label>
-              <Input {...register("sriLankaBased")} placeholder="Answer here (optional)" />
+              <label className="text-gray-700 font-medium">Company Register Number</label>
+              <Input {...register("companyRegisterNumber", {
+                required: "Company Register Number is required",
+                pattern: {
+                  value: /^[a-zA-Z0-9]+$/,
+                  message: "Only letters and numbers are allowed",
+                }
+              })}
+                placeholder="Enter Your Company Register Number" />
+              {errors.companyRegisterNumber && (
+                <p className="text-red-500 text-sm">{errors.companyRegisterNumber.message}</p>
+              )}
+
             </div>
 
-            <div className="col-span-2">
-              <label className="text-gray-700 font-medium">What is your company's annual revenue in Sri Lanka?</label>
-              <Input {...register("annualRevenue")} placeholder="Enter revenue amount (optional)" />
-            </div>
 
             {/* Privacy Policy */}
             <div className="col-span-2 flex items-center">
@@ -161,6 +259,10 @@ const SignUpPage = () => {
               <span>I have read and agree to Modde’s Seller Privacy Notice</span>
               {errors.privacyPolicy && <p className="text-red-500 text-sm">{errors.privacyPolicy.message}</p>}
             </div>
+
+            {/* Server Error Message */}
+            {serverError && <p className="text-red-500 col-span-2 text-center">{serverError}</p>}
+
 
             {/* Submit Button */}
             <div className="col-span-2 flex flex-col items-center">

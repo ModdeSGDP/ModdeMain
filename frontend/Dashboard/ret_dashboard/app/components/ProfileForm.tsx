@@ -18,6 +18,10 @@ const formSchema = z.object({
   mobileNumber: z.string().regex(/^\d{10,15}$/, "Mobile number must be between 10-15 digits"),
   companyName: z.string().min(2, "Company name is required").max(50, "Company name too long"),
   companyWebsite: z.string().optional().or(z.literal("")).or(z.string().url("Invalid URL format")),
+  companyRegisterNumber: z
+    .string()
+    .min(1, "Company Register Number is required")
+    .regex(/^[a-zA-Z0-9]+$/, "Only letters and numbers are allowed"),
 });
 
 const ProfileForm = () => {
@@ -35,6 +39,7 @@ const ProfileForm = () => {
       mobileNumber: "",
       companyName: "",
       companyWebsite: "",
+      companyRegisterNumber: "",
     },
   });
 
@@ -168,6 +173,17 @@ const ProfileForm = () => {
           <FormField control={form.control} name="companyWebsite" render={({ field }) => (
             <FormItem>
               <FormLabel>Company Website (Optional)</FormLabel>
+              <FormControl>
+                <Input {...field} disabled={!isEditing} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
+          {/* ✅ Added Company Register Number */}
+          <FormField control={form.control} name="companyRegisterNumber" render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company Register Number *</FormLabel>
               <FormControl>
                 <Input {...field} disabled={!isEditing} />
               </FormControl>
