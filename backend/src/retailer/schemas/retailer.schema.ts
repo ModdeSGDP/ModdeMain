@@ -4,7 +4,7 @@ import { HydratedDocument } from 'mongoose';
 @Schema({ timestamps: true }) // Automatically adds `createdAt` and `updatedAt`
 export class Retailer {
   @Prop({ required: true })
-  name: string;
+  companyName: string;
 
   @Prop({ required: true, unique: true })
   email: string;
