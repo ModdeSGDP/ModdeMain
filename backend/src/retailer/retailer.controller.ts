@@ -55,5 +55,11 @@ export class RetailerController {
   test(): string {
     return 'Hello World!';
   }
+
+  @Post('signup')
+  async createRetailer(@Body() data) {
+    const { retailer, admin } = data; // Expecting retailer and admin details from the request
+    return this.retailerService.createRetailerWithAdmin(retailer, admin);
+  }
   
 }
