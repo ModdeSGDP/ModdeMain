@@ -14,7 +14,7 @@ import { ProductModule } from './product/product.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal:true,envFilePath:".env",cache:true
+      isGlobal:true,envFilePath:'.env',cache:true
     }),
     MongooseModule.forRootAsync(mongooseModuleAsyncOptions),
     UserModule,
