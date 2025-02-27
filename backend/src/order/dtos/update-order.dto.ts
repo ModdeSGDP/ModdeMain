@@ -1,11 +1,26 @@
-import { IsOptional, IsEnum, IsNumber } from 'class-validator';
+import { IsOptional, IsArray, ValidateNested, IsMongoId, IsNumber, IsEnum } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class UpdateOrderItemDto {
+  @IsMongoId()
+  stockId: string;
+
+  @IsNumber()
+  quantity: number;
+}
 
 export class UpdateOrderDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateOrderItemDto)
   @IsOptional()
-  @IsEnum(['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Canceled'])
-  status?: string;
+  items?: UpdateOrderItemDto[];
 
-  @IsOptional()
   @IsNumber()
+  @IsOptional()
   totalPrice?: number;
+
+  @IsEnum(['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Canceled'])
+  @IsOptional()
+  status?: string;
 }
