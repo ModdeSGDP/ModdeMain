@@ -25,7 +25,7 @@ export class ProductService {
     private readonly s3Service: S3Service, // Using isolated AWS functionality
   ) {
     // Although S3 functionality is now handled by AwsService, we still initialize s3 here if needed.
-    // Alternatively, you can remove these lines if you solely rely on s3Service.uploadFile().
+    // Alternatively, we can remove these lines if we want to solely rely on s3Service.uploadFile().
     this.s3 = new S3Client({
       region: this.configService.get('AWS_REGION'),
       credentials: {
