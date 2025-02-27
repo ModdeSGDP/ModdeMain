@@ -1,8 +1,7 @@
-// Base URL Configuration
-export const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+export const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
 // POST API Endpoints
-export const API_POST_USER_REGISTER = `${baseUrl}/api/user/register`;
+export const API_POST_USER_REGISTER = `${baseUrl}/User/UserController_register`; 
 export const API_POST_INVITE_ADMIN = `${baseUrl}/api/user/invite-admin`;
 export const API_POST_VERIFY_PASSWORD = `${baseUrl}/api/user/verify-password`;
 export const API_POST_RETAILER_REGISTER = `${baseUrl}/api/retailers/register`;
