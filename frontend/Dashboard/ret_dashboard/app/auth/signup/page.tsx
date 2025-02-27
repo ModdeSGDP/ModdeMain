@@ -1,14 +1,14 @@
+"use client"
 
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { API_POST_USER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
 
 // Validation Schema
 const signUpSchema = z
@@ -37,11 +37,11 @@ const signUpSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
-  });
+  })
 
 const SignUpPage = () => {
-  const router = useRouter();
-  const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter()
+  const [serverError, setServerError] = useState<string | null>(null)
 
   // useEffect(() => {
   //   if (localStorage.getItem("authenticated") === "true") {
@@ -68,12 +68,12 @@ const SignUpPage = () => {
       confirmPassword: "",
       privacyPolicy: false,
     },
-  });
+  })
 
   const onSubmit = async (data: any) => {
-    setServerError(null);
+    setServerError(null)
     try {
-      console.log("Submitting Data:", data); // Debugging step
+      console.log("Submitting Data:", data) // Debugging step
 
       const formattedData = {
         firstName: data?.firstName || "",
@@ -86,46 +86,35 @@ const SignUpPage = () => {
         companyRegisterNumber: data?.companyRegisterNumber || "",
         password: data?.password || "",
         role: "USER", // Default role assigned
-      };
+      }
 
-      console.log("Sending formatted data:", formattedData); // Debugging Step
-      const response = await fetch("http://localhost:3000/api/user/register", {
+      console.log("Sending formatted data:", formattedData) // Debugging Step
+      const response = await fetch(API_POST_USER_REGISTER, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(
-          formattedData,
-
-        ),
-      });
-
+        body: JSON.stringify(formattedData),
+      })
       // Check if response is valid JSON
-      const contentType = response.headers.get("content-type");
+      const contentType = response.headers.get("content-type")
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Registration failed. Please try again.");
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Registration failed. Please try again.")
       }
-
       if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Received unexpected response format. Expected JSON.");
+        throw new Error("Received unexpected response format. Expected JSON.")
       }
-
-      const result = await response.json();
-
-
-
-      console.log("User Signed Up:", result);
-
-      localStorage.setItem("user", JSON.stringify(result));
-      localStorage.setItem("authenticated", "true");
-
-      router.push("/Dashboard");
+      const result = await response.json()
+      console.log("User Signed Up:", result)
+      localStorage.setItem("user", JSON.stringify(result))
+      localStorage.setItem("authenticated", "true")
+      router.push("/Dashboard")
     } catch (error: any) {
-      setServerError(error.message);
-      console.error("Error during registration:", error);
+      setServerError(error.message)
+      console.error("Error during registration:", error)
     }
-  };
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -141,9 +130,8 @@ const SignUpPage = () => {
           <h1 className="text-4xl font-bold">Get started with Modde!</h1>
           <p className="text-gray-600 text-lg mt-2">Sign up to sell on Modde</p>
           <p className="text-gray-500 mt-4">
-            We are looking for Sri Lankan brands and sellers who share our passion for delivering
-            quality products and exceptional customer experiences. If that sounds like you, we’d love
-            for you to apply!
+            We are looking for Sri Lankan brands and sellers who share our passion for delivering quality products and
+            exceptional customer experiences. If that sounds like you, we’d love for you to apply!
           </p>
           <Button className="mt-6 bg-black text-white px-6 py-3 rounded-md">Learn More</Button>
         </div>
@@ -238,20 +226,20 @@ const SignUpPage = () => {
             {/* Optional Fields */}
             <div className="col-span-2">
               <label className="text-gray-700 font-medium">Company Register Number</label>
-              <Input {...register("companyRegisterNumber", {
-                required: "Company Register Number is required",
-                pattern: {
-                  value: /^[a-zA-Z0-9]+$/,
-                  message: "Only letters and numbers are allowed",
-                }
-              })}
-                placeholder="Enter Your Company Register Number" />
+              <Input
+                {...register("companyRegisterNumber", {
+                  required: "Company Register Number is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9]+$/,
+                    message: "Only letters and numbers are allowed",
+                  },
+                })}
+                placeholder="Enter Your Company Register Number"
+              />
               {errors.companyRegisterNumber && (
                 <p className="text-red-500 text-sm">{errors.companyRegisterNumber.message}</p>
               )}
-
             </div>
-
 
             {/* Privacy Policy */}
             <div className="col-span-2 flex items-center">
@@ -263,15 +251,18 @@ const SignUpPage = () => {
             {/* Server Error Message */}
             {serverError && <p className="text-red-500 col-span-2 text-center">{serverError}</p>}
 
-
             {/* Submit Button */}
             <div className="col-span-2 flex flex-col items-center">
-              <Button type="submit" className="bg-black hover:bg-gray-800">Submit</Button>
+              <Button type="submit" className="bg-black hover:bg-gray-800">
+                Submit
+              </Button>
 
               {/* Already have an account? */}
               <p className="mt-4 text-gray-700">
                 Do you already have an account?{" "}
-                <Link href="/auth/login" className="text-blue-600 hover:underline">Login</Link>
+                <Link href="/auth/login" className="text-blue-600 hover:underline">
+                  Login
+                </Link>
               </p>
             </div>
           </form>
@@ -283,14 +274,21 @@ const SignUpPage = () => {
         <div className="container mx-auto flex justify-between items-center px-6">
           <span>© 2024 - Modde SellerHub Dashboard</span>
           <div className="flex space-x-6">
-            <Link href="/about" className="hover:underline">About</Link>
-            <Link href="/policy" className="hover:underline">Policy</Link>
-            <Link href="/contact" className="hover:underline">Contact</Link>
+            <Link href="/about" className="hover:underline">
+              About
+            </Link>
+            <Link href="/policy" className="hover:underline">
+              Policy
+            </Link>
+            <Link href="/contact" className="hover:underline">
+              Contact
+            </Link>
           </div>
         </div>
       </footer>
     </div>
-  );
-};
+  )
+}
 
-export default SignUpPage;
+export default SignUpPage
+

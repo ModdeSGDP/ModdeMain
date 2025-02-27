@@ -1,20 +1,22 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { mongooseModuleAsyncOptions } from './common/configs/mongodb.config';
-import { ConfigModule } from '@nestjs/config';
-import { EmailModule } from './common/email/email.module';
-import { RetailerModule } from './retailer/retailer.module';
-import { StocksModule } from './stocks/stocks.module';
-import { ProductModule } from './product/product.module';
+import { Module } from "@nestjs/common"
+import { MongooseModule } from "@nestjs/mongoose"
+import { AppController } from "./app.controller"
+import { AppService } from "./app.service"
+import { UserModule } from "./user/user.module"
+import { AuthModule } from "./auth/auth.module"
+import { mongooseModuleAsyncOptions } from "./common/configs/mongodb.config"
+import { ConfigModule } from "@nestjs/config"
+import { EmailModule } from "./common/email/email.module"
+import { RetailerModule } from "./retailer/retailer.module"
+import { StocksModule } from "./stocks/stocks.module"
+import { ProductModule } from "./product/product.module"
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal:true,envFilePath:'.env',cache:true
+      isGlobal: true,
+      envFilePath: ".env",
+      cache: true,
     }),
     MongooseModule.forRootAsync(mongooseModuleAsyncOptions),
     UserModule,
@@ -22,8 +24,10 @@ import { ProductModule } from './product/product.module';
     EmailModule,
     RetailerModule,
     ProductModule,
-    StocksModule],
+    StocksModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
