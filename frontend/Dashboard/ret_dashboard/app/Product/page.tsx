@@ -164,7 +164,7 @@ export default function Products() {
                     {/* Horizontal Line */}
                     <hr className="my-4 border-gray-300" />
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="flex flex-row flex-wrap gap-5">
                         {products.map((product) => (
                             <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
                         ))}

@@ -14,11 +14,11 @@ const ProductUploadForm = () => {
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("All");
-  const [size, setSize] = useState("All");
+  // const [size, setSize] = useState("All");
   const [color, setColor] = useState("#000000");
-  const [stockQuantity, setStockQuantity] = useState(0);
-  const [regularPrice, setRegularPrice] = useState(0);
-  const [salePrice, setSalePrice] = useState(0);
+  // const [stockQuantity, setStockQuantity] = useState(0);
+  // const [regularPrice, setRegularPrice] = useState(0);
+  // const [salePrice, setSalePrice] = useState(0);
   const [images, setImages] = useState<string[]>([]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,10 +51,10 @@ const ProductUploadForm = () => {
       image: images,
       title: productName,
       category,
-      price: `LKR ${salePrice}`,
+      // price: `LKR ${salePrice}`,
       description,
-      salesCount: 0,
-      remainingCount: stockQuantity,
+      // salesCount: 0,
+      // remainingCount: stockQuantity,
     };
 
     // Retrieve existing products from localStorage
@@ -118,7 +118,7 @@ const ProductUploadForm = () => {
             </div>
 
             {/* Size Dropdown */}
-            <div className="flex-1">
+            {/* <div className="flex-1">
               <Label>Select Size</Label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -134,7 +134,7 @@ const ProductUploadForm = () => {
                   <DropdownMenuItem onSelect={() => setSize("Extra Large")}>Extra Large</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
+            </div> */}
           </div>
 
           {/* Color Picker */}
@@ -168,7 +168,7 @@ const ProductUploadForm = () => {
             </div>
 
             {/* Stock Quantity */}
-            <div className="flex-1">
+            {/* <div className="flex-1">
               <Label htmlFor="stockQuantity">Stock Quantity</Label>
               <Input
                 id="stockQuantity"
@@ -177,11 +177,11 @@ const ProductUploadForm = () => {
                 onChange={(e) => setStockQuantity(parseInt(e.target.value))}
                 required
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Prices */}
-          <div className="flex gap-4">
+          {/* <div className="flex gap-4">
             <div>
               <Label htmlFor="regularPrice">Regular Price</Label>
               <Input
@@ -202,7 +202,7 @@ const ProductUploadForm = () => {
                 required
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Submit Button */}
           <div className="flex gap-4">

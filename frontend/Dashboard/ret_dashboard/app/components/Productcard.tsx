@@ -96,13 +96,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <Card className="w-full md:w-[300px] rounded-xl shadow-md hover:shadow-lg transition-shadow bg-white p-4">
+    <Card className="w-full md:w-[260px] rounded-xl shadow-md hover:shadow-lg transition-shadow bg-white p-2 flex flex-col justify-between">
       <div className="relative">
         <ImageCarousel images={product.image} />
         <ProductMenu product={product} onDelete={() => onDelete(id)} onUpdate={handleUpdate} />
       </div>
 
-      <CardContent className="mt-2">
+      <CardContent className="mt-2 p-4">
         <h2 className="text-lg font-semibold text-gray-900">{product.title}</h2>
         <p className="text-sm text-gray-500">{product.category}</p>
         <p className="text-md font-bold text-gray-800 mt-1">{product.price}</p>
