@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { API_POST_USER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
+import { API_POST_RETAILER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
+
 
 // Validation Schema
 const signUpSchema = z
@@ -42,6 +44,9 @@ const signUpSchema = z
 const SignUpPage = () => {
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
+  // const [showPassword, setShowPassword] = useState(false);
+  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   // useEffect(() => {
   //   if (localStorage.getItem("authenticated") === "true") {
@@ -75,21 +80,21 @@ const SignUpPage = () => {
     try {
       console.log("Submitting Data:", data) // Debugging step
 
-      const formattedData = {
+      let formattedData = {
         firstName: data?.firstName || "",
         lastName: data?.lastName || "",
-        jobTitle: data?.jobTitle || "",
+        // jobTitle: data?.jobTitle || "",
         email: data?.email || "",
-        mobileNumber: data?.mobileNumber || "",
-        companyName: data?.companyName || "",
-        companyWebsite: data?.companyWebsite || "",
-        companyRegisterNumber: data?.companyRegisterNumber || "",
+        // mobileNumber: data?.mobileNumber || "",
+        // companyName: data?.companyName || "",
+        // companyWebsite: data?.companyWebsite || "", 
+        // companyRegisterNumber: data?.companyRegisterNumber || "",
         password: data?.password || "",
-        role: "USER", // Default role assigned
+        role: "Admin", // Default role assigned
       }
 
       console.log("Sending formatted data:", formattedData) // Debugging Step
-      const response = await fetch(API_POST_USER_REGISTER, {
+      let response = await fetch(API_POST_USER_REGISTER, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,14 +102,53 @@ const SignUpPage = () => {
         body: JSON.stringify(formattedData),
       })
       // Check if response is valid JSON
-      const contentType = response.headers.get("content-type")
+      // const contentType = response.headers.get("content-type")
+      // if (!response.ok) {
+      //   const errorData = await response.json()
+      //   throw new Error(errorData.message || "Registration failed. Please try again.")
+      // }
+      // if (!contentType || !contentType.includes("application/json")) {
+      //   throw new Error("Received unexpected response format. Expected JSON.")
+      // }
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Registration failed. Please try again.")
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed. Please try again.");
       }
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Received unexpected response format. Expected JSON.")
+
+      const formattedDataRetailer = {
+
+        companyName: data?.companyName,
+        email: data?.email,
+        contactNumber: String(data.mobileNumber),
+        registrationNumber: String(data.companyRegisterNumber),
+
+
+
+
       }
+
+      console.log("Sending formatted data:", formattedDataRetailer) // Debugging Step
+      response = await fetch(API_POST_RETAILER_REGISTER, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formattedDataRetailer),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed. Please try again.");
+      }
+
+
+
+
+
+
+
+
       const result = await response.json()
       console.log("User Signed Up:", result)
       localStorage.setItem("user", JSON.stringify(result))
