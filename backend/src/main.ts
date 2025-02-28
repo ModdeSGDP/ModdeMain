@@ -17,10 +17,11 @@ async function bootstrap() {
 
   // CORS Configuration
   app.enableCors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.PRODUCTION_FRONTEND_URL // Make sure to set this in your .env file
-        : "http://localhost:3000",
+    // origin:
+    //   process.env.NODE_ENV === "production"
+    //     ? process.env.PRODUCTION_FRONTEND_URL // Make sure to set this in your .env file
+    //     : "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -37,7 +38,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup("api/docs", app, document)
 
-  const port = process.env.PORT || 3001
+  const port = process.env.PORT || 4000
   await app.listen(port)
   console.log(`Application is running on: ${await app.getUrl()}`)
 }
