@@ -2,11 +2,12 @@ import { Controller, Get, Query, Post, Body, Patch, Param, Delete, UseGuards } f
 import { RetailerService } from './retailer.service';
 import { CreateRetailerDto } from './dtos/create-retailer.dto';
 import { UpdateRetailerDto } from './dtos/update-retailer.dto';
+import { SignupRetailerDto } from './dtos/signup-retailer.dto';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ROLES } from 'src/common/constants/roles';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Retailers') // Grouping under "Retailers"
 @Controller('retailers')
@@ -57,9 +58,22 @@ export class RetailerController {
   }
 
   @Post('signup')
-  async createRetailer(@Body() data) {
-    const { retailer, admin } = data; // Expecting retailer and admin details from the request
-    return this.retailerService.createRetailerWithAdmin(retailer, admin);
+  @ApiOperation({ summary: 'Register a retailer and admin' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        retailer: { $ref: '#/components/schemas/CreateRetailerDto' },
+        admin: { $ref: '#/components/schemas/CreateAdminDto' },
+      },
+    },
+    required: true,
+  })
+  @ApiResponse({ status: 201, description: 'Retailer and admin created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async createRetailer(@Body() signupRetailerDto: SignupRetailerDto) {
+    return this.retailerService.createRetailerWithAdmin(signupRetailerDto);
   }
   
 }

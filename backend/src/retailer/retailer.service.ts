@@ -9,6 +9,7 @@ import { RegisterUserDto } from '../user/dto/register-user.dto';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import * as bcrypt from 'bcrypt';
 import { InjectConnection } from '@nestjs/mongoose';
+import { SignupRetailerDto } from './dtos/signup-retailer.dto';
 
 @Injectable()
 export class RetailerService {
@@ -71,40 +72,37 @@ export class RetailerService {
     return updatedRetailer;
   }
 
-  async createRetailerWithAdmin(createRetailerDto: CreateRetailerDto, adminDto: RegisterUserDto) {
+  async createRetailerWithAdmin(signupRetailerDto: SignupRetailerDto) {
+    const { retailer, admin } = signupRetailerDto;
     const session = await this.connection.startSession();
     session.startTransaction();
 
     try {
       // Check if retailer email already exists
-      const existingRetailer = await this.retailerModel.findOne({ email: createRetailerDto.email }).session(session);
+      const existingRetailer = await this.retailerModel.findOne({ email: retailer.email }).session(session);
       if (existingRetailer) {
-        throw new ConflictException(`Retailer with email ${createRetailerDto.email} already exists`);
+        throw new ConflictException(`Retailer with email ${retailer.email} already exists`);
       }
 
       // Check if admin email already exists
-      const existingUser = await this.userModel.findOne({ email: adminDto.email }).session(session);
+      const existingUser = await this.userModel.findOne({ email: admin.email }).session(session);
       if (existingUser) {
         throw new ConflictException('User with this email already exists');
       }
 
       // Create retailer
-      const retailer = new this.retailerModel(createRetailerDto);
-      await retailer.save({ session });
+      const newRetailer = new this.retailerModel(retailer);
+      await newRetailer.save({ session });
 
       // Hash password for admin
-      const hashedPassword = await bcrypt.hash(adminDto.password, 10);
+      const hashedPassword = await bcrypt.hash(admin.password, 10);
 
       // Create admin user linked to retailer
       const adminUser = new this.userModel({
-        email: adminDto.email,
+        ...admin,
         password: hashedPassword,
-        firstName: adminDto.firstName,
-        lastName: adminDto.lastName,
-        role: 'admin', // Ensure this is handled in your user schema
-        address: adminDto.address,
-        gender: adminDto.gender,
-        retailerId: retailer._id, // Link the admin to the retailer
+        retailerId: newRetailer._id,
+        role: 'admin',
       });
 
       await adminUser.save({ session });
@@ -115,7 +113,7 @@ export class RetailerService {
 
       return {
         message: 'Retailer and admin created successfully',
-        retailer,
+        retailer: newRetailer,
         adminUser,
       };
     } catch (error) {
