@@ -7,6 +7,7 @@ import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EditProductModal from "../components/EditProduct";
 import ImageCarousel from "./ImageCarousel";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   id: string;
@@ -107,6 +108,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <p className="text-sm text-gray-500">{product.category}</p>
         <p className="text-md font-bold text-gray-800 mt-1">{product.price}</p>
         <p className="text-sm text-gray-600 mt-2">{product.description}</p>
+        {/* Add Stocks Button */}
+        <Button
+          className="mt-3 w-full bg-blue-500 text-white hover:bg-blue-600 transition"
+
+        >
+          Add Stocks
+        </Button>
       </CardContent>
 
       <CardFooter className="flex flex-col gap-4 p-4 bg-gray-50 rounded-b-lg border-t border-gray-200">

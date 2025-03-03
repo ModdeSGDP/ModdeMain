@@ -5,7 +5,7 @@ export const API_POST_USER_REGISTER = `${baseUrl}/user/register`;
 export const API_POST_INVITE_ADMIN = `${baseUrl}/api/user/invite-admin`;
 export const API_POST_VERIFY_PASSWORD = `${baseUrl}/api/user/verify-password`;
 export const API_POST_RETAILER_REGISTER = `${baseUrl}/retailers/register`;
-export const API_POST_AUTH_LOGIN = `${baseUrl}/api/auth/login`;
+export const API_POST_AUTH_LOGIN = `${baseUrl}/auth/login`;
 export const API_POST_ADD_PRODUCTS = `${baseUrl}/api/product/add`;
 export const API_POST_STOCKS_ADD = `${baseUrl}/api/stocks/add`;
 

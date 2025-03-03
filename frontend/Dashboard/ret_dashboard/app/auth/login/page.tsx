@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { API_POST_AUTH_LOGIN } from "../../constant/apiConstant";
 
 // **Validation Schema**
 const loginSchema = z.object({
@@ -16,6 +17,7 @@ const loginSchema = z.object({
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
+  const [serverError, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm({
@@ -27,31 +29,62 @@ const Login = () => {
   });
 
   const onSubmit = async (data: any) => {
-    console.log("User Logged In:", data);
+    // console.log("User Logged In:", data);
+    // setLoading(true);
     setLoading(true);
+    setError(null);
 
-    const response = await fetch('localhost:38108/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'authorization': 'Bearer ' + localStorage.getItem('token')
-      },
-      body: JSON.stringify(data)
-    });
+    try {
+      console.log("User Logging In:", data);
 
-    if (!response.ok) {
-      console.error("Login failed:", response);
+      const requestData = {
+        username: data.email, // Adjusting field name for backend
+        password: data.password,
+      };
+
+
+      const response = await fetch(API_POST_AUTH_LOGIN, {
+        method: 'POST',
+        headers: {
+          // 'Content-Type': 'application/json',
+          // 'authorization': 'Bearer ' + localStorage.getItem('token')
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      // if (!response.ok) {
+      //   console.error("Login failed:", response);
+      //   setLoading(false);
+      //   return;
+      // }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed. Please try again.");
+      }
+
+      // const responseData = await response.json();
+      // localStorage.setItem("token", responseData.token);
+
+      const responseData = await response.json();
+      localStorage.setItem("token", responseData.token);
+      localStorage.setItem("authenticated", "true");
+
+      console.log("Login Successful:", responseData);
+      router.push("/Dashboard"); // ✅ Redirect to Dashboard
+
+      // setTimeout(() => {
+      //   localStorage.setItem("authenticated", "true");
+      //   router.push("/Dashboard"); // Redirect to dashboard upon successful login
+      // }, 1500);
+
+    } catch (err: any) {
+      setError(err.message);
+      console.error("Login Error:", err);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const responseData = await response.json();
-    localStorage.setItem("token", responseData.token);
-
-    // setTimeout(() => {
-    //   localStorage.setItem("authenticated", "true");
-    //   router.push("/Dashboard"); // Redirect to dashboard upon successful login
-    // }, 1500);
   };
 
 
