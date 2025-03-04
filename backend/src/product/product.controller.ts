@@ -22,10 +22,12 @@ import { ConfigService } from '../common/configs/config.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { PaginationDto } from '../common/dtos/pagination.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('product')
-// @UseGuards(JwtAuthGuard)
-// @Roles('PO', 'RETAILER', 'ADMIN')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -75,14 +77,14 @@ export class ProductController {
     return this.productService.updateProduct(id, updateProductDto);
   }
 
-  // @Delete(':id')
-  // async deleteProduct(@Param('id') id: string) {
-  //   const deletedProduct = await this.productService.deleteProduct(id);
-  //   await this.emailQueue.add('sendEmail', {
-  //     to: this.configService.get('ADMIN_EMAIL'),
-  //     subject: `Product Deleted`,
-  //     message: `<h3>Product ID: ${id} has been removed from the system.</h3>`,
-  //   });
-  //   return deletedProduct;
-  // }
+  @Delete(':id')
+  async deleteProduct(@Param('id') id: string) {
+    const deletedProduct = await this.productService.deleteProduct(id);
+    // await this.emailQueue.add('sendEmail', {
+    //   to: this.configService.get('ADMIN_EMAIL'),
+    //   subject: `Product Deleted`,
+    //   message: `<h3>Product ID: ${id} has been removed from the system.</h3>`,
+    // });
+    return deletedProduct;
+  }
 }

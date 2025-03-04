@@ -8,11 +8,13 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ROLES } from 'src/common/constants/roles';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Retailers') // Grouping under "Retailers"
 @Controller('retailers')
-// @UseGuards(JwtAuthGuard)
-// @Roles(ROLES.ADMIN, ROLES.PO)
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
+@Roles(ROLES.ADMIN, ROLES.PO)
 export class RetailerController {
   constructor(private readonly retailerService: RetailerService) {}
 
