@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Image } from 'react-native';
 
 // Importing screens
-import SplashScreen from './screens/introScreen1';
+import SplashScreen from './screens/splashScreen';
 import OnboardingPage from './screens/onboardingpage';
 import IntroScreen1 from './screens/introScreen1';
 import IntroScreen2 from './screens/introScreen2';
@@ -13,12 +13,10 @@ import LoginPage from './screens/loginPage';
 import RegistrationComplete from './screens/registration';
 import HomePage from './screens/homepage';
 import ShopPage from './screens/shopPage/shoppage';
-import VisualSearch from './screens/camera/visualSearch';
 import ProductDetailPage from './screens/shopPage/ProductDetailPage';
 import Cart from './screens/orderPage/cart';
 import CheckoutScreen from './screens/orderPage/checkout';
 import Profile from './screens/profile/profilePage';
-import AccountInfo from './screens/profile/accountInfo';
 import SideMenu from './screens/sideBars/homeSideBar';
 import PromotionsPage from './screens/promotions/promotion';
 import NotificationsPage from './screens/sideBars/notifications';
@@ -97,9 +95,7 @@ export default function MyStack() {
       <Stack.Screen name="SignUpPage" component={SignupPage} />
       <Stack.Screen name="Registration" component={RegistrationComplete}/>
       <Stack.Screen name="ProductDetail" component={ProductDetailPage}/>
-      <Stack.Screen name="ImageSearch" component={VisualSearch}/>
       <Stack.Screen name="CheckoutPage" component={CheckoutScreen}/>
-      <Stack.Screen name="AccountInfoPage" component={AccountInfo}/>
       <Stack.Screen name="HomeSideBar" component={SideMenu}/>
       <Stack.Screen name="PromotionPage" component={PromotionsPage}/>
       <Stack.Screen name="NotificationPage" component={NotificationsPage}/>

@@ -1,30 +1,37 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, Pressable, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type RootStackParamList = {
+  IntroScreen: undefined;
+  Intro2: undefined;
+  Intro3: undefined;
+  Login: undefined;
+};
+
+type Intro2NavigationProp = StackNavigationProp<RootStackParamList, "Intro2">;
 
 const IntroScreen2 = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<Intro2NavigationProp>();
     return (
         <View style={styles.introScreen2}>
             <Image style={styles.introScreen2Child} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
             <Text style={[styles.selectWhatYou, styles.timeTypo]}>Select what you love</Text>
             <Image style={styles.introScreen2Item} resizeMode="cover" source={require("../assets/group10_2.png")} />
-            <Pressable style={styles.skip} onPress={() => navigation.navigate("Intro1")}>
+            <Pressable style={styles.skip} onPress={() => navigation.navigate("Login")}>
                 <Text style={styles.skip1}>Skip</Text>
             </Pressable>
-            <Text style={[styles.xploreThe2024s, styles.xploreThe2024sClr]}>{`Explore the 2024’s hottest fashion,
-`}</Text>
-            <Text style={[styles.exclusivelyCuratedSelection, styles.xploreThe2024sClr]}>Exclusively curated selection of brands in the palm of your hand...</Text>
-            <Pressable style={styles.wrapper} onPress={() => navigation.navigate("Intro1")}>
+            <Text style={[styles.exclusivelyCuratedSelection, styles.xploreThe2024sClr]}>
+                Exclusively curated selection of brands in the palm of your hand...
+            </Text>
+            <Pressable style={styles.wrapper} onPress={() => navigation.navigate("IntroScreen")}>
                 <Image style={styles.icon} resizeMode="cover" source={require("../assets/chevron_left.png")} />
             </Pressable>
             <Pressable style={styles.container} onPress={() => navigation.navigate("Intro3")}>
                 <Image style={styles.icon} resizeMode="cover" source={require("../assets/group19_2.png")} />
             </Pressable>
             <Image style={[styles.introScreen2Inner, styles.selectWhatYouPosition]} resizeMode="cover" source={require("../assets/group5_2.png")} />
-            {/* <View style={[styles.homeIndicator, styles.topPosition]}>
-                <View style={[styles.homeIndicator1, styles.selectWhatYouPosition]} />
-            </View> */}
         </View>
     );
 };
@@ -38,10 +45,6 @@ const styles = StyleSheet.create({
     xploreThe2024sClr: {
         color: "#5f6174",
         fontSize: 16,
-        position: "absolute",
-    },
-    topPosition: {
-        left: 0,
         position: "absolute",
     },
     selectWhatYouPosition: {
@@ -87,16 +90,6 @@ const styles = StyleSheet.create({
         top: 67,
         position: "absolute"
     },
-    xploreThe2024s: {
-        top: 627,
-        left: 56,
-        lineHeight: 19,
-        textAlign: "left",
-        width: 289,
-        height: 60,
-        display: "none",
-        fontFamily: "JejuGothic",
-    },
     exclusivelyCuratedSelection: {
         top: 616,
         left: 52,
@@ -110,8 +103,8 @@ const styles = StyleSheet.create({
     icon: {
         height: "80%",
         width: "80%",
-        top:20,
-        left:17
+        top: 20,
+        left: 17
     },
     wrapper: {
         left: 23,
@@ -134,19 +127,6 @@ const styles = StyleSheet.create({
         height: 299,
         top: "50%",
         left: "50%",
-    },
-    homeIndicator1: {
-        marginLeft: -66.5,
-        bottom: 8,
-        borderRadius: 100,
-        backgroundColor: "#000",
-        width: 134,
-        height: 5,
-    },
-    homeIndicator: {
-        top: 778,
-        width: 375,
-        height: 34,
     },
     introScreen2: {
         borderRadius: 0,

@@ -1,18 +1,42 @@
 "use client"
 
 import { useState } from "react"
-import { View, Text, TextInput, StyleSheet, Image, Pressable, Alert } from "react-native"
+import { View, Text, TextInput, StyleSheet, Pressable, Alert, Image } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+
+// Define navigation param list
+type RootStackParamList = {
+  HomePage: undefined;
+  SignUpPage: undefined;
+};
+
+// Define navigation prop type
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">;
+
+// Define user data interface for /auth/me response
+interface UserData {
+  email: string;
+  username: string;
+  // Add other fields as per your backend response
+}
+// Define API response interface for /auth/login
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  token?: string; // Assuming the backend returns a token
+}
 
 const LoginPage = () => {
-  const navigation = useNavigation<any>()
+  const navigation = useNavigation<LoginScreenNavigationProp>()
   const [rememberMe, setRememberMe] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState("")
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please fill in all fields")
       return
@@ -25,14 +49,44 @@ const LoginPage = () => {
       Alert.alert("Error", "Password must be at least 8 characters long")
       return
     }
-    // Implement actual login logic here
-    setUsername(email.split("@")[0]) // Set username for welcome message
-    Alert.alert("Success", "Login successful", [
-      {
-        text: "OK",
-        onPress: () => navigation.navigate("HomePage"),
-      },
-    ])
+    try {
+      // POST /auth/login
+      const loginResponse = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const loginData: LoginResponse = await loginResponse.json();
+      if (loginData.success && loginData.token) {
+        // Assuming the backend returns a token, use it to fetch user data
+        const meResponse = await fetch("http://localhost:3001/auth/me", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${loginData.token}`, // Use token for authentication
+          },
+        });
+        const meData: UserData = await meResponse.json();
+        if (meResponse.ok) {
+          setUsername(meData.username || email.split("@")[0]); // Update username from /auth/me response
+          Alert.alert("Login Successful", loginData.message || "Welcome back!", [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate("HomePage"),
+            },
+          ]);
+        } else {
+          Alert.alert("Error", "Failed to fetch user data");
+        }
+      } else {
+        Alert.alert("Login Failed", loginData.message || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
   }
   return (
     <View style={styles.loginPage}>
@@ -43,7 +97,6 @@ const LoginPage = () => {
         resizeMode="cover"
         source={require("../assets/logo2.png")}
       />
-
       <View style={[styles.loginParent, styles.loginPosition]}>
         <Text style={[styles.login, styles.loginTypo]}>Login</Text>
         <Text style={styles.welcomeBackAnne}>
@@ -77,11 +130,11 @@ const LoginPage = () => {
               value={password}
               onChangeText={setPassword}
             />
-            <Pressable onPress={() => setShowPassword(!showPassword)}>
-              <Image
-                style={[styles.eyeIcon, styles.iconLayout]}
-                resizeMode="cover"
-                source={showPassword ? require("../assets/eye-off.png") : require("../assets/eye.png")}
+            <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIconWrapper}>
+              <MaterialCommunityIcons
+                name={showPassword ? "eye-off" : "eye"}
+                size={20}
+                color="#000"
               />
             </Pressable>
           </View>
@@ -97,7 +150,7 @@ const LoginPage = () => {
           <View style={[styles.loginButtonChild, styles.entryChildLayout]} />
           <Text style={[styles.login1, styles.loginTypo]}>Login</Text>
         </Pressable>
-        <View style={styles.loginButton}>
+        {/* <View style={styles.loginButton}>
           <View style={[styles.signInButtonChild, styles.entryChildBorder]} />
           <View style={styles.signInGoo}>
             <Image
@@ -107,7 +160,7 @@ const LoginPage = () => {
             />
             <Text style={styles.signInWith}>Sign in with Google</Text>
           </View>
-        </View>
+        </View> */}
         <Text style={styles.dontHaveAnContainer}>
           <Text style={[styles.dontHaveAn, styles.signInLayout]}>Don't have an account?</Text>
           <Text style={styles.text}> </Text>
@@ -233,6 +286,8 @@ const styles = StyleSheet.create({
   emailEntry: {
     height: 40,
     width: 331,
+    flexDirection: "row",
+    alignItems: "center",
   },
   eMailAddressParent: {
     gap: 5,
@@ -249,14 +304,11 @@ const styles = StyleSheet.create({
   passwordEntryChild: {
     height: 40,
     width: 331,
+    backgroundColor: "#fff",
   },
-  eyeIcon: {
-    height: "60%",
-    width: "7.26%",
-    top: "20%",
-    right: "5.99%",
-    bottom: "20%",
-    left: "86.76%",
+  eyeIconWrapper: {
+    padding: 6,
+    right: 40,
   },
   rememberMeButton: {
     flexDirection: "row",
@@ -405,4 +457,3 @@ const styles = StyleSheet.create({
 })
 
 export default LoginPage
-

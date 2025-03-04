@@ -1,13 +1,26 @@
 "use client"
 
+import type React from "react"
 import { useState, useEffect } from "react"
 import { StyleSheet, Text, View, Image, ScrollView, Pressable } from "react-native"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native"
+import type { StackNavigationProp } from "@react-navigation/stack"
 
-const OrdersPage = () => {
-  const navigation = useNavigation()
-  const route = useRoute()
-  const [orders, setOrders] = useState([1, 2, 3])
+type RootStackParamList = {
+  HomePage: undefined
+  ShopPage: undefined
+  CartPage: undefined
+  ProfilePage: undefined
+  OrderSettingsPage: undefined
+}
+
+type OrdersPageNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
+type OrdersPageRouteProp = RouteProp<RootStackParamList, "HomePage">
+
+const OrdersPage: React.FC = () => {
+  const navigation = useNavigation<OrdersPageNavigationProp>()
+  const route = useRoute<OrdersPageRouteProp>()
+  const [orders, setOrders] = useState<number[]>([1, 2, 3])
 
   useEffect(() => {
     if (route.params?.deleteAll) {
@@ -18,6 +31,7 @@ const OrdersPage = () => {
   const deleteAllMessages = () => {
     setOrders([])
   }
+
   return (
     <View style={styles.ordersPage}>
       {/* Status Bar */}
@@ -94,6 +108,8 @@ const OrdersPage = () => {
     </View>
   )
 }
+
+
 const styles = StyleSheet.create({
   ordersPage: {
     flex: 1,
@@ -115,6 +131,7 @@ const styles = StyleSheet.create({
   headerButton: {
     padding: 8,
   },
+  navItem:{},
   headerIcon: {
     width: 24,
     height: 24,

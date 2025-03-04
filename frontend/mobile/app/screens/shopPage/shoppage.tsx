@@ -1,14 +1,27 @@
-import React, { useState, useCallback, useMemo } from "react"
+"use client"
+
+import { useState, useCallback, useMemo } from "react"
 import { StyleSheet, View, Text, Image, Pressable, TextInput, FlatList, Dimensions } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import type { StackNavigationProp } from "@react-navigation/stack"
 import FilterMenu from "./FilterMenu"
 import { useCartStore } from "./cartState"
 import type { Product } from "./types/product"
 
 const { width } = Dimensions.get("window")
 
+type RootStackParamList = {
+  HomePage: undefined
+  ShopPage: undefined
+  ProductDetail: { product: Product }
+  CartPage: undefined
+  ProfilePage: undefined
+}
+
+type ShopsPageNavigationProp = StackNavigationProp<RootStackParamList, "ShopPage">
+
 const ShopsPageInfinityScroll = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<ShopsPageNavigationProp>()
   const [searchQuery, setSearchQuery] = useState("")
   const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false)
   const [selectedSort, setSelectedSort] = useState("all")
@@ -88,6 +101,7 @@ const ShopsPageInfinityScroll = () => {
       material: "Denim",
     },
   ])
+
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product) => {
       const categoryMatch =
@@ -158,6 +172,7 @@ const ShopsPageInfinityScroll = () => {
       </Pressable>
     )
   }
+
   const handleApplyFilters = useCallback(
     (filters: {
       categories: string[]
@@ -173,6 +188,7 @@ const ShopsPageInfinityScroll = () => {
     },
     [],
   )
+
   return (
     <View style={styles.shopsPageInfinityScroll}>
       <Pressable style={styles.backButton} onPress={() => navigation.navigate("HomePage")}>
@@ -288,19 +304,19 @@ const styles = StyleSheet.create({
   backButtonIcon: {
     width: 37,
     height: 27,
-    top:12
+    top: 12,
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    width:290,
-    left:50,
-    height:50,
+    width: 290,
+    left: 50,
+    height: 50,
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
     margin: 10,
     marginTop: 5,
-    top:10,
+    top: 10,
     padding: 6,
     shadowColor: "#000",
     shadowOffset: {
@@ -331,7 +347,7 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 165,
     borderRadius: 10,
-    left:20,
+    left: 20,
     marginVertical: 10,
   },
   filterBar: {
