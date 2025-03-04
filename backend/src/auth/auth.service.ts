@@ -10,12 +10,12 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.userService.findUserByUsername(username);
+  async validateUser(email: string, password: string): Promise<any> {
+    const user = await this.userService.findUserByUsername(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       // Generate JWT token
       const payload = {userId: user._id, email: user.email, role: user.role, retailerId: user.retailerId };   //Added retailerId to payload
-      return { accessToken: this.jwtService.sign(payload) };
+      return { accessToken: this.jwtService.sign(payload, { expiresIn: '5d' }) };
     } else {
       throw new UnauthorizedException('Invalid credentials');
     }

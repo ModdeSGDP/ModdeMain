@@ -1,4 +1,4 @@
-import { Controller, Body, Param, Post,  Put, Get } from '@nestjs/common';
+import { Controller, Body, Param, Post,  Put, Get, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { InviteAdminDto } from './dto/invite-admin.dto';
@@ -6,10 +6,12 @@ import { EmailService } from 'src/common/email/email.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Types } from 'mongoose';
 import { BadRequestException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User')
 @Controller('user')
+
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -24,6 +26,8 @@ export class UserController {
     return this.userService.createUser(registerUserDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Post('invite-admin')
   @ApiOperation({ summary: 'Invite an admin' })
   @ApiResponse({ status: 201, description: 'Admin invited successfully' })
@@ -32,6 +36,8 @@ export class UserController {
     return this.userService.inviteAdmin(inviteAdminDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Put('update/:id')
   @ApiOperation({ summary: 'Update user details' })
   @ApiParam({ name: 'id', required: true, description: 'User ID' })
@@ -45,6 +51,8 @@ export class UserController {
   }
 
   // Find user by email
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Get('email/:email')
   @ApiOperation({ summary: 'Find a user by email' })
   @ApiParam({ name: 'email', required: true, description: 'User email' })
@@ -59,6 +67,8 @@ export class UserController {
   }
 
   // Verify password
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Post('verify-password')
   @ApiOperation({ summary: 'Verify user password' })
   @ApiResponse({ status: 200, description: 'Password is correct' })
