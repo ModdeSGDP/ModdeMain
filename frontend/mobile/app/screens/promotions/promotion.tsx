@@ -1,9 +1,26 @@
+import type React from "react"
 import { View, Text, Image, StyleSheet, Pressable, ScrollView, SafeAreaView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Ionicons } from "@expo/vector-icons"
+import type { StackNavigationProp } from "@react-navigation/stack"
 
-const PromotionCard = ({ image, title, description }) => (
+type RootStackParamList = {
+  HomePage: undefined
+  ShopPage: undefined
+  CartPage: undefined
+  ProfilePage: undefined
+}
+
+type PromotionsPageNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
+
+type PromotionCardProps = {
+  image: any
+  title: string
+  description: string
+}
+
+const PromotionCard: React.FC<PromotionCardProps> = ({ image, title, description }) => (
   <LinearGradient
     colors={["#FFB6C1", "#FFC0CB"]}
     start={{ x: 0, y: 0 }}
@@ -18,9 +35,9 @@ const PromotionCard = ({ image, title, description }) => (
   </LinearGradient>
 )
 
-const PromotionsPage = () => {
-  const navigation = useNavigation()
-  const promotions = [] // Replace with your actual promotions data
+const PromotionsPage: React.FC = () => {
+  const navigation = useNavigation<PromotionsPageNavigationProp>()
+  const promotions: PromotionCardProps[] = [] // Replace with your actual promotions data
 
   return (
     <SafeAreaView style={styles.container}>
@@ -51,10 +68,9 @@ const PromotionsPage = () => {
         ) : (
           <View style={styles.noPromotionsContainer}>
             <Image source={require("../../assets/Illustration2.png")} style={styles.noPromotionsImage} />
-
             <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
-            <Text style={styles.shopButtonText}>Go to Shop</Text>
-            <Image style={styles.left} resizeMode="cover" source={require("../../assets/chevron-left.png")} />
+              <Text style={styles.shopButtonText}>Go to Shop</Text>
+              <Image style={styles.left} resizeMode="cover" source={require("../../assets/chevron-left.png")} />
             </Pressable>
           </View>
         )}
@@ -90,6 +106,7 @@ const PromotionsPage = () => {
   )
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -100,6 +117,9 @@ const styles = StyleSheet.create({
     height: 16,
     left:80,
     bottom:6,
+  },
+  lineView:{
+
   }
   ,
   header: {

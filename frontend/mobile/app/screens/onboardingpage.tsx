@@ -1,12 +1,22 @@
-import { Image, StyleSheet, Text, View, Pressable } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { Image, StyleSheet, Text, View, Pressable } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import type { StackNavigationProp } from "@react-navigation/stack";
+
+// Define the RootStackParamList within this file
+type RootStackParamList = {
+  OnboardingPage: undefined;
+  Intro1: undefined;
+};
+
+type OnboardingPageNavigationProp = StackNavigationProp<RootStackParamList, "OnboardingPage">;
 
 const OnboardingPage = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<OnboardingPageNavigationProp>();
+  console.log("OnboardingPage: Component mounted");
+
   return (
     <View style={styles.onboardingPage}>
       <Image style={styles.onboardingPageChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
-
       <Text style={[styles.getStartedWith, styles.logoIconPosition]}>Get Started with Modde</Text>
       <Image
         style={[styles.logoIcon, styles.logoIconPosition]}
@@ -27,8 +37,8 @@ const OnboardingPage = () => {
         />
       </Pressable>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   buttonPosition: {
@@ -51,11 +61,6 @@ const styles = StyleSheet.create({
     width: 449,
     height: 353,
     position: "absolute",
-  },
-  onboardingPageItem: {
-    top: 59,
-    height: 27,
-    width: 27,
   },
   getStartedWith: {
     marginLeft: -144.5,
@@ -126,7 +131,6 @@ const styles = StyleSheet.create({
     width: "100%",
     flex: 1,
   },
-})
+});
 
-export default OnboardingPage
-
+export default OnboardingPage;

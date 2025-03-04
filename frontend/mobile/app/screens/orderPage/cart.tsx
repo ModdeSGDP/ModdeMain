@@ -1,53 +1,73 @@
-import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import { useCartStore } from "../shopPage/cartState"
+import { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useCartStore } from "../shopPage/cartState";
+import type { StackNavigationProp } from "@react-navigation/stack";
+import type { RouteProp } from "@react-navigation/native";
+
+// Define RootStackParamList for type safety
+type RootStackParamList = {
+  HomePage: undefined;
+  ShopPage: undefined;
+  CartPage: undefined;
+  ProfilePage: undefined;
+  NotificationPage: undefined;
+  CheckoutPage: { selectedItems: any[]; total: number };
+  ItemDetails: { item: any };
+};
+
+type CartNavigationProp = StackNavigationProp<RootStackParamList, "CartPage">;
 
 const Cart = () => {
-  const navigation = useNavigation()
-  const { items, removeItem, updateQuantity } = useCartStore()
-  const [selectedItems, setSelectedItems] = useState(new Set())
-  const [displayTotal, setDisplayTotal] = useState(0)
+  const navigation = useNavigation<CartNavigationProp>();
+  const { items, removeItem, updateQuantity } = useCartStore();
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [displayTotal, setDisplayTotal] = useState(0);
 
   useEffect(() => {
-    calculateDisplayTotal()
-  }, [selectedItems, items])
+    calculateDisplayTotal();
+  }, [selectedItems, items]);
 
   const calculateDisplayTotal = () => {
     if (selectedItems.size === 0) {
-      setDisplayTotal(calculateTotalPrice(items))
+      setDisplayTotal(calculateTotalPrice(items));
     } else {
-      const selectedItemsArray = items.filter((item) => selectedItems.has(item.id))
-      setDisplayTotal(calculateTotalPrice(selectedItemsArray))
+      const selectedItemsArray = items.filter((item) => selectedItems.has(item.id));
+      setDisplayTotal(calculateTotalPrice(selectedItemsArray));
     }
-  }
+  };
+
   const calculateTotalPrice = (itemsToCalculate) => {
-    return itemsToCalculate.reduce((sum,item) => {
-      const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""))
-      return sum + price * item.quantity
-    }, 0)
-  }
+    return itemsToCalculate.reduce((sum, item) => {
+      const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""));
+      return sum + price * item.quantity;
+    }, 0);
+  };
 
   const toggleItemSelection = (itemId) => {
-    const newSelectedItems = new Set(selectedItems)
+    const newSelectedItems = new Set(selectedItems);
     if (newSelectedItems.has(itemId)) {
-      newSelectedItems.delete(itemId)
+      newSelectedItems.delete(itemId);
     } else {
-      newSelectedItems.add(itemId)
+      newSelectedItems.add(itemId);
     }
-    setSelectedItems(newSelectedItems)
-  }
+    setSelectedItems(newSelectedItems);
+  };
 
   const selectAll = () => {
     if (selectedItems.size === items.length) {
-      setSelectedItems(new Set())
+      setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(items.map((item) => item.id)))
+      setSelectedItems(new Set(items.map((item) => item.id)));
     }
-  }
+  };
 
   const renderCartItem = (item) => (
-    <Pressable key={item.id} style={styles.cartItem} onPress={() => navigation.navigate("ItemDetails", { item })}>
+    <Pressable
+      key={item.id}
+      style={styles.cartItem}
+      onPress={() => navigation.navigate("ItemDetails", { item })}
+    >
       <Pressable onPress={() => toggleItemSelection(item.id)} style={styles.radioButton}>
         <View style={[styles.radio, selectedItems.has(item.id) && styles.radioSelected]} />
       </Pressable>
@@ -75,7 +95,7 @@ const Cart = () => {
         </Pressable>
       </View>
     </Pressable>
-  )
+  );
 
   return (
     <View style={styles.cart}>
@@ -119,7 +139,7 @@ const Cart = () => {
                 navigation.navigate("CheckoutPage", {
                   selectedItems: items.filter((item) => selectedItems.has(item.id)),
                   total: displayTotal,
-                })
+                });
               }}
             >
               <Text style={styles.checkoutText}>Checkout</Text>
@@ -150,8 +170,8 @@ const Cart = () => {
         <View style={styles.activeIndicator} />
       </View>
     </View>
-  )
-}
+  );
+};
 const styles = StyleSheet.create({
   dressCarddetails: {
     top: 80,

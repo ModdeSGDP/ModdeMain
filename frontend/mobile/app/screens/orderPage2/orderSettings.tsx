@@ -1,24 +1,36 @@
-"use client"
+import type { StackNavigationProp } from "@react-navigation/stack";
+import { useState } from "react";
+import { Text, StyleSheet, View, Image, Pressable, Switch } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-import { useState } from "react"
-import { Text, StyleSheet, View, Image, Pressable, Switch } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+// Define RootStackParamList for type safety
+type RootStackParamList = {
+  HomePage: undefined;
+  ShopPage: undefined;
+  CartPage: undefined;
+  ProfilePage: undefined;
+  OrderSettingsPage: undefined;
+  NotificationPage: undefined;
+  OrdersPage: { deleteAll: boolean };
+};
+
+type OrderSettingsNavigationProp = StackNavigationProp<RootStackParamList, "OrderSettingsPage">;
 
 const OrderSettings = () => {
-  const navigation = useNavigation()
-  const [allowNotifications, setAllowNotifications] = useState(true)
+  const navigation = useNavigation<OrderSettingsNavigationProp>();
+  const [allowNotifications, setAllowNotifications] = useState(true);
 
   const toggleNotifications = () => {
-    setAllowNotifications((prevState) => !prevState)
+    setAllowNotifications((prevState) => !prevState);
     // TODO: Implement API call to update notification settings
     // updateNotificationSettings(allowNotifications);
-  }
+  };
 
   const deleteAllMessages = () => {
     // TODO: Implement API call to delete all messages
     // deleteAllOrderMessages();
-    navigation.navigate("OrdersPage", { deleteAll: true })
-  }
+    navigation.navigate("OrdersPage", { deleteAll: true });
+  };
 
   return (
     <View style={styles.orderSettings}>
@@ -56,36 +68,41 @@ const OrderSettings = () => {
         <Image style={styles.trashBinIcon} resizeMode="cover" source={require("../../assets/trash-bin.png")} />
       </Pressable>
 
-      <View style={[styles.naviBar, styles.barLayout]}>
-        <View style={[styles.homeNavigationBar, styles.barLayout]}>
-          <View style={styles.homeNavigationBarChild} />
-          <View style={styles.naviIcons}>
-            <Pressable onPress={() => navigation.navigate("HomePage")}>
-              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home.png")} />
-            </Pressable>
-            <Pressable onPress={() => navigation.navigate("ShopPage")}>
-              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
-            </Pressable>
-            <Pressable onPress={() => {}}>
-              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/camera-plus.png")} />
-            </Pressable>
-            <Pressable onPress={() => navigation.navigate("CartPage")}>
-              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
-            </Pressable>
-            <Pressable onPress={() => navigation.navigate("ProfilePage")}>
-              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
-            </Pressable>
-          </View>
+      <View style={styles.navigationBar}>
+        <View style={styles.navBarBg} />
+        <View style={styles.navIcons}>
+          <Pressable onPress={() => navigation.navigate("HomePage")} style={styles.navItem}>
+            <View style={styles.lineView} />
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home.png")} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("ShopPage")} style={styles.navItem}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
+          </Pressable>
+          <Pressable onPress={() => {}} style={styles.navItem}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("CartPage")} style={styles.navItem}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate("ProfilePage")} style={styles.navItem}>
+            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
+          </Pressable>
         </View>
+        <View style={styles.activeIndicator} />
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   topPosition: {
     left: 0,
     width: 375,
+  },
+  navItem: {},
+  headerIcon: {
+    width: 24,
+    height: 24,
   },
   backButton: {
     width: 32,
@@ -260,35 +277,61 @@ const styles = StyleSheet.create({
     color: "#979797",
     width: 333,
   },
-  homeNavigationBarChild: {
-    borderRadius: 20,
-    backgroundColor: "#ffe2e6",
-    left: "0%",
-    bottom: "0%",
-    top: "0%",
-    right: "0%",
-    height: "100%",
+  navigationBar: {
     position: "absolute",
-    width: "100%",
+    bottom: 34,
+    left: "50%",
+    marginLeft: -158,
+    width: 316,
+    height: 69,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  navIcon: {
-    width: 24,
-    height: 24,
+  navBarBg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#ffe2e6",
+    borderRadius: 20,
   },
-  naviIcons: {
+  navIcons: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 18,
     paddingTop: 22,
   },
-  homeNavigationBar: {
-    marginLeft: -158,
-    top: 0,
+  navIcon: {
+    width: 23,
+    height: 24,
   },
-  naviBar: {
-    marginLeft: -157.5,
-    top: 693,
+  activeIndicator: {
+    position: "absolute",
+    left: 26,
+    bottom: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#fba3a3",
+  },
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    flex: 1,
+    width: "100%",
+    height: 1,
+    top: -20,
   },
   text: {
     fontFamily: "SF Pro",
@@ -325,7 +368,6 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
   },
-})
+});
 
-export default OrderSettings
-
+export default OrderSettings;
