@@ -8,6 +8,7 @@ import { Types } from 'mongoose';
 import { BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('User')
 @Controller('user')
@@ -26,7 +27,7 @@ export class UserController {
     return this.userService.createUser(registerUserDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('invite-admin')
   @ApiOperation({ summary: 'Invite an admin' })
@@ -36,7 +37,7 @@ export class UserController {
     return this.userService.inviteAdmin(inviteAdminDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Put('update/:id')
   @ApiOperation({ summary: 'Update user details' })
@@ -51,7 +52,7 @@ export class UserController {
   }
 
   // Find user by email
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('email/:email')
   @ApiOperation({ summary: 'Find a user by email' })
@@ -67,7 +68,7 @@ export class UserController {
   }
 
   // Verify password
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post('verify-password')
   @ApiOperation({ summary: 'Verify user password' })

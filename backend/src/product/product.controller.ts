@@ -24,10 +24,11 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { RetailerGuard } from 'src/auth/guards/retailer.guard';
 
 @Controller('product')
-@UseGuards(AuthGuard('jwt'))
-@ApiBearerAuth()
+// @UseGuards(JwtAuthGuard, RetailerGuard)
+// @ApiBearerAuth()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -41,6 +42,7 @@ export class ProductController {
     @Body() createProductDto: CreateProductDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    console.log('file', file);
     const product = await this.productService.createProduct(createProductDto, file);
     // Optionally, we could add an email notification here, but it's already queued in the service
     return product;
