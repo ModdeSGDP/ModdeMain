@@ -12,8 +12,6 @@ import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Retailers') // Grouping under "Retailers"
 @Controller('retailers')
-@UseGuards(AuthGuard('jwt'))
-@ApiBearerAuth()
 @Roles(ROLES.ADMIN, ROLES.PO)
 export class RetailerController {
   constructor(private readonly retailerService: RetailerService) {}
@@ -27,6 +25,8 @@ export class RetailerController {
     return this.retailerService.create(createRetailerDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Get a list of retailers with pagination' })
   @ApiResponse({ status: 200, description: 'List of retailers retrieved successfully' })
@@ -34,6 +34,8 @@ export class RetailerController {
     return this.retailerService.findAll(paginationDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get(':id')
   @ApiOperation({ summary: 'Get details of a specific retailer' })
   @ApiResponse({ status: 200, description: 'Retailer details retrieved successfully' })
@@ -42,6 +44,8 @@ export class RetailerController {
     return this.retailerService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Patch(':id')
   @ApiOperation({ summary: 'Update a retailer' })
   @ApiResponse({ status: 200, description: 'Retailer updated successfully' })
@@ -54,6 +58,8 @@ export class RetailerController {
     return this.retailerService.update(id, updateRetailerDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get('test')
   test(): string {
     return 'Hello World!';

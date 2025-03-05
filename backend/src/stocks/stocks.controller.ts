@@ -5,10 +5,11 @@ import { UpdateStocksDto } from './dtos/update-stocks.dto';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('Stocks') // Grouping under "Stocks"
 @Controller('stocks')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
