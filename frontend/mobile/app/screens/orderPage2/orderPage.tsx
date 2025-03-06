@@ -12,24 +12,51 @@ type RootStackParamList = {
   CartPage: undefined
   ProfilePage: undefined
   OrderSettingsPage: undefined
+  OrdersPage: { newOrder?: any; deleteAll?: boolean }
 }
 
-type OrdersPageNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
-type OrdersPageRouteProp = RouteProp<RootStackParamList, "HomePage">
+type OrdersPageNavigationProp = StackNavigationProp<RootStackParamList, "OrdersPage">
+type OrdersPageRouteProp = RouteProp<RootStackParamList, "OrdersPage">
+
+type Order = {
+  id: string
+  date: string
+  items: any[]
+  total: number
+  status: string
+  paymentMethod: string
+}
 
 const OrdersPage: React.FC = () => {
   const navigation = useNavigation<OrdersPageNavigationProp>()
   const route = useRoute<OrdersPageRouteProp>()
-  const [orders, setOrders] = useState<number[]>([1, 2, 3])
+  const [orders, setOrders] = useState<Order[]>([])
 
   useEffect(() => {
-    if (route.params?.deleteAll) {
+    const { deleteAll, newOrder } = route.params || {}
+
+    if (deleteAll) {
       setOrders([])
+      return // Early return to prevent further processing
     }
-  }, [route.params?.deleteAll])
+
+    if (newOrder) {
+      setOrders(prevOrders => {
+        // Check if order already exists to avoid duplicates
+        if (!prevOrders.some(order => order.id === newOrder.id)) {
+          return [newOrder, ...prevOrders]
+        }
+        return prevOrders // Return unchanged state if duplicate
+      })
+    }
+  }, [route.params]) // Only depend on route.params
 
   const deleteAllMessages = () => {
     setOrders([])
+  }
+
+  const formatDate = (dateString: string) => {
+    return dateString.split('/').slice(0, 2).join('/')
   }
 
   return (
@@ -52,25 +79,35 @@ const OrdersPage: React.FC = () => {
         <>
           {/* Order Details */}
           <ScrollView style={styles.orderList} showsVerticalScrollIndicator={false}>
-            {orders.map((_, index) => (
-              <View key={index} style={styles.orderItem}>
+            {orders.map((order) => (
+              <View key={order.id} style={styles.orderItem}>
                 <View style={styles.orderHeader}>
-                  <Text style={styles.orderTitle}>Order about to finish</Text>
-                  <Text style={styles.orderDate}>17/10</Text>
+                  <Text style={styles.orderTitle}>
+                    {order.status === "Processing" ? "Order about to finish" : 
+                     order.status === "Shipped" ? "Order shipped" : "Order delivered"}
+                  </Text>
+                  <Text style={styles.orderDate}>{formatDate(order.date)}</Text>
                 </View>
                 <View style={styles.orderContent}>
                   <Image source={require("../../assets/Rectangle55.png")} style={styles.orderImage} />
                   <View style={styles.orderDetails}>
                     <Text style={styles.orderDescription}>
-                      Your order is to reach On Time Delivery date and will be automatically finished in 1 day.
+                      {order.status === "Processing" 
+                        ? "Your order is to reach On Time Delivery date and will be automatically finished in 1 day."
+                        : order.status === "Shipped" 
+                        ? "Your order has been shipped and is on its way to you."
+                        : "Your order has been delivered. Enjoy your purchase!"}
                     </Text>
-                    <Text style={styles.seeDetails}>See details</Text>
+                    <Text style={styles.orderInfo}>
+                      Order #{order.id.split('-')[1]} • {order.paymentMethod === "card" ? "Card" : "Cash"} • LKR {order.total.toFixed(2)}
+                    </Text>
+                    {/* <Text style={styles.seeDetails}>See details</Text> */}
                   </View>
                 </View>
               </View>
             ))}
           </ScrollView>
-          <Text style={styles.noMoreMessages}>No More Messages</Text>
+          {orders.length > 5 && <Text style={styles.noMoreMessages}>No More Messages</Text>}
         </>
       ) : (
         <View style={styles.noOrdersContainer}>
@@ -109,11 +146,10 @@ const OrdersPage: React.FC = () => {
   )
 }
 
-
 const styles = StyleSheet.create({
   ordersPage: {
     flex: 1,
-    backgroundColor: "#FFFFFF", // Light pink background
+    backgroundColor: "#FFFFFF",
   },
   statusBar: {
     height: 44,
@@ -124,24 +160,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    bottom:50,
+    bottom: 50,
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 0,
   },
   headerButton: {
     padding: 8,
   },
-  navItem:{},
+  navItem: {},
   headerIcon: {
     width: 24,
     height: 24,
-    // tintColor: "#FF6B8A", // Soft pink color for icons
   },
   title: {
     fontSize: 20,
     fontWeight: "700",
-    // color: "#FF4D6D", 
-    // Vibrant pink for title
   },
   orderList: {
     flex: 1,
@@ -183,13 +216,17 @@ const styles = StyleSheet.create({
   },
   orderDetails: {
     flex: 1,
-    
   },
   orderDescription: {
     fontSize: 14,
     color: "#666666",
     marginBottom: 8,
     lineHeight: 20,
+  },
+  orderInfo: {
+    fontSize: 12,
+    color: "#888888",
+    marginBottom: 8,
   },
   seeDetails: {
     fontSize: 14,
@@ -202,7 +239,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginVertical: 16,
     fontStyle: "italic",
-    bottom:200,
+    bottom: 200,
   },
   noOrdersContainer: {
     flex: 1,
@@ -290,5 +327,5 @@ const styles = StyleSheet.create({
     top: -20,
   },
 })
-export default OrdersPage
 
+export default OrdersPage

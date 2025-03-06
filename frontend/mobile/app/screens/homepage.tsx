@@ -2,14 +2,24 @@
 
 import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, Image, Pressable, Dimensions, PanResponder } from "react-native"
-import { useNavigation, useRoute } from "@react-navigation/native"
 import * as ImagePicker from "expo-image-picker"
+import { useNavigation, useRoute, NavigationProp } from "@react-navigation/native"
 import SideMenu from "./sideBars/homeSideBar"
 
+
+type RootStackParamList = {
+  Home: undefined
+  Camera: undefined
+  NotificationPage: undefined
+  ShopPage: undefined
+  CartPage: undefined
+  ProfilePage: undefined
+}
 const { width } = Dimensions.get("window")
 
+
 const HomePage = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const route = useRoute()
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)

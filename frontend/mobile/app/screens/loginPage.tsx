@@ -1,34 +1,36 @@
 "use client"
 
+import type React from "react"
 import { useState } from "react"
-import { View, Text, TextInput, StyleSheet, Pressable, Alert, Image } from "react-native"
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import type { StackNavigationProp } from "@react-navigation/stack"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 
-// Define navigation param list
 type RootStackParamList = {
-  HomePage: undefined;
-  SignUpPage: undefined;
-};
-
-// Define navigation prop type
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">;
-
-// Define user data interface for /auth/me response
-interface UserData {
-  email: string;
-  username: string;
-  // Add other fields as per your backend response
+  HomePage: undefined
+  SignUpPage: undefined
 }
-// Define API response interface for /auth/login
+
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
+
 interface LoginResponse {
-  success: boolean;
-  message: string;
-  token?: string; // Assuming the backend returns a token
+  success: boolean
+  message: string
+  accessToken?: string
 }
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>()
   const [rememberMe, setRememberMe] = useState(false)
   const [email, setEmail] = useState("")
@@ -49,81 +51,58 @@ const LoginPage = () => {
       Alert.alert("Error", "Password must be at least 8 characters long")
       return
     }
+
     try {
-      // POST /auth/login
-      const loginResponse = await fetch("http://localhost:3001/auth/login", {
+      const loginResponse = await fetch("http://10.31.7.201:4000/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      });
-      const loginData: LoginResponse = await loginResponse.json();
-      if (loginData.success && loginData.token) {
-        // Assuming the backend returns a token, use it to fetch user data
-        const meResponse = await fetch("http://localhost:3001/auth/me", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${loginData.token}`, // Use token for authentication
-          },
-        });
-        const meData: UserData = await meResponse.json();
-        if (meResponse.ok) {
-          setUsername(meData.username || email.split("@")[0]); // Update username from /auth/me response
-          Alert.alert("Login Successful", loginData.message || "Welcome back!", [
-            {
-              text: "OK",
-              onPress: () => navigation.navigate("HomePage"),
-            },
-          ]);
-        } else {
-          Alert.alert("Error", "Failed to fetch user data");
-        }
+      })
+
+      const loginData: LoginResponse = await loginResponse.json()
+
+      if (loginData.accessToken) {
+        setUsername(email.split("@")[0])
+        Alert.alert("Login Successful", `Welcome back, ${username}!`, [
+          { text: "OK", onPress: () => navigation.navigate("HomePage") },
+        ])
       } else {
-        Alert.alert("Login Failed", loginData.message || "Invalid credentials");
+        Alert.alert("Login Failed", loginData.message || "Invalid credentials")
       }
     } catch (error) {
-      console.error("Login error:", error);
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      console.error("Login error:", error)
+      Alert.alert("Error", "Something went wrong. Please try again.")
     }
   }
+
   return (
-    <View style={styles.loginPage}>
-      <Image style={styles.loginPageChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
-      <Image style={styles.loginPageItem} resizeMode="cover" source={require("../assets/Ellipse2.png")} />
-      <Image
-        style={[styles.logoIcon, styles.loginPosition]}
-        resizeMode="cover"
-        source={require("../assets/logo2.png")}
-      />
-      <View style={[styles.loginParent, styles.loginPosition]}>
-        <Text style={[styles.login, styles.loginTypo]}>Login</Text>
-        <Text style={styles.welcomeBackAnne}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+      <Image style={styles.backgroundImage} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
+      <Image style={styles.logoIcon} resizeMode="cover" source={require("../assets/logo2.png")} />
+
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Login</Text>
+        <Text style={styles.subtitle}>
           Welcome back, <Text style={styles.boldText}>{username || "User"}</Text>.
         </Text>
-      </View>
-      <View style={[styles.entryFiled, styles.entryFiledPosition]}>
-        <View style={styles.eMailAddressParent}>
-          <Text style={[styles.eMailAddress, styles.eMailAddressTypo]}>E-mail address</Text>
-          <View style={styles.emailEntry}>
-            <TextInput
-              style={[styles.emailEntryChild, styles.entryChildBorder]}
-              placeholder="Enter your email here"
-              placeholderTextColor="#898989"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-            />
-          </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>E-mail address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email here"
+            placeholderTextColor="#898989"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
         </View>
-        <View style={styles.groupParent}>
-          <View style={styles.passwordWrapper}>
-            <Text style={[styles.password, styles.passwordPosition]}>Password</Text>
-          </View>
-          <View style={styles.emailEntry}>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Password</Text>
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={[styles.passwordEntryChild, styles.entryChildBorder]}
+              style={styles.passwordInput}
               placeholder="Enter your password"
               placeholderTextColor="#898989"
               secureTextEntry={!showPassword}
@@ -131,189 +110,122 @@ const LoginPage = () => {
               onChangeText={setPassword}
             />
             <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIconWrapper}>
-              <MaterialCommunityIcons
-                name={showPassword ? "eye-off" : "eye"}
-                size={20}
-                color="#000"
-              />
+              <MaterialCommunityIcons name={showPassword ? "eye" : "eye-off"} size={24} color="#898989" />
             </Pressable>
           </View>
+        </View>
+
+        <View style={styles.rememberForgotContainer}>
           <Pressable style={styles.rememberMeButton} onPress={() => setRememberMe(!rememberMe)}>
-            <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]} />
+            <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+              {rememberMe && <MaterialCommunityIcons name="check" size={16} color="#fff" />}
+            </View>
             <Text style={styles.rememberMeText}>Remember me</Text>
           </Pressable>
-          <Text style={[styles.forgotPassword, styles.passwordPosition]}>Forgot Password</Text>
-        </View>
-      </View>
-      <View style={[styles.loginButtonParent, styles.entryFiledPosition]}>
-        <Pressable style={styles.loginButton} onPress={handleLogin}>
-          <View style={[styles.loginButtonChild, styles.entryChildLayout]} />
-          <Text style={[styles.login1, styles.loginTypo]}>Login</Text>
-        </Pressable>
-        {/* <View style={styles.loginButton}>
-          <View style={[styles.signInButtonChild, styles.entryChildBorder]} />
-          <View style={styles.signInGoo}>
-            <Image
-              style={[styles.googleIcon, styles.iconLayout]}
-              resizeMode="cover"
-              source={require("../assets/Google.png")}
-            />
-            <Text style={styles.signInWith}>Sign in with Google</Text>
-          </View>
-        </View> */}
-        <Text style={styles.dontHaveAnContainer}>
-          <Text style={[styles.dontHaveAn, styles.signInLayout]}>Don't have an account?</Text>
-          <Text style={styles.text}> </Text>
-          <Pressable onPress={() => navigation.navigate("SignUpPage")}>
-            <Text style={[styles.signIn, styles.signInLayout]}>Sign up</Text>
+          <Pressable
+            onPress={() => {
+              /* Handle forgot password */
+            }}
+          >
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </Pressable>
+        </View>
+
+        <Pressable style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </Pressable>
+
+        <Text style={styles.signUpText}>
+          Don't have an account?{" "}
+          <Text style={styles.signUpLink} onPress={() => navigation.navigate("SignUpPage")}>
+            Sign up
+          </Text>
         </Text>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
-  loginPosition: {
-    left: "50%",
-    position: "absolute",
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  loginTypo: {
-    fontFamily: "Inter-SemiBold",
-    textAlign: "center",
+  backgroundImage: {
+    position: "absolute",
+    width: "100%",
+    height: "50%",
+    top: 0,
+  },
+  logoIcon: {
+    alignSelf: "center",
+    width: 174,
+    height: 100,
+    marginTop: 60,
+  },
+  formContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 30,
+    marginBottom: 50,
+  },
+  title: {
+    fontSize: 32,
     fontWeight: "600",
+    color: "#321919",
+    textAlign: "center",
+    marginBottom: 10,
   },
-  entryFiledPosition: {
-    left: 35,
-    position: "absolute",
+  subtitle: {
+    fontSize: 18,
+    color: "#321919",
+    textAlign: "center",
+    marginBottom: 30,
   },
-  eMailAddressTypo: {
-    lineHeight: 24,
-    fontSize: 12,
-    fontFamily: "Rosario-Regular",
-    textAlign: "left",
+  boldText: {
+    fontWeight: "bold",
   },
-  entryChildBorder: {
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    color: "#321919",
+    marginBottom: 5,
+  },
+  input: {
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderStyle: "solid",
+    borderColor: "#898989",
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 16,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderWidth: 1,
     borderColor: "#898989",
     borderRadius: 10,
   },
-  passwordPosition: {
-    top: 0,
-    lineHeight: 28,
-    fontSize: 12,
-    color: "#000",
-    textAlign: "center",
-    position: "absolute",
-  },
-  iconLayout: {
-    maxHeight: "100%",
-    maxWidth: "100%",
-    position: "absolute",
-    overflow: "hidden",
-  },
-  entryChildLayout: {
-    borderRadius: 10,
-    top: 0,
-    height: 40,
-  },
-  signInLayout: {
-    lineHeight: 21,
-    top: 4.5,
-    fontSize: 14,
-  },
-  loginPageChild: {
-    top: -10,
-    left: -20,
-    width: 619,
-    height: 427,
-    position: "absolute",
-  },
-  loginPageItem: {
-    top: 503,
-    left: -14,
-    borderRadius: 150,
-    width: 441,
-    height: 406,
-    position: "absolute",
-  },
-  logoIcon: {
-    marginLeft: -86.5,
-    top: 60,
-    width: 174,
-    height: 100,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  login: {
-    fontSize: 32,
-    lineHeight: 40,
-    textAlign: "center",
-    color: "#fff",
-    alignSelf: "stretch",
-  },
-  welcomeBackAnne: {
-    fontSize: 18,
-    lineHeight: 33,
-    color: "#321919",
-    textAlign: "left",
-    fontFamily: "Rosario-SemiBold",
-    fontWeight: "600",
-    alignSelf: "stretch",
-  },
-  loginParent: {
-    marginLeft: -80.5,
-    top: 176,
-    width: 162,
-    alignItems: "center",
-  },
-  eMailAddress: {
-    color: "#000",
-    alignSelf: "stretch",
-  },
-  emailEntryChild: {
-    height: 40,
-    width: 331,
-    backgroundColor: "#fff",
-  },
-  emailEntry: {
-    height: 40,
-    width: 331,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  eMailAddressParent: {
-    gap: 5,
-    alignSelf: "stretch",
-  },
-  password: {
-    fontFamily: "Rosario-Regular",
-    left: -2,
-  },
-  passwordWrapper: {
-    width: 58,
-    height: 18,
-  },
-  passwordEntryChild: {
-    height: 40,
-    width: 331,
-    backgroundColor: "#fff",
+  passwordInput: {
+    flex: 1,
+    padding: 12,
+    fontSize: 16,
   },
   eyeIconWrapper: {
-    padding: 6,
-    right: 40,
+    padding: 10,
+  },
+  rememberForgotContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
   rememberMeButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
   },
   checkbox: {
     width: 20,
@@ -322,138 +234,44 @@ const styles = StyleSheet.create({
     borderColor: "#898989",
     borderRadius: 4,
     marginRight: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
   checkboxChecked: {
     backgroundColor: "#fba3a3",
     borderColor: "#fba3a3",
   },
   rememberMeText: {
-    fontFamily: "Rosario-Regular",
-    fontSize: 12,
-    color: "#000",
+    fontSize: 14,
+    color: "#321919",
   },
   forgotPassword: {
-    left: 234,
-    fontFamily: "Rosario-SemiBold",
+    fontSize: 14,
+    color: "#fba3a3",
     fontWeight: "600",
-  },
-  groupParent: {
-    gap: 7,
-    alignSelf: "stretch",
-  },
-  entryFiled: {
-    top: 312,
-    width: 332,
-    gap: 19,
-  },
-  loginButtonChild: {
-    backgroundColor: "#fba3a3",
-    width: 327,
-    left: 0,
-    position: "absolute",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  login1: {
-    marginLeft: -24.5,
-    top: 10,
-    fontSize: 16,
-    lineHeight: 20,
-    color: "#fff8f2",
-    width: 50,
-    textAlign: "center",
-    left: "50%",
-    position: "absolute",
   },
   loginButton: {
-    width: 327,
-    height: 40,
-  },
-  signInButtonChild: {
-    marginLeft: -163.5,
-    backgroundColor: "#ffe2e6",
-    borderColor: "#fba3a3",
-    width: 327,
-    height: 40,
-    left: "50%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  googleIcon: {
-    height: "100%",
-    width: "15.27%",
-    top: "0%",
-    right: "84.73%",
-    bottom: "0%",
-    left: "0%",
-    borderRadius: 30,
-  },
-  signInWith: {
-    marginLeft: -48.5,
-    top: 4,
-    color: "#584b40",
-    fontSize: 14,
-    lineHeight: 18,
-    textAlign: "center",
-    fontFamily: "Inter-SemiBold",
-    fontWeight: "600",
-    left: "50%",
-    position: "absolute",
-  },
-  signInGoo: {
-    height: "63%",
-    width: "50.46%",
-    top: "17.5%",
-    right: "28.44%",
-    bottom: "19.5%",
-    left: "21.1%",
-    position: "absolute",
-  },
-  dontHaveAn: {
-    fontWeight: "500",
-    fontFamily: "Inter-Medium",
-  },
-  text: {
-    fontSize: 13,
-    fontFamily: "JejuGothic",
-  },
-  signIn: {
-    fontWeight: "700",
-    fontFamily: "Inter-Bold",
-  },
-  dontHaveAnContainer: {
-    color: "#000",
-    textAlign: "center",
-    alignSelf: "stretch",
-  },
-  loginButtonParent: {
-    top: 558,
-    gap: 22,
-    width: 327,
+    backgroundColor: "#fba3a3",
+    borderRadius: 10,
+    padding: 15,
     alignItems: "center",
+    marginBottom: 20,
   },
-  loginPage: {
-    width: "100%",
-    height: 812,
-    overflow: "hidden",
-    flex: 1,
-    backgroundColor: "#fff",
+  loginButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
   },
-  boldText: {
-    fontWeight: "bold",
+  signUpText: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#321919",
+  },
+  signUpLink: {
+    color: "#fba3a3",
+    fontWeight: "600",
   },
 })
 
 export default LoginPage
+
