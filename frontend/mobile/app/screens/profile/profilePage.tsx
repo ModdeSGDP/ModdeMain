@@ -2,10 +2,34 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, Image, Pressable, ScrollView, TextInput, ActivityIndicator, Modal } from "react-native"
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  ScrollView,
+  TextInput,
+  ActivityIndicator,
+  Modal,
+  TouchableOpacity,
+  Platform,
+} from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import * as ImagePicker from "expo-image-picker"
 import { useAsyncStorage } from "../AsyncStorage/useAsyncStorage"
+import { LinearGradient } from "expo-linear-gradient"
+import type { StackNavigationProp } from "@react-navigation/stack"
+
+type RootStackParamList = {
+  Login: undefined
+  HomePage: undefined
+  ShopPage: undefined
+  CartPage: undefined
+  ProfilePage: undefined
+  NotificationPage: undefined
+}
+
+type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, "ProfilePage">
 
 // Mock API function (in a real app, this would be in a separate file)
 const deleteAccount = async (): Promise<void> => {
@@ -31,14 +55,18 @@ const ConfirmationModal: React.FC<{
     <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onCancel}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>Are you sure you want to delete your account?</Text>
+          <Image source={require("../../assets/user.png")} style={styles.modalIcon} />
+          <Text style={styles.modalTitle}>Delete Account</Text>
+          <Text style={styles.modalText}>
+            Are you sure you want to delete your account? This action cannot be undone.
+          </Text>
           <View style={styles.buttonContainer}>
-            <Pressable style={[styles.button, styles.buttonCancel]} onPress={onCancel}>
-              <Text style={styles.textStyle}>Cancel</Text>
-            </Pressable>
-            <Pressable style={[styles.button, styles.buttonConfirm]} onPress={onConfirm}>
-              <Text style={styles.textStyle}>Confirm</Text>
-            </Pressable>
+            <TouchableOpacity style={[styles.button, styles.buttonCancel]} onPress={onCancel} activeOpacity={0.8}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button, styles.buttonConfirm]} onPress={onConfirm} activeOpacity={0.8}>
+              <Text style={styles.confirmButtonText}>Delete</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -46,35 +74,30 @@ const ConfirmationModal: React.FC<{
   )
 }
 
-const Profile = () => {
-  const navigation = useNavigation<any>()
+const Profile: React.FC = () => {
+  const navigation = useNavigation<ProfileScreenNavigationProp>()
   const { storeData, getData } = useAsyncStorage()
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
 
   const [profileData, setProfileData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     address: "",
-    password: "",
   })
-
-  const [profileImage, setProfileImage] = useState<string | null>(null)
 
   useEffect(() => {
     const loadUserData = async () => {
       const userData = await getData("userData")
       if (userData) {
         setProfileData({
-          name: userData.username || "",
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
           email: userData.email || "",
           address: userData.address || "",
-          password: userData.password || "",
         })
-        if (userData.profilePicture) {
-          setProfileImage(userData.profilePicture)
-        }
       }
     }
     loadUserData()
@@ -83,13 +106,7 @@ const Profile = () => {
   const handleEdit = async () => {
     if (isEditing) {
       // Save changes to AsyncStorage
-      await storeData("userData", {
-        username: profileData.name,
-        email: profileData.email,
-        address: profileData.address,
-        password: profileData.password,
-        profilePicture: profileImage,
-      })
+      await storeData("userData", JSON.stringify(profileData))
       console.log("Saving changes:", profileData)
     }
     setIsEditing(!isEditing)
@@ -97,24 +114,6 @@ const Profile = () => {
 
   const handleChange = (key: string, value: string) => {
     setProfileData((prev) => ({ ...prev, [key]: value }))
-  }
-
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    })
-
-    if (!result.canceled) {
-      const newImageUri = result.assets[0].uri
-      setProfileImage(newImageUri)
-      await storeData("userData", {
-        ...profileData,
-        profilePicture: newImageUri,
-      })
-    }
   }
 
   const handleDeleteAccount = async () => {
@@ -132,93 +131,136 @@ const Profile = () => {
 
   return (
     <View style={styles.profile}>
-      <Pressable onPress={() => navigation.goBack()}>
-        <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
-      </Pressable>
-      <Text style={styles.profileTitle}>Profile</Text>
+      <LinearGradient colors={["#fff8f8", "#fff"]} style={styles.background} />
 
-      <Pressable onPress={() => navigation.navigate("NotificationPage")}>
-        <Image style={styles.bell} source={require("../../assets/bell.png")} />
-      </Pressable>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButtonContainer} onPress={() => navigation.goBack()} activeOpacity={0.7}>
+          <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
+        </TouchableOpacity>
 
-      <View style={styles.profilePhotoContainer}>
-        <Image
-          style={styles.profilePhoto}
-          source={profileImage ? { uri: profileImage } : require("../../assets/ellipse-20.png")}
-        />
-        <Pressable style={styles.editPhotoButton} onPress={pickImage}>
-          <Text style={styles.editPhotoText}>Edit Photo</Text>
-        </Pressable>
+        <Text style={styles.profileTitle}>My Profile</Text>
+
+        <TouchableOpacity
+          style={styles.bellContainer}
+          onPress={() => navigation.navigate("NotificationPage")}
+          activeOpacity={0.7}
+        >
+          <Image style={styles.bell} source={require("../../assets/bell.png")} />
+        </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.profileOptions}>
+      {/* Main Content */}
+      <ScrollView style={styles.profileOptions} showsVerticalScrollIndicator={false}>
         <View style={styles.accountInfo}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.accountInformation}>Account information</Text>
-            <Pressable onPress={handleEdit}>
+            <Text style={styles.accountInformation}>Account Information</Text>
+            <TouchableOpacity style={styles.editButtonContainer} onPress={handleEdit} activeOpacity={0.7}>
               <Text style={styles.editButton}>{isEditing ? "Save" : "Edit"}</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
 
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Name</Text>
-            {isEditing ? (
-              <TextInput
-                style={styles.input}
-                value={profileData.name}
-                onChangeText={(text) => handleChange("name", text)}
-              />
-            ) : (
-              <Text style={styles.infoValue}>{profileData.name}</Text>
-            )}
-          </View>
+          <View style={styles.infoCard}>
+            <View style={styles.infoItem}>
+              <View style={styles.infoLabelContainer}>
+                <Image source={require("../../assets/user.png")} style={styles.infoIcon} />
+                <Text style={styles.infoLabel}>First Name</Text>
+              </View>
+              {isEditing ? (
+                <TextInput
+                  style={styles.input}
+                  value={profileData.firstName}
+                  onChangeText={(text) => handleChange("firstName", text)}
+                  placeholder="Enter your first name"
+                  placeholderTextColor="#aaa"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{profileData.firstName}</Text>
+              )}
+            </View>
 
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Email address</Text>
-            {isEditing ? (
-              <TextInput
-                style={styles.input}
-                value={profileData.email}
-                onChangeText={(text) => handleChange("email", text)}
-                keyboardType="email-address"
-              />
-            ) : (
-              <Text style={styles.infoValue}>{profileData.email}</Text>
-            )}
-          </View>
+            <View style={styles.divider} />
 
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Address</Text>
-            {isEditing ? (
-              <TextInput
-                style={styles.input}
-                value={profileData.address}
-                onChangeText={(text) => handleChange("address", text)}
-                multiline
-              />
-            ) : (
-              <Text style={styles.infoValue}>{profileData.address}</Text>
-            )}
-          </View>
+            <View style={styles.infoItem}>
+              <View style={styles.infoLabelContainer}>
+                <Image source={require("../../assets/user.png")} style={styles.infoIcon} />
+                <Text style={styles.infoLabel}>Last Name</Text>
+              </View>
+              {isEditing ? (
+                <TextInput
+                  style={styles.input}
+                  value={profileData.lastName}
+                  onChangeText={(text) => handleChange("lastName", text)}
+                  placeholder="Enter your last name"
+                  placeholderTextColor="#aaa"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{profileData.lastName}</Text>
+              )}
+            </View>
 
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Password</Text>
-            <Pressable onPress={() => navigation.navigate("ChangePassword")}>
-              <Text style={styles.changePassword}>change password</Text>
-            </Pressable>
+            <View style={styles.divider} />
+
+            <View style={styles.infoItem}>
+              <View style={styles.infoLabelContainer}>
+                <Image source={require("../../assets/bell.png")} style={[styles.infoIcon, { width: 18, height: 18 }]} />
+                <Text style={styles.infoLabel}>Email</Text>
+              </View>
+              {isEditing ? (
+                <TextInput
+                  style={styles.input}
+                  value={profileData.email}
+                  onChangeText={(text) => handleChange("email", text)}
+                  keyboardType="email-address"
+                  placeholder="Enter your email"
+                  placeholderTextColor="#aaa"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{profileData.email}</Text>
+              )}
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.infoItem}>
+              <View style={styles.infoLabelContainer}>
+                <Image source={require("../../assets/smart_home1.png")} style={styles.infoIcon} />
+                <Text style={styles.infoLabel}>Address</Text>
+              </View>
+              {isEditing ? (
+                <TextInput
+                  style={[styles.input, styles.addressInput]}
+                  value={profileData.address}
+                  onChangeText={(text) => handleChange("address", text)}
+                  multiline
+                  placeholder="Enter your address"
+                  placeholderTextColor="#aaa"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{profileData.address}</Text>
+              )}
+            </View>
           </View>
         </View>
 
-        <Pressable style={styles.deleteAccount} onPress={() => setShowConfirmation(true)}>
+        <TouchableOpacity style={styles.deleteAccount} onPress={() => setShowConfirmation(true)} activeOpacity={0.8}>
           <Image source={require("../../assets/user.png")} style={styles.trashIcon} />
           <Text style={styles.deleteAccountText}>Delete Account</Text>
-        </Pressable>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate("Login")} activeOpacity={0.8}>
+          <LinearGradient
+            colors={["#fba3a3", "#ff8a8a"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.logoutGradient}
+          >
+            <Text style={styles.logoutText}>Logout</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </ScrollView>
 
-      <Pressable style={styles.logoutButton} onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </Pressable>
-
+      {/* Navigation Bar */}
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
@@ -262,134 +304,195 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  lineView: {
-    borderStyle: "solid",
-    borderColor: "#f97c7c",
-    borderTopWidth: 1,
+  background: {
     position: "absolute",
-    top: -20,
     left: 0,
     right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === "ios" ? 50 : 20,
+    paddingBottom: 10,
+  },
+  backButtonContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 226, 230, 0.5)",
   },
   backButton: {
-    width: 32,
-    height: 32,
-    position: "absolute",
-    top: 20,
-    left: 13,
+    width: 24,
+    height: 24,
   },
   profileTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 20,
+    fontWeight: "700",
     color: "#321919",
-    textAlign: "center",
-    marginTop: 50,
-    top: -30,
+    fontFamily: "Inter-Bold",
+  },
+  bellContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 226, 230, 0.5)",
   },
   bell: {
-    width: 22,
-    height: 24,
-    position: "absolute",
-    top: -55,
-    right: 20,
-  },
-  profilePhotoContainer: {
-    alignItems: "center",
-    marginTop: 20,
-  },
-  profilePhoto: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  editPhotoButton: {
-    marginTop: 10,
-  },
-  editPhotoText: {
-    color: "#321919",
-    textDecorationLine: "underline",
+    width: 20,
+    height: 20,
   },
   profileOptions: {
-    marginTop: 30,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
   },
   accountInfo: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 16,
   },
   accountInformation: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#321919",
+    fontFamily: "Inter-Bold",
+  },
+  editButtonContainer: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 226, 230, 0.5)",
   },
   editButton: {
     fontSize: 14,
-    color: "#321919",
-    textDecorationLine: "underline",
+    color: "#ff8a8a",
+    fontWeight: "600",
+    fontFamily: "Inter-SemiBold",
+  },
+  infoCard: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#fba3a3",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   infoItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 14,
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  infoLabelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  infoIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 10,
+    tintColor: "#ff8a8a",
   },
   infoLabel: {
-    fontSize: 13,
+    fontSize: 15,
     color: "#321919",
-    fontWeight: "500",
+    fontWeight: "600",
+    fontFamily: "Inter-SemiBold",
   },
   infoValue: {
-    fontSize: 13,
+    fontSize: 15,
     color: "#898989",
-  },
-  input: {
-    fontSize: 13,
-    color: "#898989",
-    borderBottomWidth: 1,
-    borderBottomColor: "#321919",
-    minWidth: 150,
+    fontFamily: "Inter-Regular",
+    maxWidth: 180,
     textAlign: "right",
   },
-  changePassword: {
-    fontSize: 13,
-    color: "#898989",
-    textDecorationLine: "underline",
+  input: {
+    fontSize: 15,
+    color: "#321919",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minWidth: 180,
+    textAlign: "right",
+    backgroundColor: "#f9f9f9",
+  },
+  addressInput: {
+    height: 60,
+    textAlignVertical: "top",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#f0f0f0",
+    marginVertical: 4,
   },
   deleteAccount: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#FFE2E2",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 50,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: "#ff0000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   trashIcon: {
     width: 20,
     height: 20,
     marginRight: 10,
-    left: 100,
+    tintColor: "#FF0000",
   },
   deleteAccountText: {
-    fontSize: 14,
-    left: 100,
+    fontSize: 16,
+    fontWeight: "600",
     color: "#FF0000",
+    fontFamily: "Inter-SemiBold",
   },
   logoutButton: {
-    backgroundColor: "#fba3a3",
-    borderRadius: 10,
-    paddingVertical: 12,
-    marginHorizontal: 24,
+    borderRadius: 16,
     marginBottom: 130,
+    overflow: "hidden",
+    shadowColor: "#fba3a3",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  logoutGradient: {
+    paddingVertical: 16,
+    alignItems: "center",
   },
   logoutText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "500",
-    textAlign: "center",
+    fontWeight: "700",
+    fontFamily: "Inter-Bold",
   },
   navigationBar: {
     position: "absolute",
@@ -427,6 +530,15 @@ const styles = StyleSheet.create({
     width: 23,
     height: 24,
   },
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    position: "absolute",
+    top: -20,
+    left: 0,
+    right: 0,
+  },
   activeIndicator: {
     position: "absolute",
     left: 283,
@@ -435,6 +547,78 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: "#fba3a3",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalView: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  modalIcon: {
+    width: 40,
+    height: 40,
+    tintColor: "#FF0000",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#321919",
+    marginBottom: 12,
+    fontFamily: "Inter-Bold",
+  },
+  modalText: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+    lineHeight: 20,
+    fontFamily: "Inter-Regular",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  button: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    elevation: 2,
+    width: "48%",
+  },
+  buttonCancel: {
+    backgroundColor: "#f0f0f0",
+  },
+  buttonConfirm: {
+    backgroundColor: "#FF0000",
+  },
+  cancelButtonText: {
+    color: "#666",
+    fontWeight: "600",
+    textAlign: "center",
+    fontFamily: "Inter-SemiBold",
+  },
+  confirmButtonText: {
+    color: "white",
+    fontWeight: "600",
+    textAlign: "center",
+    fontFamily: "Inter-SemiBold",
   },
   loadingOverlay: {
     position: "absolute",
@@ -445,52 +629,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: 20,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-    marginHorizontal: 10,
-  },
-  buttonCancel: {
-    backgroundColor: "#FBA3A3",
-  },
-  buttonConfirm: {
-    backgroundColor: "#FF0000",
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
   },
 })
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native"
+import { StyleSheet, View, Text, Image, Pressable, ScrollView, Alert } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import type { StackNavigationProp } from "@react-navigation/stack"
 
 type Address = {
   name: string
@@ -17,10 +18,25 @@ type CartItem = {
   quantity: number
 }
 
+// Updated RootStackParamList to include all necessary screens
+type RootStackParamList = {
+  HomePage: undefined
+  ShopPage: undefined
+  CartPage: undefined
+  ProfilePage: undefined
+  NotificationPage: undefined
+  CheckoutPage: { selectedItems?: CartItem[]; total?: number; address?: Address }
+  ItemDetails: { item: any }
+  OrdersPage: { newOrder?: any }
+  OrderSettingsPage: undefined
+}
+
+type CheckoutNavigationProp = StackNavigationProp<RootStackParamList, "CheckoutPage">
+
 const CheckoutScreen = ({
   route,
 }: { route: { params?: { address?: Address; selectedItems?: CartItem[]; total?: number } } }) => {
-  const navigation = useNavigation()
+  const navigation = useNavigation<CheckoutNavigationProp>()
   const address = route.params?.address || {
     name: "Default Name",
     phone: "Default Phone",
@@ -30,6 +46,7 @@ const CheckoutScreen = ({
   const [paymentMethod, setPaymentMethod] = useState("card")
   const [selectedItems, setSelectedItems] = useState<CartItem[]>(route.params?.selectedItems || [])
   const [total, setTotal] = useState(route.params?.total || 0)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
     if (route.params?.selectedItems) {
@@ -39,6 +56,38 @@ const CheckoutScreen = ({
       setTotal(route.params.total)
     }
   }, [route.params])
+
+  const handlePayment = () => {
+    setIsProcessing(true)
+    
+    // Simulate payment processing
+    setTimeout(() => {
+      setIsProcessing(false)
+      
+      // Create order object with necessary details
+      const newOrder = {
+        id: `ORD-${Date.now()}`,
+        date: new Date().toLocaleDateString(),
+        items: selectedItems,
+        total: total,
+        paymentMethod: paymentMethod,
+        shippingAddress: address,
+        status: "Processing"
+      }
+      
+      // Show success message
+      Alert.alert(
+        "Payment Successful",
+        "Your order has been placed successfully!",
+        [
+          { 
+            text: "View Orders", 
+            onPress: () => navigation.navigate("OrdersPage", { newOrder }) 
+          }
+        ]
+      )
+    }, 1500)
+  }
 
   const renderCartItem = (item: CartItem) => (
     <View key={item.id} style={styles.cartItem}>
@@ -62,26 +111,25 @@ const CheckoutScreen = ({
           <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
         </Pressable>
         <Text style={styles.pageTitle}>Checkout</Text>
-        <Pressable onPress={() => navigation.goBack()}>
+        <Pressable onPress={() => navigation.navigate("NotificationPage")}>
           <Image style={styles.bell} source={require("../../assets/bell.png")} />
         </Pressable>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Address</Text>
+            {/* <Text style={styles.sectionTitle}>Address</Text> */}
             <Pressable
               onPress={() => {
                 /* Handle edit address */
               }}
             >
-              <Text style={styles.editButton}>Edit</Text>
             </Pressable>
           </View>
-          <View style={styles.addressInfo}>
+          {/* <View style={styles.addressInfo}>
             <Text style={styles.addressName}>{address.name}</Text>
             <Text style={styles.addressDetails}>{address.phone}</Text>
             <Text style={styles.addressDetails}>{address.fullAddress}</Text>
-          </View>
+          </View> */}
         </View>
 
         <View style={styles.section}>
@@ -109,7 +157,17 @@ const CheckoutScreen = ({
           </View>
         </View>
 
-        
+        {/* Order Items Section */}
+        {selectedItems.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Order Items</Text>
+            </View>
+            <View style={styles.orderItemsContainer}>
+              {selectedItems.map(renderCartItem)}
+            </View>
+          </View>
+        )}
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -134,12 +192,13 @@ const CheckoutScreen = ({
           </View>
         </View>
         <Pressable
-          style={styles.payNowButton}
-          onPress={() => {
-            /* Handle pay now */
-          }}
+          style={[styles.payNowButton, isProcessing && styles.payNowButtonDisabled]}
+          onPress={handlePayment}
+          disabled={isProcessing}
         >
-          <Text style={styles.payNowText}>Pay now</Text>
+          <Text style={styles.payNowText}>
+            {isProcessing ? "Processing..." : "Pay now"}
+          </Text>
         </Pressable>
       </ScrollView>
 
@@ -196,7 +255,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 24,
-    top:-50,
+    bottom:80,
   },
   sectionHeader: {
     flexDirection: "row",
@@ -266,6 +325,11 @@ const styles = StyleSheet.create({
   radioButtonSelected: {
     backgroundColor: "#F97C7C",
   },
+  orderItemsContainer: {
+    backgroundColor: "#FFE2E6",
+    borderRadius: 10,
+    padding: 10,
+  },
   totalSection: {
     marginTop: 20,
     top:-90,
@@ -291,6 +355,9 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: "center",
     marginTop: -50,
+  },
+  payNowButtonDisabled: {
+    backgroundColor: "#d3d3d3",
   },
   payNowText: {
     fontFamily: "Inter-Medium",
@@ -384,4 +451,3 @@ const styles = StyleSheet.create({
 })
 
 export default CheckoutScreen
-

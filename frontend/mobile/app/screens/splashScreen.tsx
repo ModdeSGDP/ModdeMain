@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, View, Animated } from "react-native";
+import { Image, StyleSheet, View, Animated, Text } from "react-native";
 import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -16,6 +16,7 @@ const SplashScreen = () => {
   const titleOpacity = new Animated.Value(0);
   const titleScale = new Animated.Value(0.5);
   const subtitleOpacity = new Animated.Value(0);
+  const textOpacity = new Animated.Value(0); // New animated value for the text
   const navigation = useNavigation<SplashScreenNavigationProp>();
 
   useEffect(() => {
@@ -36,6 +37,13 @@ const SplashScreen = () => {
       Animated.timing(subtitleOpacity, {
         toValue: 1,
         duration: 2000,
+        useNativeDriver: true,
+      }).start();
+
+      // Fade in the "Snap, Style & Slay" text after the logo animation
+      Animated.timing(textOpacity, {
+        toValue: 1,
+        duration: 1000,
         useNativeDriver: true,
       }).start();
     });
@@ -59,8 +67,17 @@ const SplashScreen = () => {
           { opacity: titleOpacity, transform: [{ scale: titleScale }] },
         ]}
         resizeMode="cover"
-        source={require("../assets/Rectangle17.png")}
+        source={require("../assets/logo5.png")}
       />
+      {/* Add the "Snap, Style & Slay" text with animation */}
+      <Animated.Text
+        style={[
+          styles.snapStyleSlayText,
+          { opacity: textOpacity }, // Apply the fade-in animation
+        ]}
+      >
+        Snap, Style & Slay
+      </Animated.Text>
     </View>
   );
 };
@@ -90,6 +107,17 @@ const styles = StyleSheet.create({
     top: "50%",
     width: 224,
     height: 160,
+  },
+  snapStyleSlayText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#000",
+    textAlign: "center",
+    marginTop: 20, // Adjust this value to position the text below the logo
+    position: "absolute",
+    top: "60%", // Adjust this value to position the text below the logo
+    left: "50%",
+    transform: [{ translateX: -100 }], // Center the text horizontally
   },
   splashScreen: {
     borderRadius: 0,

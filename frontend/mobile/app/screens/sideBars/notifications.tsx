@@ -1,10 +1,19 @@
 import * as React from "react";
 import { Text, StyleSheet, View, Image, Pressable } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 
+// Define the RootStackParamList type
+type RootStackParamList = {
+    OrdersPage: undefined; // No parameters for OrdersPage
+    PromotionPage: undefined; // No parameters for PromotionPage
+    // Add other screens and their parameters here
+};
+
+// Use the RootStackParamList in the NotificationsPage component
 const NotificationsPage = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const [hasMessages, setHasMessages] = React.useState(false); // State to check if there are messages
+
     return (
         <View style={styles.notificationsPage}>
             {/* Messages Header */}

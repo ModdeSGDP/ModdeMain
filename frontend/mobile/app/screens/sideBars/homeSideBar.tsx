@@ -1,12 +1,36 @@
 "use client"
 
-import { useState } from "react"
-import { View, Text, StyleSheet, Image, Pressable } from "react-native"
+import type React from "react"
+import { useState, useEffect } from "react"
+import { View, Text, StyleSheet, Image, Pressable, Animated, Easing, Platform } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import type { StackNavigationProp } from "@react-navigation/stack"
+import { LinearGradient } from "expo-linear-gradient"
 
-const SideMenu = () => {
-  const navigation = useNavigation()
-  const [selectedItem, setSelectedItem] = useState(null)
+type RootStackParamList = {
+  HomePage: undefined
+  OrdersPage: undefined
+  Favorites: undefined
+  History: undefined
+  PromotionPage: undefined
+  Camera: undefined
+}
+
+type SideMenuNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
+
+const SideMenu: React.FC = () => {
+  const navigation = useNavigation<SideMenuNavigationProp>()
+  const [selectedItem, setSelectedItem] = useState<string | null>(null)
+  const [animation] = useState(new Animated.Value(0))
+
+  useEffect(() => {
+    Animated.timing(animation, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start()
+  }, [animation])
 
   const menuItems = [
     { name: "OrdersPage", label: "My Orders", icon: require("../../assets/truck.png") },
@@ -16,47 +40,83 @@ const SideMenu = () => {
     { name: "Camera", label: "Camera", icon: require("../../assets/camera-photo.png") },
   ]
 
-  const NavigationItem = ({ name, label, icon }) => (
-    <Pressable
-      style={[styles.navigationItem, selectedItem === name && styles.selectedItem]}
-      onPress={() => {
-        setSelectedItem(name)
-        navigation.navigate(name)
-      }}
-    >
-      <Image style={styles.icon} resizeMode="cover" source={icon} />
-      <Text style={styles.navText}>{label}</Text>
-    </Pressable>
-  )
+  const NavigationItem: React.FC<{ name: string; label: string; icon: any; index: number }> = ({
+    name,
+    label,
+    icon,
+    index,
+  }) => {
+    const itemAnimation = animation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [50, 0],
+    })
+
+    return (
+      <Animated.View
+        style={{
+          transform: [{ translateX: itemAnimation }],
+          opacity: animation,
+        }}
+      >
+        <Pressable
+          style={[styles.navigationItem, selectedItem === name && styles.selectedItem]}
+          onPress={() => {
+            setSelectedItem(name)
+            navigation.navigate(name as keyof RootStackParamList)
+          }}
+        >
+          <LinearGradient
+            colors={selectedItem === name ? ["#ffccd4", "#ffd5d5"] : ["#f8f8f8", "#ffffff"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.navigationItemGradient}
+          >
+            <Image style={[styles.icon, selectedItem === name && styles.selectedIcon]} source={icon} />
+            <Text style={[styles.navText, selectedItem === name && styles.selectedNavText]}>{label}</Text>
+          </LinearGradient>
+        </Pressable>
+      </Animated.View>
+    )
+  }
 
   return (
-    <View style={styles.sideMenu}>
-      <Image style={styles.background} resizeMode="cover" source={require("../../assets/Ellipse1.png")} />
-      <Pressable style={styles.closeButton} onPress={() => navigation.navigate("HomePage")}>
+    <LinearGradient colors={["#fff8f8", "#fff"]} style={styles.sideMenu}>
+      <Image style={styles.background} source={require("../../assets/Ellipse1.png")} />
+      {/* <Pressable style={styles.closeButton} onPress={() => navigation.navigate("HomePage")}>
         <Image style={styles.closeIcon} source={require("../../assets/close.png")} />
-      </Pressable>
+      </Pressable> */}
 
-      <Image style={styles.logoIcon} resizeMode="cover" source={require("../../assets/logo.png")} />
-
-      <Pressable style={styles.profileWrapper}>
-        <Image style={styles.profileImage} resizeMode="cover" source={require("../../assets/ellipse-20.png")} />
-        <Text style={styles.username}>Anne Fernando</Text>
-      </Pressable>
+      <Animated.Image
+        style={[
+          styles.logoIcon,
+          {
+            opacity: animation,
+            transform: [
+              {
+                scale: animation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.5, 1],
+                }),
+              },
+            ],
+          },
+        ]}
+        source={require("../../assets/logo.png")}
+      />
 
       <View style={styles.navigationBar}>
-        {menuItems.map((item) => (
-          <NavigationItem key={item.name} {...item} />
+        {menuItems.map((item, index) => (
+          <NavigationItem key={item.name} {...item} index={index} />
         ))}
       </View>
-      <Image style={styles.background2} resizeMode="cover" source={require("../../assets/Ellipse2.png")} />
-    </View>
+      <Image style={styles.background2} source={require("../../assets/Ellipse2.png")} />
+    </LinearGradient>
   )
 }
 
 const styles = StyleSheet.create({
   sideMenu: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     paddingTop: 40,
     width: 280,
@@ -67,34 +127,20 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
+    opacity: 0.5,
   },
   closeButton: {
     position: "absolute",
     top: 20,
     right: 20,
     zIndex: 10,
+    padding: 10,
   },
   logoIcon: {
-    width: 66,
-    height: 44,
-    top: -60,
-    marginTop: 70,
-    marginBottom: 20,
-  },
-  profileWrapper: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  profileImage: {
-    width: 97,
-    height: 98,
-    borderRadius: 50,
-    marginBottom: 10,
-  },
-  username: {
-    fontSize: 14,
-    color: "#321919",
-    fontWeight: "bold",
+    width: 150,
+    height: 80,
+    marginTop: -10,
+    marginBottom: 100,
   },
   navigationBar: {
     width: "100%",
@@ -102,38 +148,66 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   navigationItem: {
+    width: 220,
+    marginBottom: 20,
+    borderRadius: 15,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  navigationItemGradient: {
     flexDirection: "row",
     alignItems: "center",
-    width: 220,
     paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 10,
-    marginBottom: 15,
-    backgroundColor: "#f8f8f8",
   },
   selectedItem: {
-    backgroundColor: "#ffccd4",
+    ...Platform.select({
+      ios: {
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   icon: {
     width: 24,
     height: 24,
     marginRight: 15,
+    tintColor: "#321919",
+  },
+  selectedIcon: {
+    tintColor: "#ff8a8a",
   },
   navText: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#321919",
-    fontFamily: "Inter-Regular",
+    fontFamily: "Inter-SemiBold",
+  },
+  selectedNavText: {
+    color: "#ff8a8a",
   },
   background2: {
     width: "100%",
     height: 150,
     position: "absolute",
     bottom: 0,
+    opacity: 0.5,
   },
   closeIcon: {
     width: 24,
     height: 24,
-    resizeMode: "contain",
   },
 })
 

@@ -37,14 +37,14 @@ const Cart = () => {
     }
   };
 
-  const calculateTotalPrice = (itemsToCalculate) => {
+  const calculateTotalPrice = (itemsToCalculate: any[]) => {
     return itemsToCalculate.reduce((sum, item) => {
       const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""));
       return sum + price * item.quantity;
     }, 0);
   };
 
-  const toggleItemSelection = (itemId) => {
+  const toggleItemSelection = (itemId: unknown) => {
     const newSelectedItems = new Set(selectedItems);
     if (newSelectedItems.has(itemId)) {
       newSelectedItems.delete(itemId);
@@ -62,7 +62,7 @@ const Cart = () => {
     }
   };
 
-  const renderCartItem = (item) => (
+  const renderCartItem = (item: any) => (
     <Pressable
       key={item.id}
       style={styles.cartItem}
@@ -172,6 +172,7 @@ const Cart = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   dressCarddetails: {
     top: 80,
@@ -491,6 +492,6 @@ const styles = StyleSheet.create({
     height: 20,
     marginLeft: 10,
   },
-})
-export default Cart
+});
 
+export default Cart;
