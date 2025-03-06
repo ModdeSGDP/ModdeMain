@@ -27,6 +27,7 @@ type RootStackParamList = {
   CartPage: undefined
   ProfilePage: undefined
   NotificationPage: undefined
+  Camera:undefined
 }
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, "ProfilePage">
@@ -270,7 +271,7 @@ const Profile: React.FC = () => {
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
           </Pressable>
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() => navigation.navigate("Camera")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("CartPage")}>

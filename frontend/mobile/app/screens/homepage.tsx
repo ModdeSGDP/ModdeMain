@@ -41,7 +41,6 @@ const HomePage = () => {
       }
     },
   })
-
   const handleUploadImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
@@ -49,7 +48,6 @@ const HomePage = () => {
       alert("Permission to access camera roll is required!")
       return
     }
-
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -133,7 +131,7 @@ const HomePage = () => {
             <Pressable onPress={() => navigation.navigate("ShopPage")}>
               <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/shirt.png")} />
             </Pressable>
-            <Pressable onPress={() => {}}>
+            <Pressable onPress={() => navigation.navigate("Camera")}>
               <Image style={styles.navIcon} resizeMode="cover" source={require("../assets/cameraplus.png")} />
             </Pressable>
             <Pressable onPress={() => navigation.navigate("CartPage")}>

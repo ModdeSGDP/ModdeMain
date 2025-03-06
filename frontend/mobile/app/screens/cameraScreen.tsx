@@ -63,8 +63,8 @@ const CameraScreen = () => {
         <Image source={{ uri: capturedImage }} style={styles.preview} />
         {isProcessing ? (
           <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color="#FF69B4" />
-            <Text style={styles.loaderText}>Magic in progress... Your image is getting ready!</Text>
+            <ActivityIndicator size="large" color="#000" />
+            <Text style={styles.loaderText}>Your image is getting ready!</Text>
           </View>
         ) : (
           <View style={styles.buttonContainer}>
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   loaderText: {
     marginTop: 10,
     fontSize: 18,
-    color: '#FF69B4',
+    color: '#000',
     fontWeight: 'bold',
     textAlign: 'center',
     paddingHorizontal: 20,
