@@ -54,13 +54,7 @@ export class ProductService {
     });
     const savedProduct = await newProduct.save();
 
-    // Queue an email notification for product creation
-    await this.emailQueue.add('sendEmail', {
-      to: this.configService.get('ADMIN_EMAIL'),
-      subject: `New Product Added: ${savedProduct.name}`,
-      message: `A new product "${savedProduct.name}" has been added.`,
-    });
-
+  
     return savedProduct;
   }
 
