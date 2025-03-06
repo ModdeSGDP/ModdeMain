@@ -1,9 +1,10 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File
 from pinecone import Pinecone
 import uvicorn
 import shutil
 import uuid
-from app.feature_extractor import extract_features
+from feature_extractor import extract_features
+from fastapi import FastAPI, UploadFile, File, HTTPException
 
 app = FastAPI()
 

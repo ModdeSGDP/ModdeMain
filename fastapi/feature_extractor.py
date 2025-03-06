@@ -17,6 +17,9 @@ transform = transforms.Compose([
 ])
 
 def extract_features(img_path):
+    """
+    Extract features from an image using MobileNetV2.
+    """
     img = Image.open(img_path).convert("RGB")  # Convert to RGB
     img = transform(img).unsqueeze(0)  # Apply transforms and add batch dimension
 
