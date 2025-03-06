@@ -11,6 +11,7 @@ type RootStackParamList = {
   ShopPage: undefined;
   CartPage: undefined;
   ProfilePage: undefined;
+  Camera:undefined
   NotificationPage: undefined;
   CheckoutPage: { selectedItems: any[]; total: number };
   ItemDetails: { item: any };
@@ -39,7 +40,7 @@ const Cart = () => {
 
   const calculateTotalPrice = (itemsToCalculate: any[]) => {
     return itemsToCalculate.reduce((sum, item) => {
-      const price = Number.parseFloat(item.price.replace("LKR ", "").replace(",", ""));
+      const price = Number.parseFloat(item.price);
       return sum + price * item.quantity;
     }, 0);
   };
@@ -156,7 +157,7 @@ const Cart = () => {
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
           </Pressable>
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() => navigation.navigate("Camera")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("CartPage")}>

@@ -16,6 +16,7 @@ type RootStackParamList = {
   ProductDetail: { product: Product }
   CartPage: undefined
   ProfilePage: undefined
+  Camera:undefined
 }
 
 type ShopsPageNavigationProp = StackNavigationProp<RootStackParamList, "ShopPage">
@@ -156,7 +157,6 @@ const ShopsPageInfinityScroll = () => {
     },
     [addItem, navigation],
   )
-
   const renderItem = useCallback(({ item }: { item: Product }) => <ProductCard item={item} />, [ProductCard])
 
   const CartButton = () => {
@@ -265,7 +265,7 @@ const ShopsPageInfinityScroll = () => {
             <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt1.png")} />
           </Pressable>
-          <Pressable onPress={() => {}}>
+          <Pressable onPress={() => navigation.navigate("Camera")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
           </Pressable>
           <CartButton />
