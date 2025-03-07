@@ -89,4 +89,15 @@ export class ProductController {
     // });
     return deletedProduct;
   }
+
+  @Post('search-similar')
+  @UseInterceptors(FileInterceptor('file'))
+  async searchSimilarProducts(
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+    return this.productService.searchSimilarProducts(file);
+  }
 }
