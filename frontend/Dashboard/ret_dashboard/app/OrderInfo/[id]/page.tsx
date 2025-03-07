@@ -140,7 +140,7 @@ const OrderInfoPage = () => {
             <img src="/images/Customer.svg" alt="Customer Icon" className="h-6 w-6 mr-2" />
             <h3 className="text-lg font-semibold">Customer</h3>
           </div>
-          <CustomerInfo customer={{ name: orderDetails.customer, phone: orderDetails.phone }} />
+          <CustomerInfo customer={{ name: orderDetails.customer, email: orderDetails.email, phone: orderDetails.phone }} />
         </div>
 
         {/* Order Info */}

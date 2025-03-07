@@ -46,8 +46,16 @@ const ProfileForm = () => {
   // Load saved user data from localStorage (Sign-Up Form Data)
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      form.reset(JSON.parse(savedUser)); // Pre-fill form fields
+    const savedRetailer = localStorage.getItem("retailer")
+    if (savedUser && savedRetailer) {
+      // form.reset(JSON.parse(savedUser)); // Pre-fill form fields
+      const userData = JSON.parse(savedUser)
+      const retailerData = JSON.parse(savedRetailer)
+      form.reset({
+        ...userData,
+        ...retailerData,
+      })
+
     }
 
     const savedProfilePic = localStorage.getItem("profilePicture");

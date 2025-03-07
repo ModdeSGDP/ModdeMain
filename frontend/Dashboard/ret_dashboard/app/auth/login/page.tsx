@@ -8,6 +8,10 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { API_POST_AUTH_LOGIN } from "../../constant/apiConstant";
+import { FaRegEye, FaEyeSlash } from "react-icons/fa";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+
 
 // **Validation Schema**
 const loginSchema = z.object({
@@ -17,10 +21,28 @@ const loginSchema = z.object({
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const [serverError, setError] = useState<string | null>(null);
+  // const [serverError, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const form = useForm({
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+
+  // const form = useForm({
+  //   resolver: zodResolver(loginSchema),
+  //   defaultValues: {
+  //     email: "",
+  //     password: "",
+  //   },
+  // });
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -32,13 +54,13 @@ const Login = () => {
     // console.log("User Logged In:", data);
     // setLoading(true);
     setLoading(true);
-    setError(null);
+    // setError(null);
 
     try {
       console.log("User Logging In:", data);
 
       const requestData = {
-        username: data.email, // Adjusting field name for backend
+        email: data.email, // Adjusting field name for backend
         password: data.password,
       };
 
@@ -61,7 +83,19 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed. Please try again.");
+        // throw new Error(errorData.message || "Login failed. Please try again.");
+        // **Handle Invalid Email or Password Error**
+        if (errorData.message.includes("Invalid email")) {
+          setError("email", { type: "manual", message: "Invalid email address." });
+        } else if (errorData.message.includes("Invalid password")) {
+          setError("password", { type: "manual", message: "Incorrect password." });
+        } else {
+          setError("email", { type: "manual", message: "Invalid credentials. Please try again." });
+          setError("password", { type: "manual", message: "Invalid credentials. Please try again." });
+        }
+
+        throw new Error(errorData.message || "Login failed.");
+
       }
 
       // const responseData = await response.json();
@@ -80,7 +114,7 @@ const Login = () => {
       // }, 1500);
 
     } catch (err: any) {
-      setError(err.message);
+      // setError(err.message);
       console.error("Login Error:", err);
     } finally {
       setLoading(false);
@@ -100,17 +134,26 @@ const Login = () => {
         <h2 className="text-gray-600 text-center mb-6">Enter your credentials to access your account</h2>
 
         {/* Form */}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-md space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md space-y-4">
           {/* Email Input Field with Label */}
           <div>
             <label className="text-gray-700 font-medium">Email address</label>
-            <Input {...form.register("email")} placeholder="Enter your email" />
+            <Input {...register("email")} placeholder="Enter your email" />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}  {/* ✅ Show error message */}
           </div>
 
           {/* Password Input Field with Label and Forgot Password */}
           <div className="relative">
             <label className="text-gray-700 font-medium">Password</label>
-            <Input {...form.register("password")} type="password" placeholder="Enter your password" />
+            <Input {...register("password")} type={showPassword ? "text" : "password"} placeholder="Enter your password" />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-3 top-5 flex items-center"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaRegEye />}
+            </button>
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}  {/* ✅ Show error message */}
             <a href="#" className="absolute right-2 top-0 text-blue-600 text-sm hover:underline">
               Forgot password?
             </a>

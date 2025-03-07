@@ -7,7 +7,7 @@ const Retailor = () => {
   const [retailorData, setRetailorData] = useState({
     name: "InCaranage",
     avatar: "/images/maleavatar.svg",
-    greeting: "Hi, Joel!",
+    greeting: "Hi, User!",
   });
 
   // Fetch data from localStorage on mount and listen for changes
@@ -19,7 +19,7 @@ const Retailor = () => {
       setRetailorData({
         name: savedUser.companyName || "InCaranage",
         avatar: savedProfilePic || "/images/maleavatar.svg",
-        greeting: `Hi, ${savedUser.firstName || "Joel"}!`,
+        greeting: `Hi, ${savedUser.firstName || "user"}!`,
       });
     };
 
@@ -44,7 +44,7 @@ const Retailor = () => {
       />
       <div>
         <p className="text-sm text-gray-500">{retailorData.greeting}</p>
-        <h1 className="text-xl font-bold text-gray-900">Welcome Back! {retailorData.name}</h1>
+        <h1 className="text-xl font-bold text-gray-900">Welcome {retailorData.name}!</h1>
       </div>
     </div>
   );
