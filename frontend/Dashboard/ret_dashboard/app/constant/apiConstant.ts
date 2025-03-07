@@ -6,7 +6,7 @@ export const API_POST_INVITE_ADMIN = `${baseUrl}/api/user/invite-admin`;
 export const API_POST_VERIFY_PASSWORD = `${baseUrl}/api/user/verify-password`;
 export const API_POST_RETAILER_REGISTER = `${baseUrl}/retailers/register`;
 export const API_POST_AUTH_LOGIN = `${baseUrl}/auth/login`;
-export const API_POST_ADD_PRODUCTS = `${baseUrl}/api/product/add`;
+export const API_POST_ADD_PRODUCTS = `${baseUrl}/product/add`;
 export const API_POST_STOCKS_ADD = `${baseUrl}/api/stocks/add`;
 
 // GET API Endpoints
@@ -30,4 +30,4 @@ export const API_PATCH_UPDATE_STOCKS = (id: string | number) => `${baseUrl}/api/
 export const API_UPDATE_USER_DETAILS = (id: string | number) => `${baseUrl}/api/user/update/${id}`;
 
 // DELETE API Endpoints
-export const API_DELETE_STOCKS = (id: string | number) => `${baseUrl}/api/stocks/${id}`;
+export const API_DELETE_STOCKS = (id: string | number) => `${baseUrl}/api/stocks/${id}`

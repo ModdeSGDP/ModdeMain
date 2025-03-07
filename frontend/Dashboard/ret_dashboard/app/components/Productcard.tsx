@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EditProductModal from "../components/EditProduct";
-import ImageCarousel from "./ImageCarousel";
+// import ImageCarousel from "./ImageCarousel";
 import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
   id: string;
-  image: string[];
+  image: string;
   title: string;
   category: string;
   price: string;
@@ -33,6 +34,7 @@ const ProductMenu: React.FC<{ product: ProductCardProps; onDelete: () => void; o
 
   return (
     <>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
@@ -84,6 +86,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     onUpdate,
   });
 
+  const router = useRouter(); // Initialize router
+
   // Load only the specific product from localStorage on mount
   useEffect(() => {
     const storedProduct = localStorage.getItem(`product-${id}`);
@@ -96,10 +100,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     setProduct(updatedProduct);
   };
 
+  // Navigate to Add Stocks Page
+  const handleAddStockClick = () => {
+    router.push(`/add-stocks?id=${id}`);
+  };
+
   return (
     <Card className="w-full md:w-[260px] rounded-xl shadow-md hover:shadow-lg transition-shadow bg-white p-2 flex flex-col justify-between">
       <div className="relative">
-        <ImageCarousel images={product.image} />
+        {/* <ImageCarousel images={product.image} /> */}
+        <Image
+          src={product.image}
+          alt={product.title}
+          width={260}
+          height={200}
+          className="w-full h-48 object-cover rounded-t-xl"
+        />
+
         <ProductMenu product={product} onDelete={() => onDelete(id)} onUpdate={handleUpdate} />
       </div>
 
@@ -111,7 +128,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {/* Add Stocks Button */}
         <Button
           className="mt-3 w-full bg-blue-500 text-white hover:bg-blue-600 transition"
-
+          onClick={handleAddStockClick}
         >
           Add Stocks
         </Button>
