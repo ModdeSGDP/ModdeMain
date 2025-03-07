@@ -11,6 +11,8 @@ import { FilterProductDto } from "./dtos/filter-product.dto";
 import { ConfigService } from '../common/configs/config.service';
 import { S3Service } from '../common/aws/s3.service';
 import { PaginationDto } from '../common/dtos/pagination.dto';
+import { HttpService } from '@nestjs/axios';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class ProductService {
@@ -23,6 +25,7 @@ export class ProductService {
     private readonly configService: ConfigService,
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
     private readonly s3Service: S3Service, // Using isolated AWS functionality
+    private readonly httpService: HttpService,  // Injecting HttpService
   ) {
     // Although S3 functionality is now handled by AwsService, we still initialize s3 here if needed.
     // Alternatively, we can remove these lines if we want to solely rely on s3Service.uploadFile().
@@ -108,5 +111,35 @@ export class ProductService {
 
     return this.productModel.find(filterConditions);
   }
+
+  async searchSimilarProducts(file: Express.Multer.File): Promise<Product[]> {
+    try {
+      // Make a POST request to the external service to get similar images
+      const response: AxiosResponse = await this.httpService
+        .post('http://127.0.0.1:8000/search', file.buffer, {
+          headers: {
+            'Content-Type': file.mimetype,  // Send the mimetype of the file
+            'Content-Length': file.buffer.length.toString(),  // Send the content length
+          },
+        })
+        .toPromise(); // Convert Observable to Promise
+
+      const similarImageIds: string[] = response.data.similar_images; // Assuming the response has a 'similar_images' field
+
+      // Fetch products that match the similar image IDs
+      const products = await this.productModel
+        .find({
+          image_id: { $in: similarImageIds }, // Query by image_id or the field that matches
+        })
+        .exec();
+
+      return products;
+    } catch (error) {
+      // Handle errors
+      console.error('Error in searchSimilarProducts:', error);
+      throw new Error('Failed to search similar products');
+    }
+  }
+
 }
 
