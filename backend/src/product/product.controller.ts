@@ -25,6 +25,7 @@ import { PaginationDto } from '../common/dtos/pagination.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { RetailerGuard } from 'src/auth/guards/retailer.guard';
+import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @Controller('product')
 // @UseGuards(JwtAuthGuard, RetailerGuard)
@@ -62,10 +63,10 @@ export class ProductController {
   // @UseGuards(JwtAuthGuard)
   async getProductsByRetailer(
     @Param('retailerId') retailerId: string,
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
-    return this.productService.getProductsByRetailer(retailerId, Number(page), Number(limit));
+    return this.productService.getProductsByRetailer(retailerId, page, limit);
   }
 
 
