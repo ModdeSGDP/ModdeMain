@@ -1,4 +1,7 @@
-import { useState } from "react";
+
+
+
+import { Dispatch, SetStateAction, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -11,8 +14,8 @@ interface ImageData {
   status: "Uploading" | "Completed";
 }
 
-export default function ProductGallery() {
-  const [images, setImages] = useState<ImageData[]>([]);
+export default function ProductGallery({ images, setImages }: { images: string[], setImages: Dispatch<SetStateAction<string[]>> }) {
+  const [imagesInternal, setImagesInternal] = useState<ImageData[]>([]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -24,12 +27,13 @@ export default function ProductGallery() {
         status: "Uploading" as "Uploading",
       }));
 
-      setImages([...images, ...newImages]);
+      setImages([...images, ...newImages.map(i => i.url)]);
+      setImagesInternal([...imagesInternal, ...newImages]);
 
       // Simulate upload progress
       newImages.forEach((image, index) => {
         const interval = setInterval(() => {
-          setImages((prevImages) => {
+          setImagesInternal((prevImages) => {
             return prevImages.map((img, i) => {
               if (img.url === image.url) {
                 const newProgress = Math.min(img.progress + 20, 100);
@@ -50,7 +54,9 @@ export default function ProductGallery() {
   };
 
   const handleRemoveImage = (index: number) => {
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    const toRemoveImageURL = imagesInternal[index].url;
+    setImages((prevImages) => prevImages.filter(i => i != toRemoveImageURL));
+    setImagesInternal((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   return (
@@ -73,7 +79,7 @@ export default function ProductGallery() {
 
       {/* Image Preview List */}
       <div className="mt-4 space-y-3">
-        {images.map((image, index) => (
+        {imagesInternal.map((image, index) => (
           <div key={index} className="flex items-center bg-gray-50 p-2 rounded-lg shadow">
             <img src={image.url} alt="Product thumbnail" className="w-12 h-12 rounded-md object-cover mr-3" />
             <div className="flex-1">

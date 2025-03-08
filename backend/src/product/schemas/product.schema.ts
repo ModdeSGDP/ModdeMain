@@ -5,6 +5,9 @@ import { HydratedDocument, Types } from 'mongoose';
 @Schema({ timestamps: true })
 export class Product {
   @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })

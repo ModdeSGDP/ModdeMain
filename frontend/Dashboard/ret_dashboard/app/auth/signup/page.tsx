@@ -1,13 +1,16 @@
+
+
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 import { API_POST_USER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
 import { API_POST_RETAILER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
 
@@ -44,9 +47,12 @@ const signUpSchema = z
 const SignUpPage = () => {
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   // useEffect(() => {
   //   if (localStorage.getItem("authenticated") === "true") {
@@ -75,12 +81,14 @@ const SignUpPage = () => {
     },
   })
 
+
+
   const onSubmit = async (data: any) => {
     setServerError(null)
     try {
       console.log("Submitting Data:", data) // Debugging step
 
-      let formattedData = {
+      let userData = {
         firstName: data?.firstName || "",
         lastName: data?.lastName || "",
         // jobTitle: data?.jobTitle || "",
@@ -93,13 +101,15 @@ const SignUpPage = () => {
         role: "Admin", // Default role assigned
       }
 
-      console.log("Sending formatted data:", formattedData) // Debugging Step
+
+
+      console.log("Sending formatted data:", userData) // Debugging Step
       let response = await fetch(API_POST_USER_REGISTER, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(userData),
       })
       // Check if response is valid JSON
       // const contentType = response.headers.get("content-type")
@@ -116,16 +126,13 @@ const SignUpPage = () => {
         throw new Error(errorData.message || "Registration failed. Please try again.");
       }
 
-      const formattedDataRetailer = {
 
+
+      const formattedDataRetailer = {
         companyName: data?.companyName,
         email: data?.email,
         contactNumber: String(data.mobileNumber),
         registrationNumber: String(data.companyRegisterNumber),
-
-
-
-
       }
 
       console.log("Sending formatted data:", formattedDataRetailer) // Debugging Step
@@ -133,6 +140,7 @@ const SignUpPage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(formattedDataRetailer),
       })
@@ -149,7 +157,9 @@ const SignUpPage = () => {
 
 
 
-      const result = await response.json()
+
+
+      const result = await response.json();
       console.log("User Signed Up:", result)
       localStorage.setItem("user", JSON.stringify(result))
       localStorage.setItem("authenticated", "true")
@@ -242,17 +252,48 @@ const SignUpPage = () => {
               {errors.mobileNumber && <p className="text-red-500 text-sm">{errors.mobileNumber.message}</p>}
             </div>
 
-            <div className="col-span-2">
+            {/* <div className="col-span-2">
               <label className="text-gray-700 font-medium">Password *</label>
-              <Input type="password" {...register("password")} placeholder="Enter a strong password" />
+              <Input type={showPassword ? "text" : "password"} {...register("password")} placeholder="Enter a strong password" />
               {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+              <button
+                type="button"
+                className="absolute inset-y-0 right-3 flex items-center"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaRegEye />}
+              </button>
+            </div> */}
+
+            <div className="col-span-2 relative">
+              <label className="text-gray-700 font-medium">Password *</label>
+              <Input type={showPassword ? "text" : "password"} {...register("password")} placeholder="Enter a strong password" />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-3 top-5 flex items-center"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaRegEye />}
+              </button>
+            </div>
+            <div className="col-span-2 relative">
+              <label className="text-gray-700 font-medium">Confirm Password *</label>
+              <Input type={showConfirmPassword ? "text" : "password"} {...register("confirmPassword")} placeholder="Re-enter your password" />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-3 top-5 flex items-center"
+                onClick={toggleConfirmPasswordVisibility}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaRegEye />}
+              </button>
             </div>
 
-            <div className="col-span-2">
+
+            {/* <div className="col-span-2">
               <label className="text-gray-700 font-medium">Confirm Password *</label>
               <Input type="password" {...register("confirmPassword")} placeholder="Re-enter your password" />
               {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
-            </div>
+            </div> */}
 
             {/* Company Name */}
             <div>

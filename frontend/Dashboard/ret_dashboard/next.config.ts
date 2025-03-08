@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
     ]
   },
   /* config options here */
+  images: {
+    domains: ["modde.s3.us-east-1.amazonaws.com"], // Allow images from S3 bucket
+  },
 };
 
 export default nextConfig;

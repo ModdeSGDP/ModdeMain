@@ -1,3 +1,6 @@
+
+
+
 "use client";
 
 import React from "react";
@@ -53,31 +56,30 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
                 {/* Customer profile image + name */}
                 <td className="p-3">
                   <div className="flex items-center space-x-3">
-                    <Image
+                    {/* <Image
                       src={order.customer.image}
                       alt={order.customer.name}
                       width={30}
                       height={30}
                       className="rounded-full object-cover"
-                    />
+                    /> */}
                     <span>{order.customer.name}</span>
                   </div>
                 </td>
 
                 {/* Status with colored dot */}
                 <td className="p-3">
-                <div className="flex items-center space-x-2">
-                  <span
-                    className={`w-3 h-3 rounded-full ${
-                      order.status === "Delivered"
+                  <div className="flex items-center space-x-2">
+                    <span
+                      className={`w-3 h-3 rounded-full ${order.status === "Delivered"
                         ? "bg-green-500"
                         : order.status === "Pending"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }`}
-                  ></span>
-                  <span>{order.status}</span>
-                </div>
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                        }`}
+                    ></span>
+                    <span>{order.status}</span>
+                  </div>
                 </td>
 
                 <td className="p-3">{order.amount}</td>
@@ -85,7 +87,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
             ))}
           </tbody>
         </table>
-      </div> 
+      </div>
     </div>
   );
 };
