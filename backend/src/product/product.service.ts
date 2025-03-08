@@ -112,34 +112,93 @@ export class ProductService {
     return this.productModel.find(filterConditions);
   }
 
-  async searchSimilarProducts(file: Express.Multer.File): Promise<Product[]> {
-    try {
-      // Make a POST request to the external service to get similar images
-      const response: AxiosResponse = await this.httpService
-        .post('http://127.0.0.1:8000/search', file.buffer, {
-          headers: {
-            'Content-Type': file.mimetype,  // Send the mimetype of the file
-            'Content-Length': file.buffer.length.toString(),  // Send the content length
-          },
-        })
-        .toPromise(); // Convert Observable to Promise
+ //Uploaidng to S3 and pinecone and mongoDB though featuree extraction
+ async uploadProduct(file: Express.Multer.File, productData: any): Promise<string> {
+  try {
+    console.log('Uploading image to S3...');
 
-      const similarImageIds: string[] = response.data.similar_images; // Assuming the response has a 'similar_images' field
+    // Upload to S3
+    const s3Response = await this.s3.send(
+      new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: `${Date.now()}_${file.originalname}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      }),
+    );
 
-      // Fetch products that match the similar image IDs
-      const products = await this.productModel
-        .find({
-          image_id: { $in: similarImageIds }, // Query by image_id or the field that matches
-        })
-        .exec();
+    const imageUrl = `https://${this.bucketName}.s3.${this.configService.get('AWS_REGION')}.amazonaws.com/${Date.now()}_${file.originalname}`;
+    console.log('Image uploaded to S3. URL:', imageUrl);
 
-      return products;
-    } catch (error) {
-      // Handle errors
-      console.error('Error in searchSimilarProducts:', error);
-      throw new Error('Failed to search similar products');
-    }
+    console.log('Calling FastAPI for feature extraction...');
+
+    // Call FastAPI for feature extraction
+    const response = await this.httpService
+      .post('http://127.0.0.1:8000/upload', file.buffer, {
+        headers: {
+          'Content-Type': file.mimetype,
+          'Content-Length': file.buffer.length.toString(),
+        },
+      })
+      .toPromise();
+
+    const imageId = response.data.image_id;
+    console.log('Feature extraction complete. Image ID:', imageId);
+
+    console.log('Preparing product data for MongoDB...');
+    const product = new this.productModel({
+      ...productData,
+      image_id: imageId,
+      image_url: imageUrl,
+    });
+    console.log('Product data:', product);
+
+    console.log('Saving product data to MongoDB...');
+    const savedProduct = await product.save();
+    console.log('Product saved to MongoDB:', savedProduct);
+
+    return imageId;
+  } catch (error) {
+    console.error('Error in uploadProduct:', error);
+    throw error;
   }
+}
+
+  
+ //Sending to fastapi though nestJS
+ async searchSimilarProducts(file: Express.Multer.File): Promise<Product[]> {
+  try {
+    console.log('Searching for similar products...');
+
+    // Call FastAPI for similar image search
+    const response = await this.httpService
+      .post('http://127.0.0.1:8000/search', file.buffer, {
+        headers: {
+          'Content-Type': file.mimetype,
+          'Content-Length': file.buffer.length.toString(),
+        },
+      })
+      .toPromise();
+
+    const similarImageIds: string[] = response.data.similar_images;
+    console.log('Similar image IDs:', similarImageIds);
+
+    // Fetch products that match the similar image IDs
+    const products = await this.productModel
+      .find({
+        image_id: { $in: similarImageIds },
+      })
+      .exec();
+
+    console.log('Found similar products:', products);
+    return products;
+  } catch (error) {
+    console.error('Error in searchSimilarProducts:', error.response?.data || error.message);
+    throw new Error('Failed to search similar products');
+  }
+}
+
+  
 
 }
 
