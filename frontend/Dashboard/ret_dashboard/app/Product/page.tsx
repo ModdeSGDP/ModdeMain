@@ -10,7 +10,7 @@ import Link from "next/link";
 
 interface Product {
     id: string;
-    image: string[];
+    image: string;
     title: string;
     category: string;
     price: string;
@@ -23,7 +23,7 @@ export default function Products() {
     const initialProducts: Product[] = [
         {
             id: "1",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Women",
             price: "LKR 4850",
@@ -33,7 +33,7 @@ export default function Products() {
         },
         {
             id: "2",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Men",
             price: "LKR 5750",
@@ -43,7 +43,7 @@ export default function Products() {
         },
         {
             id: "3",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Women",
             price: "LKR 7200",
@@ -53,7 +53,7 @@ export default function Products() {
         },
         {
             id: "4",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Unisex",
             price: "LKR 6300",
@@ -63,7 +63,7 @@ export default function Products() {
         },
         {
             id: "5",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Unisex",
             price: "LKR 9100",
@@ -73,7 +73,7 @@ export default function Products() {
         },
         {
             id: "6",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Men",
             price: "LKR 10200",
@@ -83,7 +83,7 @@ export default function Products() {
         },
         {
             id: "7",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Unisex",
             price: "LKR 4700",
@@ -93,7 +93,7 @@ export default function Products() {
         },
         {
             id: "8",
-            image: ["/images/Productcard.svg", "/images/Productcard2.jpg", "/images/Productcard3.jpg"],
+            image: "/images/Productcard.svg",
             title: "Hooded Long Sleeve - New York",
             category: "Unisex",
             price: "LKR 3200",
@@ -166,6 +166,7 @@ export default function Products() {
 
                     <div className="flex flex-row flex-wrap gap-5">
                         {products.map((product) => (
+                            // <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
                             <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
                         ))}
                     </div>

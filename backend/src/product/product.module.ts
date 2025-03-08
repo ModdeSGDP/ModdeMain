@@ -7,6 +7,7 @@ import { Product, ProductSchema } from './schemas/product.schema';
 import { CommonModule } from '../common/common.module'; 
 import { AuthModule } from 'src/auth/auth.module';
 import { S3Service } from 'src/common/aws/s3.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { S3Service } from 'src/common/aws/s3.service';
     BullModule.registerQueue({ name: 'emailQueue' }), // Register Bull queue for emails
     CommonModule,
     AuthModule, // Import shared services
+    HttpModule,
   ],
   controllers: [ProductController],
   providers: [ProductService, S3Service],

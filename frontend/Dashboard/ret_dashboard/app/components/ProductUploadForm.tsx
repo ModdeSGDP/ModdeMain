@@ -8,6 +8,36 @@ import { Card } from "@/components/ui/card";
 import Image from 'next/image';
 import { useRouter } from "next/navigation";
 import ProductGallery from "./ProductGallery";
+import { API_POST_ADD_PRODUCTS } from "../constant/apiConstant";
+
+const dataURLtoFile = (dataUrl: string, filename: string) => {
+  let arr = dataUrl.split(",");
+  let mime = arr[0].match(/:(.*?);/)![1];
+  let bstr = atob(arr[1]);
+  let n = bstr.length;
+  let u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], filename, { type: mime });
+};
+
+const convertObjectURLToDataURL = async (objectURL: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    fetch(objectURL)
+      .then((response) => response.blob()) // Convert to Blob
+      .then((blob) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string); // Convert Blob to Data URL
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      })
+      .catch(reject);
+  });
+};
+
 
 const ProductUploadForm = () => {
   const router = useRouter();
@@ -21,52 +51,118 @@ const ProductUploadForm = () => {
   // const [salePrice, setSalePrice] = useState(0);
   const [images, setImages] = useState<string[]>([]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const files = Array.from(e.target.files);
-    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (!e.target.files) return;
+  //   const files = Array.from(e.target.files);
+  //   const validTypes = ["image/jpeg", "image/jpg", "image/png"];
 
-    files.forEach((file) => {
-      if (validTypes.includes(file.type)) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          setImages((prev) => [...prev, reader.result as string]);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert("Invalid file type. Only JPG, JPEG, and PNG are allowed.");
-      }
-    });
-  };
+  //   files.forEach((file) => {
+  //     if (validTypes.includes(file.type)) {
+  //       const reader = new FileReader();
+  //       reader.onload = () => {
+  //         setImages((prev) => [...prev, reader.result as string]);
+  //       };
+  //       reader.readAsDataURL(file);
+  //     } else {
+  //       alert("Invalid file type. Only JPG, JPEG, and PNG are allowed.");
+  //     }
+  //   });
+  // };
 
   const handleRemoveImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    const newProduct = {
-      id: Date.now().toString(), // Unique ID for the product
-      image: images,
-      title: productName,
-      category,
-      // price: `LKR ${salePrice}`,
+    console.log(productName,
       description,
-      // salesCount: 0,
-      // remainingCount: stockQuantity,
-    };
+      category,
+      color,
+      images.length);
 
-    // Retrieve existing products from localStorage
-    const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
-    const updatedProducts = [...storedProducts, newProduct];
+    if (!productName || !description || !category || !color || images.length === 0) {
+      alert("Please fill all required fields and upload at least one image.");
+      return;
+    }
 
-    // Save updated products in localStorage
-    localStorage.setItem("products", JSON.stringify(updatedProducts));
+    const formData = new FormData();
+    formData.append("name", productName);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("color", color);
+    formData.append("retailerId", "65a8f2e24b5e4a001c3d9b21"); // Replace with actual retailerId
 
-    // Redirect to product page after adding
-    router.push("/Product");
+    // Upload only the first image
+    const firstImage = images[0];
+    const blob = dataURLtoFile(await convertObjectURLToDataURL(firstImage), "product-image.png");
+    formData.append("file", blob); // Ensure field name matches NestJS controller
+
+    try {
+      const response = await fetch(API_POST_ADD_PRODUCTS, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+
+        const newProduct = {
+          id: responseData.id || Date.now().toString(), // Use backend ID if available
+          image: responseData.image || firstImage, // Store image URL if provided by backend
+          title: productName,
+          category,
+          description,
+          color,
+          retailerId: responseData.retailerId || "65a8f2e24b5e4a001c3d9b21",
+        };
+
+        // Retrieve existing products from localStorage
+        const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
+        const updatedProducts = [...storedProducts, newProduct];
+
+        // Save updated products in localStorage
+        localStorage.setItem("products", JSON.stringify(updatedProducts));
+
+        // Redirect to product page after adding
+        router.push("/Product");
+      } else {
+        throw new Error("Failed to upload product");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error uploading product.");
+    }
   };
+
+
+
+  // const handleSubmit = (e: { preventDefault: () => void }) => {
+  //   e.preventDefault();
+
+  //   const newProduct = {
+  //     id: Date.now().toString(), // Unique ID for the product
+  //     image: images,
+  //     title: productName,
+  //     category,
+  //     // price: `LKR ${salePrice}`,
+  //     description,
+  //     // salesCount: 0,
+  //     // remainingCount: stockQuantity,
+  //   };
+
+  //   // Retrieve existing products from localStorage
+  //   const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
+  //   const updatedProducts = [...storedProducts, newProduct];
+
+  //   // Save updated products in localStorage
+  //   localStorage.setItem("products", JSON.stringify(updatedProducts));
+
+  //   // Redirect to product page after adding
+  //   router.push("/Product");
+  // };
 
   return (
     <div className="flex flex-col md:flex-row gap-8 p-6">
@@ -218,7 +314,7 @@ const ProductUploadForm = () => {
 
       {/* Right Side: Image Upload Section */}
       <Card className="flex-1 p-6">
-        <ProductGallery />
+        <ProductGallery images={images} setImages={setImages} />
       </Card>
     </div>
   );
