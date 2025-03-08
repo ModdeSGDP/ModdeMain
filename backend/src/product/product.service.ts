@@ -71,7 +71,7 @@ export class ProductService {
   }
 
   async getAllProducts(paginationDto: PaginationDto) {
-    const { page = 1, limit = 10 } = paginationDto;
+    const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
 
     const [products, total] = await Promise.all([
