@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectQueue } from '@nestjs/bull';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Queue } from 'bull';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Product } from './schemas/product.schema';
@@ -44,15 +44,21 @@ export class ProductService {
     return this.s3Service.uploadFile(file);
   }
 
-  async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File): Promise<Product> {
+  async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File, user?: any,): Promise<Product> {
     let imageUrl = null;
 
     if (file) {
       imageUrl = await this.uploadToS3(file);
     }
 
+    const retailerId = new Types.ObjectId(user.retailerId);
+    if(!retailerId) {
+      throw new Error('Retailer ID is missing from the token');
+    }
+
     const newProduct = new this.productModel({
       ...createProductDto,
+      retailerId,
       image: imageUrl,
     });
     const savedProduct = await newProduct.save();

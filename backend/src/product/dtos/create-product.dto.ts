@@ -4,6 +4,10 @@ import { Types } from 'mongoose';
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
+  productId: string;
+
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsString()
@@ -22,7 +26,7 @@ export class CreateProductDto {
   @IsString()
   image?: string; // Optional field for the product image URL
 
-  @IsMongoId()
-  retailerId: Types.ObjectId;
+  // @IsMongoId()
+  // retailerId: Types.ObjectId;
 
 }
