@@ -10,6 +10,7 @@ import {
   UploadedFile,
   UseInterceptors,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
@@ -28,8 +29,8 @@ import { RetailerGuard } from 'src/auth/guards/retailer.guard';
 import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @Controller('product')
-// @UseGuards(JwtAuthGuard, RetailerGuard)
-// @ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -41,10 +42,11 @@ export class ProductController {
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
     @Body() createProductDto: CreateProductDto,
+    @Request() req,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     console.log('file', file);
-    const product = await this.productService.createProduct(createProductDto, file);
+    const product = await this.productService.createProduct(createProductDto, file, req.user);
     // Optionally, we could add an email notification here, but it's already queued in the service
     return product;
   }
