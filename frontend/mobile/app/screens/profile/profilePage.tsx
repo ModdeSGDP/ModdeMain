@@ -46,34 +46,6 @@ const deleteAccount = async (): Promise<void> => {
   })
 }
 
-// ConfirmationModal component
-const ConfirmationModal: React.FC<{
-  visible: boolean
-  onConfirm: () => void
-  onCancel: () => void
-}> = ({ visible, onConfirm, onCancel }) => {
-  return (
-    <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onCancel}>
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <Image source={require("../../assets/user.png")} style={styles.modalIcon} />
-          <Text style={styles.modalTitle}>Delete Account</Text>
-          <Text style={styles.modalText}>
-            Are you sure you want to delete your account? This action cannot be undone.
-          </Text>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={[styles.button, styles.buttonCancel]} onPress={onCancel} activeOpacity={0.8}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, styles.buttonConfirm]} onPress={onConfirm} activeOpacity={0.8}>
-              <Text style={styles.confirmButtonText}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  )
-}
 
 const Profile: React.FC = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>()
@@ -244,11 +216,6 @@ const Profile: React.FC = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.deleteAccount} onPress={() => setShowConfirmation(true)} activeOpacity={0.8}>
-          <Image source={require("../../assets/user.png")} style={styles.trashIcon} />
-          <Text style={styles.deleteAccountText}>Delete Account</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate("Login")} activeOpacity={0.8}>
           <LinearGradient
             colors={["#fba3a3", "#ff8a8a"]}
@@ -285,11 +252,6 @@ const Profile: React.FC = () => {
         <View style={styles.activeIndicator} />
       </View>
 
-      <ConfirmationModal
-        visible={showConfirmation}
-        onConfirm={handleDeleteAccount}
-        onCancel={() => setShowConfirmation(false)}
-      />
 
       {isDeleting && (
         <View style={styles.loadingOverlay}>

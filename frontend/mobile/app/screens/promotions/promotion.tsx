@@ -1,5 +1,5 @@
 import type React from "react"
-import { View, Text, Image, StyleSheet, Pressable, ScrollView, SafeAreaView } from "react-native"
+import { View, Text, Image, StyleSheet, Pressable, ScrollView, SafeAreaView, Animated } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Ionicons } from "@expo/vector-icons"
@@ -38,6 +38,19 @@ const PromotionCard: React.FC<PromotionCardProps> = ({ image, title, description
 const PromotionsPage: React.FC = () => {
   const navigation = useNavigation<PromotionsPageNavigationProp>()
   const promotions: PromotionCardProps[] = [] // Replace with your actual promotions data
+  const buttonScale = new Animated.Value(1)
+
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
+      Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+    ]).start()
+  }
+
+  const handleShopPress = () => {
+    animateButton()
+    setTimeout(() => navigation.navigate("ShopPage"), 200)
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,10 +81,19 @@ const PromotionsPage: React.FC = () => {
         ) : (
           <View style={styles.noPromotionsContainer}>
             <Image source={require("../../assets/Illustration2.png")} style={styles.noPromotionsImage} />
-            <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
-              <Text style={styles.shopButtonText}>Go to Shop</Text>
-              <Image style={styles.left} resizeMode="cover" source={require("../../assets/chevron-left.png")} />
-            </Pressable>
+            <Animated.View style={[styles.shopButtonContainer, { transform: [{ scale: buttonScale }] }]}>
+              <LinearGradient
+                colors={["#ff9a9e", "#fad0c4"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.shopButton}
+              >
+                <Pressable onPress={handleShopPress} style={styles.shopButtonContent}>
+                  <Text style={styles.shopButtonText}>Go to Shop</Text>
+                  <Ionicons name="arrow-forward" size={20} color="#FFF" style={styles.shopButtonIcon} />
+                </Pressable>
+              </LinearGradient>
+            </Animated.View>
           </View>
         )}
       </ScrollView>
@@ -106,22 +128,18 @@ const PromotionsPage: React.FC = () => {
   )
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
   },
-  left:{
+  left: {
     width: 18,
     height: 16,
-    left:80,
-    bottom:6,
+    left: 80,
+    bottom: 6,
   },
-  lineView:{
-
-  }
-  ,
+  lineView: {},
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -182,6 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingBottom: 80,
   },
   noPromotionsImage: {
     width: 300,
@@ -195,19 +214,32 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 20,
   },
-  shopButton: {
-    backgroundColor: "#fba3a3",
-    paddingHorizontal: 40,  // Reduced width
-    paddingVertical: 8,     // Reduced height
-    marginBottom: 90,       // Slightly reduced bottom margin
-    borderRadius: 8,        // Slightly smaller border radius
+  shopButtonContainer: {
+    overflow: "hidden",
+    borderRadius: 25,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-
+  shopButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  shopButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   shopButtonText: {
     color: "#FFF",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    top:10,
+    marginRight: 8,
+  },
+  shopButtonIcon: {
+    marginLeft: 8,
   },
   /* Custom Navigation Bar */
   navigationBar: {
