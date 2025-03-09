@@ -74,7 +74,6 @@ const OrdersPage: React.FC = () => {
           <Image source={require("../../assets/cog.png")} style={styles.headerIcon} />
         </Pressable>
       </View>
-
       {orders.length > 0 ? (
         <>
           {/* Order Details */}
@@ -248,9 +247,9 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   noOrdersImage: {
-    width: 200,
+    width: 250,
     height: 200,
-    marginBottom: 24,
+    marginBottom: 80,
   },
   noOrdersText: {
     fontSize: 18,

@@ -1,14 +1,29 @@
 "use client"
 
-import { useState, useCallback, useMemo } from "react"
-import { StyleSheet, View, Text, Image, Pressable, TextInput, FlatList, Dimensions } from "react-native"
+import React, { useState, useCallback, useEffect } from "react"
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  Pressable,
+  TextInput,
+  FlatList,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
-import FilterMenu from "./FilterMenu"
 import { useCartStore } from "./cartState"
-import type { Product } from "./types/product"
 
 const { width } = Dimensions.get("window")
+
+// API endpoint - consider moving to environment config
+const API_BASE_URL = "http://192.168.1.42:4000"
+
+// Authentication token - should be stored securely and fetched from secure storage
+// For example, using react-native-keychain or similar
+const AUTH_TOKEN = "your-auth-token" // Replace with your actual auth token or token retrieval logic
 
 type RootStackParamList = {
   HomePage: undefined
@@ -16,191 +31,403 @@ type RootStackParamList = {
   ProductDetail: { product: Product }
   CartPage: undefined
   ProfilePage: undefined
-  Camera:undefined
+  Camera: undefined
+}
+type ShopsPageNavigationProp = StackNavigationProp<RootStackParamList, "ShopPage">
+
+// Extend Product type to include retailer details
+type Retailer = {
+  id: string
+  name: string
+  logo?: string | null
+  location?: string | null
 }
 
-type ShopsPageNavigationProp = StackNavigationProp<RootStackParamList, "ShopPage">
+type Product = {
+  id: string
+  name: string
+  description: string
+  category: string
+  color: string
+  sizes: string[]
+  image: string | null
+  price: number
+  brand: string
+  tag: string
+  gender: string
+  material: string
+  retailerId: string
+  retailer?: Retailer | null
+}
+
+// Function to fix S3 image URLs
+const fixS3ImageUrl = (url: string | null): string | null => {
+  if (!url) return null;
+  
+  // Check if it's an S3 URL with issues
+  if (url.includes('modde.s3.undefined.amazonaws.com')) {
+    // Replace undefined region with a valid one (us-east-1 in this case)
+    return url.replace('modde.s3.undefined.amazonaws.com', 'modde.s3.us-east-1.amazonaws.com');
+  }
+  
+  return url;
+}
 
 const ShopsPageInfinityScroll = () => {
   const navigation = useNavigation<ShopsPageNavigationProp>()
   const [searchQuery, setSearchQuery] = useState("")
-  const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false)
-  const [selectedSort, setSelectedSort] = useState("all")
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([])
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([])
-  const [priceRange, setPriceRange] = useState({ low: 0, high: 25000 })
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "1",
-      name: "Hooded Long Sleeve -Teen Girls",
-      brand: "Incarnag",
-      price: 4850,
-      image: require("../../assets/Rectangle51.png"),
-      tag: "popular",
-      category: "Casual Wear",
-      gender: "Women",
-      sizes: ["S", "M", "L"],
-      material: "Cotton",
-    },
-    {
-      id: "2",
-      name: "Another Product",
-      brand: "Kelly Felder",
-      price: 3500,
-      image: require("../../assets/Rectangle52.png"),
-      tag: "popular",
-      category: "Party Wear",
-      gender: "Women",
-      sizes: ["M", "L", "XL"],
-      material: "Silk",
-    },
-    {
-      id: "3",
-      name: "Third Product",
-      brand: "Incarnage",
-      price: 2750,
-      image: require("../../assets/Rectangle52.png"),
-      tag: "recommended",
-      category: "Formal Wear",
-      gender: "Men",
-      sizes: ["M", "L", "XXL"],
-      material: "Polyester",
-    },
-    {
-      id: "4",
-      name: "Fourth Product",
-      brand: "Kelly Felder",
-      price: 5200,
-      image: require("../../assets/Rectangle51.png"),
-      tag: "recommended",
-      category: "Sportswear",
-      gender: "Men",
-      sizes: ["S", "M", "L", "XL"],
-      material: "Nylon",
-    },
-    {
-      id: "5",
-      name: "Fifth Product",
-      brand: "Kelly Felder",
-      price: 5200,
-      image: require("../../assets/Rectangle51.png"),
-      category: "Plus Size",
-      gender: "Women",
-      sizes: ["XL", "XXL"],
-      material: "Cotton",
-    },
-    {
-      id: "6",
-      name: "Sixth Product",
-      brand: "Kelly Felder",
-      price: 5200,
-      image: require("../../assets/Rectangle51.png"),
-      category: "Casual Wear",
-      gender: "Men",
-      sizes: ["M", "L", "XL"],
-      material: "Denim",
-    },
-  ])
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [authToken, setAuthToken] = useState<string | null>(AUTH_TOKEN)
+  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({})
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products.filter((product) => {
-      const categoryMatch =
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(product.category) ||
-        selectedCategories.includes(product.gender)
-      const sizeMatch = selectedSizes.length === 0 || product.sizes.some((size) => selectedSizes.includes(size))
-      const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(product.material)
-      const priceMatch = product.price >= priceRange.low && product.price <= priceRange.high
-      return categoryMatch && sizeMatch && materialMatch && priceMatch
-    })
+  const { items, addItem } = useCartStore()
+  const totalQuantity = items.reduce((total, item) => total + item.quantity, 0)
 
-    if (selectedSort === "popular") {
-      filtered = filtered.filter((product) => product.tag === "popular")
-    } else if (selectedSort === "recommended") {
-      filtered = filtered.filter((product) => product.tag === "recommended")
+  // Fetch retailer details with authentication
+  const fetchRetailerDetails = async (retailerId: string): Promise<Retailer | null> => {
+    try {
+      // Skip fetch if retailerId is empty or invalid
+      if (!retailerId || retailerId.trim() === "") {
+        return {
+          id: "unknown",
+          name: "Unknown Retailer",
+        }
+      }
+
+      // Check if we have an auth token
+      if (!authToken) {
+        console.log("No auth token available for retailer fetch")
+        return {
+          id: retailerId,
+          name: "Unknown Retailer",
+        }
+      }
+
+      const response = await fetch(`${API_BASE_URL}/retailer/${retailerId}`, {
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${authToken}`, // Add auth token
+        },
+      })
+
+      if (!response.ok) {
+        // Handle different error codes
+        if (response.status === 401) {
+          console.log(`Authentication failed for retailer ${retailerId}`)
+          // You might want to trigger a re-authentication here
+          setAuthToken(null) // Clear invalid token
+          return {
+            id: retailerId,
+            name: "Unknown Retailer",
+          }
+        } else if (response.status === 404) {
+          console.log(`Retailer ${retailerId} not found`)
+          return {
+            id: retailerId,
+            name: "Unknown Retailer",
+          }
+        }
+        throw new Error(`Failed to fetch retailer details: ${response.status}`)
+      }
+
+      const retailerData = await response.json()
+      return {
+        id: retailerData._id || retailerId,
+        name: retailerData.name || "Unknown Retailer",
+        logo: retailerData.logo || null,
+        location: retailerData.location || null,
+      }
+    } catch (error) {
+      console.error(`Error fetching retailer ${retailerId}:`, error)
+      return {
+        id: retailerId,
+        name: "Unknown Retailer",
+      }
     }
-    return filtered
-  }, [products, selectedSort, selectedCategories, selectedSizes, selectedMaterials, priceRange])
+  }
 
-  const addItem = useCartStore((state) => state.addItem)
+  // Function to fetch products with retry logic and authentication
+  const fetchProducts = async (pageNum: number, retryCount = 0) => {
+    if (retryCount === 0) {
+      setIsLoading(true)
+    }
+    setError(null)
+    
+    try {
+      const API_ENDPOINT = `${API_BASE_URL}/product?page=${pageNum}&limit=10`
+      console.log("Fetching products from:", API_ENDPOINT)
 
+      // Prepare headers with authentication if available
+      const headers: Record<string, string> = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      }
+      
+      if (authToken) {
+        headers["Authorization"] = `Bearer ${authToken}`
+      }
+
+      const response = await fetch(API_ENDPOINT, { headers })
+      
+      if (!response.ok) {
+        // Handle authentication errors
+        if (response.status === 401) {
+          console.log("Authentication failed for product fetch")
+          setAuthToken(null) // Clear invalid token
+          throw new Error("Authentication failed. Please log in again.")
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+      
+      const result = await response.json()
+      console.log("API Response received")
+
+      const productsArray = result.products || []
+      setTotalPages(result.totalPages || 1)
+
+      // Map products and fetch retailer details
+      const mappedProducts = await Promise.all(
+        productsArray.map(async (item: any) => {
+          const retailer = item.retailerId ? await fetchRetailerDetails(item.retailerId) : null
+          
+          // Fix S3 image URL if needed
+          const fixedImageUrl = fixS3ImageUrl(item.image)
+          
+          return {
+            id: item._id,
+            name: item.name || "Unnamed Product",
+            description: item.description || "",
+            category: item.category || "Uncategorized",
+            color: item.color || "",
+            sizes: item.sizes || [],
+            image: fixedImageUrl,
+            price: item.price || 0,
+            brand: item.brand || "Unknown Brand",
+            tag: item.tag || "none",
+            gender: item.gender || "unisex",
+            material: item.material || "unknown",
+            retailerId: item.retailerId || "",
+            retailer,
+          }
+        })
+      )
+
+      if (pageNum === 1) {
+        setProducts(mappedProducts)
+      } else {
+        setProducts((prevProducts) => [...prevProducts, ...mappedProducts])
+      }
+      
+      return true
+    } catch (error) {
+      console.error("Fetch error:", error)
+      
+      // Retry logic (max 3 attempts)
+      if (retryCount < 3) {
+        console.log(`Retrying fetch (attempt ${retryCount + 1})...`)
+        setTimeout(() => {
+          fetchProducts(pageNum, retryCount + 1)
+        }, 1000 * (retryCount + 1)) // Exponential backoff
+        return false
+      }
+      
+      setError(error instanceof Error ? error.message : "Failed to fetch products")
+      return false
+    } finally {
+      if (retryCount === 0) {
+        setIsLoading(false)
+        setIsRefreshing(false)
+      }
+    }
+  }
+
+  // Initial load and pagination
+  useEffect(() => {
+    fetchProducts(page)
+  }, [page])
+
+  // Handle refresh
+  const handleRefresh = () => {
+    setIsRefreshing(true)
+    setPage(1)
+    fetchProducts(1)
+  }
+
+  const loadMoreProducts = () => {
+    if (page < totalPages && !isLoading) {
+      setPage((prevPage) => prevPage + 1)
+    }
+  }
+
+  // Handle image loading errors
+  const handleImageError = (imageUrl: string | null) => {
+    if (imageUrl) {
+      setImageLoadErrors(prev => ({
+        ...prev,
+        [imageUrl]: true
+      }))
+    }
+  }
+
+  // Improved ProductCard with better image handling
   const ProductCard = useCallback(
     ({ item }: { item: Product }) => {
+      // Check if this image previously had an error
+      const hasError = item.image ? imageLoadErrors[item.image] : true
+      
+      // Determine image source with fallback
+      const imageSource = (() => {
+        // If we already know this image has an error, use fallback
+        if (hasError) {
+          return require("../../assets/user.png")
+        }
+        
+        // Check if image is a valid URL
+        if (item.image && typeof item.image === "string" && 
+            (item.image.startsWith("http://") || item.image.startsWith("https://"))) {
+          return { uri: item.image }
+        }
+        
+        // Return default image if no valid image URL
+        return require("../../assets/user.png")
+      })()
+      
       return (
-        <Pressable style={styles.card} onPress={() => navigation.navigate("ProductDetail", { product: item })}>
-          <Image style={styles.productImage} resizeMode="cover" source={item.image} />
+        <Pressable 
+          style={styles.card} 
+          onPress={() => navigation.navigate("ProductDetail", { product: item })}
+        >
+          <Image
+            style={styles.productImage}
+            resizeMode="cover"
+            source={imageSource}
+            defaultSource={require("../../assets/user.png")}
+            onError={(e) => {
+              console.log("Image load error:", e.nativeEvent.error, "URL:", item.image)
+              handleImageError(item.image)
+            }}
+          />
           <View style={styles.inStockLabel}>
             <Text style={styles.inStockText}>In stock</Text>
           </View>
-          {item.tag && (
-            <View style={[styles.tagLabel, item.tag === "popular" ? styles.popularTag : styles.recommendedTag]}>
-              <Text style={styles.tagText}>{item.tag === "popular" ? "Most Popular" : "Recommended"}</Text>
+          {item.tag && item.tag !== "none" && (
+            <View style={[
+              styles.tagLabel, 
+              item.tag === "popular" ? styles.popularTag : styles.recommendedTag
+            ]}>
+              <Text style={styles.tagText}>
+                {item.tag === "popular" ? "Most Popular" : "Recommended"}
+              </Text>
             </View>
           )}
           <View style={styles.description}>
-            <Text style={styles.productName}>{item.name}</Text>
-            <Image style={styles.brandLogo} resizeMode="cover" source={require("../../assets/Ellipse18.png")} />
-            <Text style={styles.brandName}>{item.brand}</Text>
-            <Text style={styles.price}>LKR {item.price}</Text>
+            <Text style={styles.productName} numberOfLines={1} ellipsizeMode="tail">
+              {item.name}
+            </Text>
+            <Text style={styles.brandName} numberOfLines={1} ellipsizeMode="tail">
+              {item.retailer?.name || item.brand}
+            </Text>
+            <Text style={styles.price}>LKR {item.price.toFixed(2)}</Text>
           </View>
           <Pressable
             style={styles.addToCartButton}
-            onPress={() =>
-              addItem({ id: item.id, name: item.name, price: item.price.toString(), image: item.image, quantity: 1 })
-            }
+            onPress={() => {
+              addItem({
+                id: item.id,
+                name: item.name,
+                price: item.price.toString(),
+                image: item.image,
+                quantity: 1,
+                color: item.color,
+                size: item.sizes[0] || "",
+                brand: item.brand,
+                shop: item.retailer?.name || item.brand,
+              })
+            }}
           >
-            <Image style={styles.addToCartIcon} resizeMode="cover" source={require("../../assets/addcart.png")} />
+            <Image 
+              style={styles.addToCartIcon} 
+              resizeMode="cover" 
+              source={require("../../assets/addcart.png")} 
+            />
           </Pressable>
         </Pressable>
       )
     },
-    [addItem, navigation],
+    [navigation, addItem, imageLoadErrors]
   )
-  const renderItem = useCallback(({ item }: { item: Product }) => <ProductCard item={item} />, [ProductCard])
 
-  const CartButton = () => {
-    const itemCount = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0))
+  const renderItem = useCallback(
+    ({ item }: { item: Product }) => <ProductCard item={item} />, 
+    [ProductCard]
+  )
+
+  // Loading state for initial load
+  if (isLoading && page === 1) {
     return (
-      <Pressable onPress={() => navigation.navigate("CartPage")}>
-        <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
-        {itemCount > 0 && (
-          <View style={styles.cartBadge}>
-            <Text style={styles.cartBadgeText}>{itemCount}</Text>
-          </View>
-        )}
-      </Pressable>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#F97C7C" />
+        <Text>Loading products...</Text>
+      </View>
     )
   }
 
-  const handleApplyFilters = useCallback(
-    (filters: {
-      categories: string[]
-      sizes: string[]
-      materials: string[]
-      priceRange: { low: number; high: number }
-    }) => {
-      setSelectedCategories(filters.categories)
-      setSelectedSizes(filters.sizes)
-      setSelectedMaterials(filters.materials)
-      setPriceRange(filters.priceRange)
-      setIsFilterMenuVisible(false)
-    },
-    [],
-  )
+  // Error state
+  if (error && products.length === 0) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+        <Pressable 
+          style={styles.retryButton} 
+          onPress={() => fetchProducts(1)}
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </Pressable>
+      </View>
+    )
+  }
+
+  // Empty state
+  if (products.length === 0 && !isLoading) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text>No products found.</Text>
+        <Pressable 
+          style={styles.retryButton} 
+          onPress={() => fetchProducts(1)}
+        >
+          <Text style={styles.retryButtonText}>Refresh</Text>
+        </Pressable>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.shopsPageInfinityScroll}>
-      <Pressable style={styles.backButton} onPress={() => navigation.navigate("HomePage")}>
-        <Image style={styles.backButtonIcon} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
+      <Pressable 
+        style={styles.backButton} 
+        onPress={() => navigation.navigate("HomePage")}
+      >
+        <Image 
+          style={styles.backButtonIcon} 
+          resizeMode="cover" 
+          source={require("../../assets/chevron_left.png")} 
+        />
       </Pressable>
+      
       <View style={styles.searchBar}>
-        <Pressable
-          onPress={() => {
-            /* Handle camera press */
-          }}
-        >
-          <Image style={styles.searchCamera} resizeMode="cover" source={require("../../assets/Vector1.png")} />
+        <Pressable onPress={() => navigation.navigate("Camera")}>
+          <Image 
+            style={styles.searchCamera} 
+            resizeMode="cover" 
+            source={require("../../assets/Vector1.png")} 
+          />
         </Pressable>
         <TextInput
           style={styles.searchInput}
@@ -208,84 +435,88 @@ const ShopsPageInfinityScroll = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <Pressable
-          onPress={() => {
-            /* Handle search press */
-          }}
-        >
-          <Image style={styles.searchIcon} resizeMode="cover" source={require("../../assets/vector.png")} />
+        <Pressable onPress={() => { /* Handle search */ }}>
+          <Image 
+            style={styles.searchIcon} 
+            resizeMode="cover" 
+            source={require("../../assets/vector.png")} 
+          />
         </Pressable>
       </View>
-      <Image style={styles.bannerImage} resizeMode="cover" source={require("../../assets/Rectangle41.png")} />
-      <View style={styles.filterBar}>
-        <View style={styles.sortOptions}>
-          <Pressable onPress={() => setSelectedSort("all")}>
-            <Text style={[styles.sortOptionText, selectedSort === "all" && styles.selectedSortText]}>All</Text>
-          </Pressable>
-          <Pressable onPress={() => setSelectedSort("recommended")}>
-            <Text style={[styles.sortOptionText, selectedSort === "recommended" && styles.selectedSortText]}>
-              Recommended
-            </Text>
-          </Pressable>
-          <Pressable onPress={() => setSelectedSort("popular")}>
-            <View style={styles.popularOption}>
-              <Text style={[styles.sortOptionText, selectedSort === "popular" && styles.selectedSortText]}>
-                Most Popular
-              </Text>
-              {selectedSort === "popular" && (
-                <Image
-                  style={styles.angleDownIcon}
-                  resizeMode="cover"
-                  source={require("../../assets/angle-down.png")}
-                />
-              )}
-            </View>
-          </Pressable>
-        </View>
-        <Pressable style={styles.filterButton} onPress={() => setIsFilterMenuVisible(true)}>
-          <Image style={styles.filterIcon} resizeMode="cover" source={require("../../assets/sliders.png")} />
-          <Text style={styles.filterText}>Filters</Text>
-        </Pressable>
-      </View>
+      
+      <Image 
+        style={styles.bannerImage} 
+        resizeMode="cover" 
+        source={require("../../assets/Rectangle41.png")} 
+      />
+      
       <FlatList
-        data={filteredProducts}
+        data={products}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
         numColumns={2}
         contentContainerStyle={styles.productGrid}
         columnWrapperStyle={styles.columnWrapper}
+        onEndReached={loadMoreProducts}
+        onEndReachedThreshold={0.5}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
+        ListFooterComponent={
+          isLoading && page > 1 ? (
+            <ActivityIndicator size="small" color="#F97C7C" style={styles.footerLoader} />
+          ) : null
+        }
       />
+      
       <View style={styles.navigationBar}>
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
           <Pressable onPress={() => navigation.navigate("HomePage")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
+            <Image 
+              style={styles.navIcon} 
+              resizeMode="cover" 
+              source={require("../../assets/smart_home1.png")} 
+            />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
             <View style={styles.lineView} />
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt1.png")} />
+            <Image 
+              style={styles.navIcon} 
+              resizeMode="cover" 
+              source={require("../../assets/shirt1.png")} 
+            />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("Camera")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
+            <Image 
+              style={styles.navIcon} 
+              resizeMode="cover" 
+              source={require("../../assets/cameraplus.png")} 
+            />
           </Pressable>
-          <CartButton />
+          <Pressable onPress={() => navigation.navigate("CartPage")}>
+            <View style={styles.cartBadgeContainer}>
+              <Image 
+                style={styles.navIcon} 
+                resizeMode="cover" 
+                source={require("../../assets/shopping_cart.png")} 
+              />
+              {totalQuantity > 0 && (
+                <View style={styles.cartBadge}>
+                  <Text style={styles.cartBadgeText}>{totalQuantity}</Text>
+                </View>
+              )}
+            </View>
+          </Pressable>
           <Pressable onPress={() => navigation.navigate("ProfilePage")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
+            <Image 
+              style={styles.navIcon} 
+              resizeMode="cover" 
+              source={require("../../assets/user.png")} 
+            />
           </Pressable>
         </View>
         <View style={styles.activeIndicator} />
       </View>
-      <FilterMenu
-        isVisible={isFilterMenuVisible}
-        onClose={() => setIsFilterMenuVisible(false)}
-        onApplyFilters={handleApplyFilters}
-        initialFilters={{
-          categories: selectedCategories,
-          sizes: selectedSizes,
-          materials: selectedMaterials,
-          priceRange: priceRange,
-        }}
-      />
     </View>
   )
 }
@@ -294,6 +525,39 @@ const styles = StyleSheet.create({
   shopsPageInfinityScroll: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  retryButton: {
+    backgroundColor: "#F97C7C",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  retryButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
   backButton: {
     position: "absolute",
@@ -319,10 +583,7 @@ const styles = StyleSheet.create({
     top: 10,
     padding: 6,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -350,58 +611,6 @@ const styles = StyleSheet.create({
     left: 20,
     marginVertical: 10,
   },
-  filterBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#FFE2E6",
-    padding: 10,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  sortOptions: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  sortOptionText: {
-    fontFamily: "Inter-SemiBold",
-    fontSize: 12,
-    color: "#979797",
-    marginRight: 10,
-  },
-  selectedSortText: {
-    color: "#F97C7C",
-  },
-  popularOption: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  angleDownIcon: {
-    width: 12,
-    height: 12,
-    marginLeft: 5,
-  },
-  filterButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  filterIcon: {
-    width: 16,
-    height: 16,
-    marginRight: 4,
-  },
-  filterText: {
-    fontFamily: "Inter-SemiBold",
-    fontSize: 13,
-    color: "#F97C7C",
-  },
   productGrid: {
     paddingHorizontal: 10,
     paddingBottom: 120,
@@ -416,10 +625,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 10,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -449,11 +655,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Medium",
     fontSize: 12,
     color: "#321919",
-    marginBottom: 5,
-  },
-  brandLogo: {
-    width: 20,
-    height: 20,
     marginBottom: 5,
   },
   brandName: {
@@ -486,10 +687,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 20,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -532,6 +730,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  cartBadgeContainer: {
+    position: "relative",
+  },
   cartBadge: {
     position: "absolute",
     right: -6,
@@ -566,7 +767,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "#000",
   },
+  footerLoader: {
+    marginVertical: 20,
+  },
 })
 
 export default ShopsPageInfinityScroll
-
