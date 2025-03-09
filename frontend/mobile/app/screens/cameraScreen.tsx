@@ -1,8 +1,10 @@
-import React, { useState, useRef, useEffect } from "react"
+"use client"
+
+import { useState, useRef, useEffect } from "react"
 import { StyleSheet, Text, TouchableOpacity, View, Image, ActivityIndicator } from "react-native"
 import { CameraView, type CameraType, useCameraPermissions } from "expo-camera"
 import { useNavigation } from "@react-navigation/native"
-import { MaterialIcons, Ionicons } from '@expo/vector-icons'
+import { MaterialIcons, Ionicons } from "@expo/vector-icons"
 
 const CameraScreen = () => {
   const [facing, setFacing] = useState<CameraType>("back")
@@ -57,6 +59,10 @@ const CameraScreen = () => {
     navigation.navigate("HomePage" as never, { capturedImage: capturedImage } as never)
   }
 
+  const goBack = () => {
+    navigation.goBack()
+  }
+
   if (capturedImage) {
     return (
       <View style={styles.container}>
@@ -85,6 +91,9 @@ const CameraScreen = () => {
   return (
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
+        <TouchableOpacity style={styles.closeButton} onPress={goBack}>
+          <Ionicons name="close" size={30} color="white" />
+        </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.iconButton} onPress={toggleCameraFacing}>
             <MaterialIcons name="flip-camera-ios" size={30} color="white" />
@@ -103,36 +112,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: '#FFB6C1',
+    backgroundColor: "#FFB6C1",
   },
   message: {
     textAlign: "center",
     paddingBottom: 20,
     fontSize: 18,
-    color: 'white',
+    color: "white",
   },
   camera: {
     flex: 1,
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    position: 'absolute',
+    justifyContent: "space-around",
+    alignItems: "center",
+    position: "absolute",
     bottom: 30,
     left: 0,
     right: 0,
   },
   iconButton: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   captureButton: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#FF69B4',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#FF69B4",
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
     fontSize: 14,
@@ -145,31 +154,38 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   permissionButton: {
-    backgroundColor: '#FF69B4',
+    backgroundColor: "#FF69B4",
     padding: 15,
     borderRadius: 25,
     marginHorizontal: 50,
   },
   permissionButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   loaderContainer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   loaderText: {
     marginTop: 10,
     fontSize: 18,
-    color: '#000',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "#000",
+    fontWeight: "bold",
+    textAlign: "center",
     paddingHorizontal: 20,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 1,
   },
 })
 
 export default CameraScreen
+

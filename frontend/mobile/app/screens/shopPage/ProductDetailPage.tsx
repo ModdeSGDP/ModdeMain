@@ -2,7 +2,16 @@
 
 import type React from "react"
 import { useState } from "react"
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Dimensions, TextInput } from "react-native"
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  TextInput,
+} from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import type { RouteProp } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -20,6 +29,8 @@ type Product = {
   brand: string
   price: string
   image: any
+  color: string
+  sizes: string[]
 }
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, "ProductDetail">
@@ -31,36 +42,31 @@ type Props = {
 
 const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
   const { product } = route.params
-  const [selectedColor, setSelectedColor] = useState("black")
-  const [selectedSize, setSelectedSize] = useState("M")
+  const [selectedColor, setSelectedColor] = useState(product.color || "black")
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "M")
   const [quantity, setQuantity] = useState(1)
   const [userRating, setUserRating] = useState(0)
   const [reviewText, setReviewText] = useState("")
   const [showReviewInput, setShowReviewInput] = useState(false)
 
-  // Get the addItem function from the cart store
   const { addItem } = useCartStore()
 
   const colors = ["black", "white", "gray"]
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"]
+  const sizes = product.sizes.length > 0 ? product.sizes : ["XS", "S", "M", "L", "XL", "XXL"]
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1)
   const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
 
   const handleSubmitReview = () => {
-    // Here you would typically send the review to your backend
     console.log("Submitting review:", { rating: userRating, text: reviewText })
-    // Reset the form
     setUserRating(0)
     setReviewText("")
     setShowReviewInput(false)
   }
 
-  // Function to handle adding the product to the cart
   const handleAddToCart = () => {
-    // Create a cart item with the selected options
     const cartItem = {
-      id: `${product.id}-${selectedColor}-${selectedSize}`, // Create a unique ID based on product and options
+      id: `${product.id}-${selectedColor}-${selectedSize}`,
       name: product.name,
       price: product.price,
       image: product.image,
@@ -68,16 +74,10 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
       color: selectedColor,
       size: selectedSize,
       brand: product.brand,
-      shop: product.brand, // Using brand as shop for now, update if you have shop data
+      shop: product.brand,
     }
-
-    // Add the item to the cart
     addItem(cartItem)
-
-    // Optionally, show a confirmation message or navigate to the cart
     alert(`Added ${quantity} ${product.name} to your cart!`)
-    // Uncomment the line below if you want to navigate to the cart after adding
-    // navigation.navigate('CartPage');
   }
 
   return (
@@ -93,7 +93,16 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
       </View>
       <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
         {[1, 2, 3, 4].map((img) => (
-          <Image key={img} source={product.image} style={styles.productImage} />
+          <Image
+            key={img}
+            source={
+              typeof product.image === "string" && product.image.startsWith("http")
+                ? { uri: product.image }
+                : require("../../assets/user.png")
+            }
+            style={styles.productImage}
+            onError={(e) => console.log("Image load error:", e.nativeEvent.error)}
+          />
         ))}
       </ScrollView>
       <View style={styles.productInfo}>
@@ -127,7 +136,6 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
             />
           ))}
         </View>
-
         <Text style={styles.sectionTitle}>Size</Text>
         <View style={styles.sizeOptions}>
           {sizes.map((size) => (
@@ -142,7 +150,6 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
             </TouchableOpacity>
           ))}
         </View>
-
         <Text style={styles.sectionTitle}>Quantity</Text>
         <View style={styles.quantitySelector}>
           <TouchableOpacity style={styles.quantityButton} onPress={decrementQuantity}>
@@ -153,13 +160,11 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
             <Text style={styles.quantityButtonText}>+</Text>
           </TouchableOpacity>
         </View>
-
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>
           Shop {product.brand} for trendy sportswear for ladies in Sri Lanka. Stay stylish and comfortable during your
           workouts with our premium women's sportswear collection.
         </Text>
-
         <Text style={styles.sectionTitle}>Reviews</Text>
         <View style={styles.reviewsContainer}>
           <View style={styles.overallRating}>
@@ -209,10 +214,8 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
               </View>
               <Text style={styles.reviewText}>Great product! Very comfortable and stylish. Highly recommended.</Text>
             </View>
-            {/* Add more review items as needed */}
           </View>
         </View>
-
         <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
           <Text style={styles.addToCartButtonText}>Add to Cart</Text>
         </TouchableOpacity>
@@ -224,7 +227,7 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF0F5", // Light pink color
+    backgroundColor: "#FFF0F5",
     paddingTop: 5,
     paddingBottom: 80,
   },
@@ -461,4 +464,3 @@ const styles = StyleSheet.create({
 })
 
 export default ProductDetailPage
-
