@@ -101,8 +101,13 @@ const ProductUploadForm = () => {
     formData.append("file", blob); // Ensure field name matches NestJS controller
 
     try {
+      const token = sessionStorage.getItem("token");
       const response = await fetch(API_POST_ADD_PRODUCTS, {
         method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
         body: formData,
       });
 
