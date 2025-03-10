@@ -134,16 +134,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </Button>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-4 p-4 bg-gray-50 rounded-b-lg border-t border-gray-200">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Sales</span>
-          <span className="text-sm font-medium text-green-600">{product.salesCount}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Remaining Products</span>
-          <span className="text-sm font-medium text-gray-900">{product.remainingCount}</span>
-        </div>
-      </CardFooter>
+
     </Card>
   );
 };

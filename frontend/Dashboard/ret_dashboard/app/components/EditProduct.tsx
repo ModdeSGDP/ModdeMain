@@ -51,9 +51,9 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }: E
               <SelectItem value="Women">Unisex</SelectItem>
             </SelectContent>
           </Select>
-          <Input name="price" type="text" value={formData.price} onChange={handleChange} placeholder="Price" />
+          {/* <Input name="price" type="text" value={formData.price} onChange={handleChange} placeholder="Price" />
           <Input name="salesCount" type="number" value={formData.salesCount} onChange={handleChange} placeholder="Sales Count" />
-          <Input name="remainingCount" type="number" value={formData.remainingCount} onChange={handleChange} placeholder="Stock Quantity" />
+          <Input name="remainingCount" type="number" value={formData.remainingCount} onChange={handleChange} placeholder="Stock Quantity" /> */}
         </div>
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="ghost" onClick={onClose} className="bg-gray-300">Cancel</Button>

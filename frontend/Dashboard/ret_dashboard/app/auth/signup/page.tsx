@@ -93,10 +93,6 @@ const SignUpPage = () => {
         lastName: data?.lastName || "",
         // jobTitle: data?.jobTitle || "",
         email: data?.email || "",
-        // mobileNumber: data?.mobileNumber || "",
-        // companyName: data?.companyName || "",
-        // companyWebsite: data?.companyWebsite || "", 
-        // companyRegisterNumber: data?.companyRegisterNumber || "",
         password: data?.password || "",
         role: "Admin", // Default role assigned
       }
@@ -126,7 +122,7 @@ const SignUpPage = () => {
         throw new Error(errorData.message || "Registration failed. Please try again.");
       }
 
-
+      const userResult = await response.json();
 
       const formattedDataRetailer = {
         companyName: data?.companyName,
@@ -159,9 +155,11 @@ const SignUpPage = () => {
 
 
 
-      const result = await response.json();
-      console.log("User Signed Up:", result)
-      localStorage.setItem("user", JSON.stringify(result))
+      const retailerResult = await response.json();
+      console.log("User Signed Up:", retailerResult)
+      data.password = null;
+      localStorage.setItem("user", JSON.stringify(data))
+      localStorage.setItem("retailer", JSON.stringify(data))
       localStorage.setItem("authenticated", "true")
       router.push("/Dashboard")
     } catch (error: any) {
