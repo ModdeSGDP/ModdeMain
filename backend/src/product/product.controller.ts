@@ -29,8 +29,8 @@ import { RetailerGuard } from 'src/auth/guards/retailer.guard';
 import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @Controller('product')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
+// @UseGuards(JwtAuthGuard)
+// @ApiBearerAuth()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -38,6 +38,8 @@ export class ProductController {
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('add')
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
