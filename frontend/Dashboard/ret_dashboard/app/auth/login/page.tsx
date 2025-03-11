@@ -102,8 +102,8 @@ const Login = () => {
       // localStorage.setItem("token", responseData.token);
 
       const responseData = await response.json();
-      localStorage.setItem("token", responseData.token);
-      localStorage.setItem("authenticated", "true");
+      sessionStorage.setItem("token", responseData.token);
+      sessionStorage.setItem("authenticated", "true");
 
       console.log("Login Successful:", responseData);
       router.push("/Dashboard"); // ✅ Redirect to Dashboard
