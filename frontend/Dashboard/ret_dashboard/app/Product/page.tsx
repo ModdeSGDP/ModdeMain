@@ -7,16 +7,17 @@ import { ProductCard } from "../components/Productcard";
 import { Plus } from "lucide-react";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import Link from "next/link";
+import { API_GET_PRODUCT } from "../constant/apiConstant";
 
 interface Product {
     id: string;
     image: string;
     title: string;
     category: string;
-    price: string;
+    //price: string;
     description: string;
-    salesCount: number;
-    remainingCount: number;
+    //salesCount?: number;
+    //remainingCount?: number;
 }
 
 export default function Products() {
@@ -118,12 +119,38 @@ export default function Products() {
 
         const fetchProducts = async () => {
             try {
-                const response = await fetch("/api/products"); // Update this endpoint as needed
+                const token = localStorage.getItem("token");
+                // const response = await fetch("/api/product"); // Update this endpoint as needed
+                const response = await fetch(API_GET_PRODUCT, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 if (!response.ok) {
                     throw new Error("Failed to fetch products");
                 }
                 const data = await response.json();
-                setProducts(data);
+                if (!data.products) {
+                    throw new Error("Invalid product data format from API");
+                }
+                // setProducts(data);
+
+
+                // Map API response to match the frontend component structure
+                const formattedProducts: Product[] = data.products.map((product: any) => ({
+                    id: product._id, // Use _id from backend
+                    image: product.image || "/images/default-product.png", // Handle missing images
+                    title: product.name,
+                    category: product.category,
+                    price: product.price ? `LKR ${product.price}` : "Price Not Available",
+                    description: product.description,
+                    salesCount: 0, // Default to 0 if not provided
+                    remainingCount: 0, // Default to 0 if not provided
+                }));
+
+                setProducts(formattedProducts);
             } catch (error) {
                 console.error("Error fetching products:", error);
             }
