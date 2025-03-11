@@ -29,8 +29,8 @@ import { RetailerGuard } from 'src/auth/guards/retailer.guard';
 import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @Controller('product')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
+// @UseGuards(JwtAuthGuard)
+// @ApiBearerAuth()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -38,6 +38,8 @@ export class ProductController {
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('add')
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
@@ -50,17 +52,14 @@ export class ProductController {
     // Optionally, we could add an email notification here, but it's already queued in the service
     return product;
   }
-
   @Get()
   async getAllProducts(@Query() paginationDto: PaginationDto) {
     return this.productService.getAllProducts(paginationDto);
   }
-
   @Get(':id')
   async getProductById(@Param('id') id: string) {
     return this.productService.getProductById(id);
   }
-
   @Get('retailer/:retailerId/products')
   // @UseGuards(JwtAuthGuard)
   async getProductsByRetailer(

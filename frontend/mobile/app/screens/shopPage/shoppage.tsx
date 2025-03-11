@@ -19,11 +19,10 @@ import { useCartStore } from "./cartState"
 const { width } = Dimensions.get("window")
 
 // API endpoint - consider moving to environment config
-const API_BASE_URL = "http://192.168.1.42:4000"
+const API_BASE_URL = "http://10.31.7.201:4000"
 
 // Authentication token - should be stored securely and fetched from secure storage
-// For example, using react-native-keychain or similar
-const AUTH_TOKEN = "your-auth-token" // Replace with your actual auth token or token retrieval logic
+const AUTH_TOKEN = "usertoken" // Replace with your actual auth token or token retrieval logic
 
 type RootStackParamList = {
   HomePage: undefined
@@ -34,7 +33,6 @@ type RootStackParamList = {
   Camera: undefined
 }
 type ShopsPageNavigationProp = StackNavigationProp<RootStackParamList, "ShopPage">
-
 // Extend Product type to include retailer details
 type Retailer = {
   id: string
@@ -42,7 +40,6 @@ type Retailer = {
   logo?: string | null
   location?: string | null
 }
-
 type Product = {
   id: string
   name: string
@@ -59,17 +56,15 @@ type Product = {
   retailerId: string
   retailer?: Retailer | null
 }
-
 // Function to fix S3 image URLs
 const fixS3ImageUrl = (url: string | null): string | null => {
   if (!url) return null;
-  
   // Check if it's an S3 URL with issues
   if (url.includes('modde.s3.undefined.amazonaws.com')) {
     // Replace undefined region with a valid one (us-east-1 in this case)
     return url.replace('modde.s3.undefined.amazonaws.com', 'modde.s3.us-east-1.amazonaws.com');
   }
-  
+
   return url;
 }
 
@@ -158,11 +153,9 @@ const ShopsPageInfinityScroll = () => {
       setIsLoading(true)
     }
     setError(null)
-    
     try {
       const API_ENDPOINT = `${API_BASE_URL}/product?page=${pageNum}&limit=10`
       console.log("Fetching products from:", API_ENDPOINT)
-
       // Prepare headers with authentication if available
       const headers: Record<string, string> = {
         "Accept": "application/json",

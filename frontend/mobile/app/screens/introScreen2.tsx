@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         position: "absolute",
     },
     selectWhatYou: {
-        marginTop: 160,
+        marginTop: 180,
         marginLeft: -140.5,
         fontSize: 24,
         lineHeight: 30,

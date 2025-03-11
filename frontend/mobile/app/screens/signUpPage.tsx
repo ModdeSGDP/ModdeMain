@@ -1,4 +1,5 @@
 "use client"
+
 import React, { useState, useEffect } from "react"
 import {
   View,
@@ -54,6 +55,7 @@ const SignupPage: React.FC = () => {
       }),
     ]).start()
   }, [fadeAnim, slideAnim])
+
   const handleSignup = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword || !address || !gender) {
       Alert.alert("Error", "Please fill in all fields")
@@ -71,6 +73,7 @@ const SignupPage: React.FC = () => {
       Alert.alert("Error", "Passwords do not match")
       return
     }
+
     const userData = {
       email,
       password,
@@ -80,8 +83,9 @@ const SignupPage: React.FC = () => {
       gender,
       address,
     }
+
     try {
-      const response = await fetch("http://192.168.1.42:4000/user/register", {
+      const response = await fetch("http://192.168.8.100:4000/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,10 +95,9 @@ const SignupPage: React.FC = () => {
       const data = await response.json()
 
       if (response.ok) {
-        // Store token and user data
+        console.log("Received token:", data.token) // Debug token
         await storeData("userToken", data.token)
         await storeData("userData", userData)
-
         Alert.alert("Success", "Signup successful", [
           {
             text: "OK",
