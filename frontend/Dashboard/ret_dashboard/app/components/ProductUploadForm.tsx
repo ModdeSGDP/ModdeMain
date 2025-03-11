@@ -41,6 +41,7 @@ const convertObjectURLToDataURL = async (objectURL: string): Promise<string> => 
 
 const ProductUploadForm = () => {
   const router = useRouter();
+  const [productId, setProductId] = useState("");
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("All");
@@ -78,18 +79,22 @@ const ProductUploadForm = () => {
     e.preventDefault();
 
     console.log(productName,
+      productId,
       description,
       category,
       color,
       images.length);
 
-    if (!productName || !description || !category || !color || images.length === 0) {
+    // if (!productId || !productName || !description || !category || !color || images.length === 0)
+
+    if (!productId || !productName || !description || !category || !color || images.length === 0) {
       alert("Please fill all required fields and upload at least one image.");
       return;
     }
 
     const formData = new FormData();
     formData.append("name", productName);
+    formData.append("id", productId);
     formData.append("description", description);
     formData.append("category", category);
     formData.append("color", color);
@@ -101,14 +106,12 @@ const ProductUploadForm = () => {
     formData.append("file", blob); // Ensure field name matches NestJS controller
 
     try {
-      const token = sessionStorage.getItem("token");
       const response = await fetch(API_POST_ADD_PRODUCTS, {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
         body: formData,
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token'), // Add Authorization header
+        },
       });
 
       if (response.ok) {
@@ -183,6 +186,16 @@ const ProductUploadForm = () => {
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
               maxLength={20}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="productId">Product ID</Label>
+            <Input
+              id="productId"
+              value={productId}
+              onChange={(e) => setProductId(e.target.value)}
               required
             />
           </div>

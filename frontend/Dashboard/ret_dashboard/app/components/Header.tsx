@@ -4,7 +4,7 @@ import Image from "next/image";
 const Header = () => {
   return (
     <header className="bg-white-800 py-4 ">
-      <div className="container mx-auto flex items-center justify-between px-8">
+      <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-8">
         {/* Welcome Section */}
         <div className="flex items-center space-x-2 md:space-x-12 md:ml-40">
           {/* <Image
@@ -21,7 +21,7 @@ const Header = () => {
         </div>
 
         {/* Search Bar Section */}
-        <div className="flex items-center space-x-2 md:space-x-3 mt-4 md:mt-0">
+        <div className="flex flex-col md:flex-row items-center space-y-2 md:space-x-4 mt-4 md:mt-0 w-full md:w-auto">
           {/* Icons Section Moved Closer */}
           <div className="flex items-center space-x-3">
             <Image
@@ -46,26 +46,27 @@ const Header = () => {
             <input
               type="text"
               placeholder="Search products..."
-              className="form-control block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              // className="form-control block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-12"
             />
             <button
               type="button"
-              className="absolute right-0 top-0 h-full px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-r-lg"
+              className="absolute right-0 top-0 bottom-0 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-r-lg flex items-center justify-center"
             >
               Search
             </button>
           </div>
 
-          
+
         </div>
 
 
 
-        
 
-      
-        
-        
+
+
+
+
 
 
       </div>

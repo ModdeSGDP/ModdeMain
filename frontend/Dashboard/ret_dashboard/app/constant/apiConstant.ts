@@ -7,7 +7,7 @@ export const API_POST_VERIFY_PASSWORD = `${baseUrl}/api/user/verify-password`;
 export const API_POST_RETAILER_REGISTER = `${baseUrl}/retailers/register`;
 export const API_POST_AUTH_LOGIN = `${baseUrl}/auth/login`;
 export const API_POST_ADD_PRODUCTS = `${baseUrl}/product/add`;
-export const API_POST_STOCKS_ADD = `${baseUrl}/api/stocks/add`;
+export const API_POST_STOCKS_ADD = `${baseUrl}/stocks/add`;
 
 // GET API Endpoints
 export const API_GET_EMAIL = (email: string) => `${baseUrl}/api/user/email/${email}`;
