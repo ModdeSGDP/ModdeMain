@@ -13,7 +13,7 @@ export const API_POST_STOCKS_ADD = `${baseUrl}/stocks/add`;
 export const API_GET_EMAIL = (email: string) => `${baseUrl}/api/user/email/${email}`;
 export const API_GET_AUTHENTICATION = `${baseUrl}/api/retailers`;
 export const API_GET_RETAILER_BY_ID = (id: string | number) => `${baseUrl}/api/retailers/${id}`;
-export const API_GET_PRODUCT = `${baseUrl}/api/product`;
+export const API_GET_PRODUCT = `${baseUrl}/product`;
 export const API_GET_PRODUCT_ID = (id: string | number) => `${baseUrl}/api/product/${id}`;
 export const API_GET_RETAILER_ID_PRODUCT = (retailerId: string | number) => `${baseUrl}/api/product/retailer/${retailerId}/products`;
 export const API_GET_PRODUCT_FILTER = `${baseUrl}/api/product/filter`;
@@ -30,4 +30,5 @@ export const API_PATCH_UPDATE_STOCKS = (id: string | number) => `${baseUrl}/api/
 export const API_UPDATE_USER_DETAILS = (id: string | number) => `${baseUrl}/api/user/update/${id}`;
 
 // DELETE API Endpoints
+export const API_DELETE_PRODUCT = (id: string | number) => `${baseUrl}/product/${id}`;
 export const API_DELETE_STOCKS = (id: string | number) => `${baseUrl}/api/stocks/${id}`
