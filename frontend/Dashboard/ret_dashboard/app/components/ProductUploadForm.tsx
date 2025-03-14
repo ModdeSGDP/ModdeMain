@@ -78,12 +78,14 @@ const ProductUploadForm = () => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    console.log(productName,
+    console.log("Submitting Product Data:", {
       productId,
+      productName,
       description,
       category,
       color,
-      images.length);
+      images
+    });
 
     // if (!productId || !productName || !description || !category || !color || images.length === 0)
 
@@ -93,12 +95,12 @@ const ProductUploadForm = () => {
     }
 
     const formData = new FormData();
+    formData.append("productId", productId);
     formData.append("name", productName);
-    formData.append("id", productId);
     formData.append("description", description);
     formData.append("category", category);
     formData.append("color", color);
-    formData.append("retailerId", "65a8f2e24b5e4a001c3d9b21"); // Replace with actual retailerId
+    //formData.append("retailerId", "65a8f2e24b5e4a001c3d9b21"); // Replace with actual retailerId
 
     // Upload only the first image
     const firstImage = images[0];
@@ -117,22 +119,25 @@ const ProductUploadForm = () => {
       if (response.ok) {
         const responseData = await response.json();
 
-        const newProduct = {
-          id: responseData.id || Date.now().toString(), // Use backend ID if available
-          image: responseData.image || firstImage, // Store image URL if provided by backend
-          title: productName,
-          category,
-          description,
-          color,
-          retailerId: responseData.retailerId || "65a8f2e24b5e4a001c3d9b21",
-        };
+        console.log("Product Added Successfully:", responseData);
+        alert("Product uploaded successfully!");
 
-        // Retrieve existing products from localStorage
-        const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
-        const updatedProducts = [...storedProducts, newProduct];
+        // const newProduct = {
+        //   id: responseData.id || Date.now().toString(), // Use backend ID if available
+        //   image: responseData.image || firstImage, // Store image URL if provided by backend
+        //   title: productName,
+        //   category,
+        //   description,
+        //   color,
+        //   retailerId: responseData.retailerId || "65a8f2e24b5e4a001c3d9b21",
+        // };
+
+        // // Retrieve existing products from localStorage
+        // const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
+        // const updatedProducts = [...storedProducts, newProduct];
 
         // Save updated products in localStorage
-        localStorage.setItem("products", JSON.stringify(updatedProducts));
+        //localStorage.setItem("products", JSON.stringify(updatedProducts));
 
         // Redirect to product page after adding
         router.push("/Product");

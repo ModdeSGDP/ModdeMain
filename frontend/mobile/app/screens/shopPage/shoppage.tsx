@@ -19,7 +19,7 @@ import { useCartStore } from "./cartState"
 const { width } = Dimensions.get("window")
 
 // API endpoint - consider moving to environment config
-const API_BASE_URL = "http://10.31.7.201:4000"
+const API_BASE_URL = "http://192.168.8.100:4000"
 
 // Authentication token - should be stored securely and fetched from secure storage
 const AUTH_TOKEN = "usertoken" // Replace with your actual auth token or token retrieval logic

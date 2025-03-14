@@ -5,6 +5,7 @@ import { Image } from 'react-native';
 
 // Importing screens
 import SplashScreen from './screens/splashScreen';
+import OrderComplete from './screens/orderComplete';
 import OnboardingPage from './screens/onboardingpage';
 import IntroScreen1 from './screens/introScreen1';
 import IntroScreen2 from './screens/introScreen2';
@@ -89,11 +90,12 @@ export default function MyStack() {
       <Stack.Screen name="Intro3" component={IntroScreen3} />
       <Stack.Screen name="HomePage" component={HomePage} />
       <Stack.Screen name="ShopPage" component={ShopPage} />
+      <Stack.Screen name="orderComplete" component={OrderComplete} />
       <Stack.Screen name="CartPage" component={Cart} />
       <Stack.Screen name="ProfilePage" component={Profile} />
       <Stack.Screen name="Login" component={LoginPage}/>
-      <Stack.Screen name="SignUpPage" component={SignupPage} />
       <Stack.Screen name="Registration" component={RegistrationComplete}/>
+      <Stack.Screen name="SignUpPage" component={SignupPage} />
       <Stack.Screen name="ProductDetail" component={ProductDetailPage}/>
       <Stack.Screen name="CheckoutPage" component={CheckoutScreen}/>
       <Stack.Screen name="HomeSideBar" component={SideMenu}/>

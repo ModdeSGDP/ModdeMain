@@ -102,10 +102,19 @@ const Login = () => {
       // localStorage.setItem("token", responseData.token);
 
       const responseData = await response.json();
-      sessionStorage.setItem("token", responseData.token);
-      sessionStorage.setItem("authenticated", "true");
+      console.log(responseData.accessToken);
+      const token = responseData.accessToken;
+      if (!token) {
+        throw new Error("Token is missing in response");
+      }
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("authenticated", "true");
 
       console.log("Login Successful:", responseData);
+      console.log("Navigating to Dashboard...");
+
+
       router.push("/Dashboard"); // ✅ Redirect to Dashboard
 
       // setTimeout(() => {

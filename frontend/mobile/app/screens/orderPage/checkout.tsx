@@ -1,5 +1,7 @@
+"use client"
+
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Text, Image, Pressable, ScrollView, Alert } from "react-native"
+import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
 
@@ -18,7 +20,7 @@ type CartItem = {
   quantity: number
 }
 
-// Updated RootStackParamList to include all necessary screens
+// Updated RootStackParamList to include OrderComplete screen
 type RootStackParamList = {
   HomePage: undefined
   ShopPage: undefined
@@ -29,6 +31,7 @@ type RootStackParamList = {
   ItemDetails: { item: any }
   OrdersPage: { newOrder?: any }
   OrderSettingsPage: undefined
+  orderComplete: { order: any }
 }
 
 type CheckoutNavigationProp = StackNavigationProp<RootStackParamList, "CheckoutPage">
@@ -59,11 +62,11 @@ const CheckoutScreen = ({
 
   const handlePayment = () => {
     setIsProcessing(true)
-    
+
     // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false)
-      
+
       // Create order object with necessary details
       const newOrder = {
         id: `ORD-${Date.now()}`,
@@ -72,20 +75,11 @@ const CheckoutScreen = ({
         total: total,
         paymentMethod: paymentMethod,
         shippingAddress: address,
-        status: "Processing"
+        status: "Processing",
       }
-      
-      // Show success message
-      Alert.alert(
-        "Payment Successful",
-        "Your order has been placed successfully!",
-        [
-          { 
-            text: "View Orders", 
-            onPress: () => navigation.navigate("OrdersPage", { newOrder }) 
-          }
-        ]
-      )
+
+      // Navigate to OrderComplete page instead of showing Alert
+      navigation.navigate("orderComplete", { order: newOrder })
     }, 1500)
   }
 
@@ -122,8 +116,7 @@ const CheckoutScreen = ({
               onPress={() => {
                 /* Handle edit address */
               }}
-            >
-            </Pressable>
+            ></Pressable>
           </View>
           {/* <View style={styles.addressInfo}>
             <Text style={styles.addressName}>{address.name}</Text>
@@ -163,9 +156,7 @@ const CheckoutScreen = ({
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Order Items</Text>
             </View>
-            <View style={styles.orderItemsContainer}>
-              {selectedItems.map(renderCartItem)}
-            </View>
+            <View style={styles.orderItemsContainer}>{selectedItems.map(renderCartItem)}</View>
           </View>
         )}
 
@@ -196,9 +187,7 @@ const CheckoutScreen = ({
           onPress={handlePayment}
           disabled={isProcessing}
         >
-          <Text style={styles.payNowText}>
-            {isProcessing ? "Processing..." : "Pay now"}
-          </Text>
+          <Text style={styles.payNowText}>{isProcessing ? "Processing..." : "Pay now"}</Text>
         </Pressable>
       </ScrollView>
 
@@ -235,7 +224,7 @@ const styles = StyleSheet.create({
     left: 340,
     width: 21,
     height: 23,
-    top: -100
+    top: -100,
   },
   scrollContent: {
     padding: 20,
@@ -248,14 +237,14 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontFamily: "Inter-SemiBold",
     fontSize: 24,
-    left:130,
-    top:-50,
+    left: 130,
+    top: -50,
     color: "#321919",
     marginBottom: 20,
   },
   section: {
     marginBottom: 24,
-    bottom:80,
+    bottom: 80,
   },
   sectionHeader: {
     flexDirection: "row",
@@ -332,7 +321,7 @@ const styles = StyleSheet.create({
   },
   totalSection: {
     marginTop: 20,
-    top:-90,
+    top: -90,
   },
   totalRow: {
     flexDirection: "row",
@@ -451,3 +440,4 @@ const styles = StyleSheet.create({
 })
 
 export default CheckoutScreen
+

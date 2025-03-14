@@ -23,6 +23,8 @@ import { StackNavigationProp } from "@react-navigation/stack"
 type RootStackParamList = {
   Login: undefined
   ProfilePage: undefined
+  Registration: undefined
+  HomePage: undefined
 }
 type SignupScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">
 
@@ -98,12 +100,9 @@ const SignupPage: React.FC = () => {
         console.log("Received token:", data.token) // Debug token
         await storeData("userToken", data.token)
         await storeData("userData", userData)
-        Alert.alert("Success", "Signup successful", [
-          {
-            text: "OK",
-            onPress: () => navigation.navigate("ProfilePage"),
-          },
-        ])
+        
+        // Navigate to RegistrationComplete page instead of ProfilePage
+        navigation.navigate("Registration")
       } else {
         Alert.alert("Error", data.message || "Signup failed. Please try again.")
       }
