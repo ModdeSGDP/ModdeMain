@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 export const useAsyncStorage = () => {
   const [isLoading, setIsLoading] = useState(true)
 
-  const storeData = async (key, value) => {
+  const storeData = async (key: string, value: any) => {
     try {
       const jsonValue = JSON.stringify(value)
       await AsyncStorage.setItem(key, jsonValue)
@@ -15,9 +15,10 @@ export const useAsyncStorage = () => {
     }
   }
 
-  const getData = async (key) => {
+  const getData = async (key: string) => {
     try {
       const jsonValue = await AsyncStorage.getItem(key)
+      console.log(key)
       return jsonValue != null ? JSON.parse(jsonValue) : null
     } catch (e) {
       console.error("Error retrieving data:", e)
@@ -25,19 +26,16 @@ export const useAsyncStorage = () => {
     }
   }
 
-  const removeData = async (key) => {
+  const removeData = async (key: string) => {
     try {
       await AsyncStorage.removeItem(key)
     } catch (e) {
       console.error("Error removing data:", e)
     }
   }
-
   useEffect(() => {
-    // You might want to add loading logic here if needed.
     setIsLoading(false)
   }, [])
 
   return { storeData, getData, removeData, isLoading }
 }
-
