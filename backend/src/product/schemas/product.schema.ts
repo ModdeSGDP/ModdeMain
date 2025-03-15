@@ -24,6 +24,9 @@ export class Product {
 
   @Prop({type: Types.ObjectId, ref: 'Retailer', required:true })
   retailerId: Types.ObjectId;
+
+  @Prop({ required: true })
+  image_id: string;
 }
 
 export type ProductDocument = HydratedDocument<Product>;
