@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      const loginResponse = await fetch("http://192.168.1.42:4000/auth/login", {
+      const loginResponse = await fetch("http://192.168.8.100:4000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

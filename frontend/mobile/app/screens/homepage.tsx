@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, Image, Pressable, Dimensions, PanResponder } from "react-native"
+import { View, Text, StyleSheet, Image, Pressable, Dimensions, PanResponder, Alert } from "react-native"
 import * as ImagePicker from "expo-image-picker"
-import { useNavigation, useRoute, NavigationProp } from "@react-navigation/native"
+import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native"
 import SideMenu from "./sideBars/homeSideBar"
-
+import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage" // Import useAsyncStorage
 
 type RootStackParamList = {
   Home: undefined
@@ -14,9 +14,10 @@ type RootStackParamList = {
   ShopPage: undefined
   CartPage: undefined
   ProfilePage: undefined
+  Login: undefined // Add Login route
 }
-const { width } = Dimensions.get("window")
 
+const { width } = Dimensions.get("window")
 
 const HomePage = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
@@ -24,11 +25,13 @@ const HomePage = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const { getData } = useAsyncStorage() // Use hook for token retrieval
 
   useEffect(() => {
     if (route.params?.capturedImage) {
       setUploadedImage(route.params.capturedImage)
       simulateUpload()
+      uploadImage(route.params.capturedImage) // Upload captured image
     }
   }, [route.params?.capturedImage])
 
@@ -41,23 +44,101 @@ const HomePage = () => {
       }
     },
   })
-  const handleUploadImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!")
+  const handleUploadImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      console.log("Permission result:", permissionResult)
+
+      if (!permissionResult.granted) {
+        Alert.alert("Permission Required", "Permission to access your photo library is required.", [{ text: "OK" }])
+        console.error("Permission to access media library denied")
+        return
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      })
+      console.log("Image picker result:", result)
+
+      if (result.canceled) {
+        console.log("Image selection canceled by user")
+        return
+      }
+
+      if (!result.assets || result.assets.length === 0) {
+        throw new Error("No image selected")
+      }
+
+      const selectedImage = result.assets[0].uri
+      setUploadedImage(selectedImage)
+      simulateUpload()
+      await uploadImage(selectedImage)
+    } catch (error) {
+      console.error("Image picker error:", error)
+      Alert.alert("Error", "Failed to select image. Please try again.")
+    }
+  }
+
+  const uploadImage = async (imageUri: string) => {
+    // Retrieve token
+    const token = await getData("userToken")
+    console.log("Retrieved token for uploadImage:", token)
+    if (!token) {
+      Alert.alert("Authentication Error", "Please log in to upload images.")
+      navigation.navigate("Login")
       return
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    })
 
-    if (!result.canceled) {
-      setUploadedImage(result.assets[0].uri)
-      simulateUpload()
+    const formData = new FormData()
+    formData.append("file", {
+      uri: imageUri,
+      name: "image.jpg",
+      type: "image/jpeg",
+    } as any)
+
+    console.log("FormData prepared with image URI:", imageUri)
+
+    try {
+      setUploadProgress(10)
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      }
+      console.log("Request headers:", headers)
+
+      const response = await fetch("http://192.168.8.100:4000/product/search-similar", {
+        method: "POST",
+        body: formData,
+        headers,
+      })
+
+      console.log("Server response status:", response.status)
+      const responseText = await response.text()
+      console.log("Server response text:", responseText)
+
+      if (!response.ok) {
+        let errorMessage
+        try {
+          const errorData = JSON.parse(responseText)
+          errorMessage = errorData.message || "Upload failed"
+        } catch {
+          errorMessage = `Upload failed with status: ${response.status}`
+        }
+        throw new Error(errorMessage)
+      }
+
+      setUploadProgress(100)
+      const data = JSON.parse(responseText)
+      console.log("Upload successful, server response:", data)
+      navigation.navigate("Home", { products: data })
+    } catch (error) {
+      console.error("Upload error:", error)
+      setUploadProgress(0)
+      Alert.alert("Upload Failed", error.message || "Failed to upload image. Please try again.", [{ text: "OK" }])
     }
   }
 
@@ -65,13 +146,14 @@ const HomePage = () => {
     setUploadProgress(0)
     const interval = setInterval(() => {
       setUploadProgress((prevProgress) => {
-        if (prevProgress >= 100) {
+        if (prevProgress >= 90) {
           clearInterval(interval)
-          return 100
+          return 90
         }
-        return prevProgress + 10
+        return prevProgress + 5
       })
-    }, 500)
+    }, 300)
+    setTimeout(() => clearInterval(interval), 5000)
   }
 
   const handleTakePhoto = () => {
@@ -420,3 +502,4 @@ const styles = StyleSheet.create({
 })
 
 export default HomePage
+

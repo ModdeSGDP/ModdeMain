@@ -52,17 +52,14 @@ export class ProductController {
     // Optionally, we could add an email notification here, but it's already queued in the service
     return product;
   }
-
   @Get()
   async getAllProducts(@Query() paginationDto: PaginationDto) {
     return this.productService.getAllProducts(paginationDto);
   }
-
   @Get(':id')
   async getProductById(@Param('id') id: string) {
     return this.productService.getProductById(id);
   }
-
   @Get('retailer/:retailerId/products')
   // @UseGuards(JwtAuthGuard)
   async getProductsByRetailer(

@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useCartStore } from "../shopPage/cartState";
-import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RouteProp } from "@react-navigation/native";
+import React, { useState, useEffect } from "react"
+import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native"
+import { useNavigation } from "@react-navigation/native"
+import { useCartStore } from "../shopPage/cartState"
+import type { StackNavigationProp } from "@react-navigation/stack"
+import type { RouteProp } from "@react-navigation/native"
 
 // Define RootStackParamList for type safety
 type RootStackParamList = {
@@ -11,7 +11,7 @@ type RootStackParamList = {
   ShopPage: undefined;
   CartPage: undefined;
   ProfilePage: undefined;
-  Camera:undefined
+  Camera: undefined;
   NotificationPage: undefined;
   CheckoutPage: { selectedItems: any[]; total: number };
   ItemDetails: { item: any };
@@ -73,7 +73,11 @@ const Cart = () => {
         <View style={[styles.radio, selectedItems.has(item.id) && styles.radioSelected]} />
       </Pressable>
       <View style={styles.dressCard}>
-        <Image style={styles.itemImage} resizeMode="cover" source={item.image} />
+        <Image 
+          style={styles.itemImage} 
+          resizeMode="cover" 
+          source={item.image ? { uri: item.image } : require("../../assets/user.png")} 
+        />
       </View>
       <View style={styles.itemDetails}>
         <View style={styles.shopContainer}>

@@ -18,16 +18,23 @@ export type RootStackParamList = {
   ProfilePage: undefined
   Login: undefined
   RegistrationComplete: undefined
+  OrderComplete: { order: any }
+  OrdersPage: { newOrder?: any }
 }
 
-const RegistrationComplete = () => {
+const OrderComplete = ({ route }: { route: { params: { order: any } } }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const confettiRef = useRef(null)
+  const order = route.params.order
 
+  const handleViewOrders = () => {
+    // Navigate to OrdersPage with the new order
+    navigation.navigate("OrdersPage", { newOrder: order })
+  }
 
   return (
-    <View style={styles.registrationComplete}>
-      <Image style={styles.registrationCompleteChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
+    <View style={styles.orderComplete}>
+      <Image style={styles.orderCompleteChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
 
       {/* Confetti animation */}
       <ConfettiCannon
@@ -41,20 +48,30 @@ const RegistrationComplete = () => {
       />
 
       <View style={[styles.contentParent, styles.contentPosition]}>
-        <Text style={[styles.woohoo, styles.woohooTypo]}>Woohoo!</Text>
-        <Text style={styles.registrationIsComplete}>
-          Registration is complete! Get ready to have the best shopping experiences of your life!
+        <Text style={[styles.congratulations, styles.congratulationsTypo]}>Order Confirmed!</Text>
+        <Text style={styles.orderIsComplete}>
+          Your order has been placed successfully! We're preparing your items for shipping.
         </Text>
       </View>
 
-      <Pressable onPress={() => navigation.navigate("Login")}>
+      <Pressable onPress={() => navigation.navigate("HomePage")}>
         <Image style={styles.groupIcon} resizeMode="cover" source={require("../assets/chevron_left.png")} />
       </Pressable>
 
+      <View style={[styles.orderInfoContainer, styles.contentPosition]}>
+        <Text style={styles.orderNumberText}>Order #: {order.id}</Text>
+        <Text style={styles.estimatedDeliveryText}>Order Date: {order.date}</Text>
+        <Text style={styles.estimatedDeliveryText}>
+          Payment Method: {order.paymentMethod === "card" ? "Credit/Debit Card" : "Cash"}
+        </Text>
+        <Text style={styles.estimatedDeliveryText}>Total Amount: LKR {order.total.toFixed(2)}</Text>
+        <Text style={styles.estimatedDeliveryText}>Estimated Delivery: 3-5 business days</Text>
+      </View>
+
       <View style={[styles.buttonParent, styles.buttonPosition]}>
-        <Pressable style={styles.button} onPress={() => navigation.navigate("HomePage")}>
+        <Pressable style={styles.button} onPress={handleViewOrders}>
           <View style={[styles.buttonChild, styles.buttonChildLayout]} />
-          <Text style={[styles.letsBegin, styles.buttonTypo]}>Let's begin</Text>
+          <Text style={[styles.viewOrders, styles.buttonTypo]}>View My Orders</Text>
         </Pressable>
       </View>
     </View>
@@ -62,7 +79,7 @@ const RegistrationComplete = () => {
 }
 
 const styles = StyleSheet.create({
-  registrationComplete: {
+  orderComplete: {
     flex: 1,
     width: "100%",
     height: 812,
@@ -77,7 +94,7 @@ const styles = StyleSheet.create({
     left: "50%",
     position: "absolute",
   },
-  woohooTypo: {
+  congratulationsTypo: {
     fontFamily: "Rosario-Bold",
     fontWeight: "700",
     textAlign: "center",
@@ -95,21 +112,21 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
-  registrationCompleteChild: {
+  orderCompleteChild: {
     top: -16,
     left: -119,
     width: 449,
     height: 353,
     position: "absolute",
   },
-  woohoo: {
+  congratulations: {
     fontSize: 27,
     lineHeight: 36,
     color: "#321919",
-    width: 187,
+    width: 250,
     height: 34,
   },
-  registrationIsComplete: {
+  orderIsComplete: {
     fontSize: 16,
     lineHeight: 24,
     fontFamily: "Rosario-Regular",
@@ -120,8 +137,29 @@ const styles = StyleSheet.create({
   },
   contentParent: {
     marginLeft: -147,
-    top: 319,
+    top: 250,
     alignItems: "center",
+  },
+  orderInfoContainer: {
+    marginLeft: -147,
+    top: 380,
+    alignItems: "center",
+    backgroundColor: "rgba(251, 163, 163, 0.1)",
+    padding: 15,
+    borderRadius: 10,
+    width: 294,
+  },
+  orderNumberText: {
+    fontSize: 14,
+    fontFamily: "Inter-SemiBold",
+    color: "#321919",
+    marginBottom: 8,
+  },
+  estimatedDeliveryText: {
+    fontSize: 14,
+    fontFamily: "Inter-Regular",
+    color: "#707493",
+    marginBottom: 5,
   },
   groupIcon: {
     top: 53,
@@ -139,7 +177,7 @@ const styles = StyleSheet.create({
     left: "0%",
     backgroundColor: "#fba3a3",
   },
-  letsBegin: {
+  viewOrders: {
     fontSize: 12,
     lineHeight: 15,
     color: "#fff",
@@ -164,5 +202,5 @@ const styles = StyleSheet.create({
   },
 })
 
-export default RegistrationComplete
+export default OrderComplete
 
