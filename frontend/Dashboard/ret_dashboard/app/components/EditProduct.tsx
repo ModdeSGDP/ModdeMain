@@ -7,15 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+}
+
+
 interface EditProductModalProps {
-  product: any;
+  product: Product;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updatedProduct: any) => void;
+  onSave: (updatedProduct: Product) => void;
 }
 
 export default function EditProductModal({ product, isOpen, onClose, onSave }: EditProductModalProps) {
-  const [formData, setFormData] = useState(product);
+  const [formData, setFormData] = useState<Product>(product);
 
   useEffect(() => {
     if (isOpen) {
@@ -23,10 +31,16 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }: E
     }
   }, [isOpen, product]);
 
-  const handleChange = (e: { target: { name: any; value: any } }) => {
+  // const handleChange = (e: { target: { name: any; value: any } }) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev: any) => ({ ...prev, [name]: value }));
+  // };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
 
   const handleSubmit = () => {
     onSave(formData); // Save the specific product

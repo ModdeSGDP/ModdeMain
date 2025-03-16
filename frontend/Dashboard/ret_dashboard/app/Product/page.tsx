@@ -139,16 +139,30 @@ export default function Products() {
 
 
                 // Map API response to match the frontend component structure
-                const formattedProducts: Product[] = data.products.map((product: any) => ({
-                    id: product._id, // Use _id from backend
-                    image: product.image || "/images/default-product.png", // Handle missing images
-                    title: product.name,
-                    category: product.category,
-                    price: product.price ? `LKR ${product.price}` : "Price Not Available",
-                    description: product.description,
-                    salesCount: 0, // Default to 0 if not provided
-                    remainingCount: 0, // Default to 0 if not provided
-                }));
+                // const formattedProducts: Product[] = data.products.map((product: any) => ({
+                //     id: product._id, // Use _id from backend
+                //     image: product.image || "/images/default-product.png", // Handle missing images
+                //     title: product.name,
+                //     category: product.category,
+                //     price: product.price ? `LKR ${product.price}` : "Price Not Available",
+                //     description: product.description,
+                //     salesCount: 0, // Default to 0 if not provided
+                //     remainingCount: 0, // Default to 0 if not provided
+                // }));  // before the below code
+
+                const formattedProducts: Product[] = data.products.map(
+                    (product: { _id: string; image?: string; name: string; category: string; price?: number; description: string }) => ({
+                        id: product._id,
+                        image: product.image || "/images/default-product.png",
+                        title: product.name,
+                        category: product.category,
+                        description: product.description,
+                    })
+                );
+
+
+
+
 
                 setProducts(formattedProducts);
             } catch (error) {
@@ -163,9 +177,16 @@ export default function Products() {
 
     // Function to update a single product
     const updateProduct = (updatedProduct: Product) => {
-        const updatedProducts = products.map((product) =>
-            product.id === updatedProduct.id ? updatedProduct : product
-        );
+        // const updatedProducts = products.map((product) =>
+        //     product.id === updatedProduct.id ? updatedProduct : product
+        // );   //before the below code
+
+        setProducts((prevProducts) =>
+            prevProducts.map((product) => (product.id === updatedProduct.id ? updatedProduct : product))
+        ); //  FIXED: Removed unused `updatedProducts` variable
+
+
+
         // setProducts(updatedProducts);
         // localStorage.setItem("products", JSON.stringify(updatedProducts)); // Store updated product list in localStorage
     };

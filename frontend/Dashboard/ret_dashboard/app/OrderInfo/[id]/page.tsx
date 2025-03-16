@@ -3,19 +3,31 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import CustomerInfo from "../../components/orderinfocomponents/CustomerInfo";
 import OrderInfo from "../../components/orderinfocomponents/OrderInfo";
 import DeliveryInfo from "../../components/orderinfocomponents/DeliveryInfo";
 import PaymentInfo from "../../components/orderinfocomponents/PaymentInfo";
 import { Badge } from "@/components/ui/badge";
-import { orders as ordersConst } from "../../data/orders";
+// import { orders as ordersConst } from "../../data/orders";
 
 interface Product {
   id: number;
   name: string;
   quantity: number;
   total: string;
+}
+
+interface OrderDetails {  // Explicitly define OrderDetails
+  id: string;
+  customer: string;
+  email: string;
+  phone: string;
+  address: string;
+  total: string;
+  status: string;
+  products: Product[];
 }
 
 const statusColors: { [key: string]: string } = {
@@ -33,7 +45,7 @@ const OrderInfoPage = () => {
   const params = useParams();
   const orderId = params?.id as string;
 
-  const [orderDetails, setOrderDetails] = useState<any>(null);
+  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
 
   useEffect(() => {
     if (!orderId) return;
@@ -93,13 +105,29 @@ const OrderInfoPage = () => {
     //   }
     // ];
     const orderData = localStorage.getItem("orderData");
-    if (!orderData) router.push("/Orders");
+    if (!orderData) {
+      router.push("/Orders");
+      return;
+    }
 
-    const order = (JSON.parse(orderData as string) as typeof ordersConst).find((order) => order.id === +orderId);
-    if (!order) router.push("/Orders");
-    else {
+    // const order = (JSON.parse(orderData as string) as typeof ordersConst).find((order) => order.id === +orderId);
+    // if (!order) router.push("/Orders");
+    // else {
+    //   setOrderDetails(order);
+    // }
+
+    const order = (JSON.parse(orderData) as OrderDetails[]).find(
+      (order) => order.id === orderId
+    );
+
+
+    if (!order) {
+      router.push("/Orders");
+    } else {
       setOrderDetails(order);
     }
+
+
 
   }, [orderId, router]);
 
@@ -137,7 +165,11 @@ const OrderInfoPage = () => {
         {/* Customer Info */}
         <div className=" p-6 rounded-lg ">
           <div className="flex items-center mb-2">
-            <img src="/images/Customer.svg" alt="Customer Icon" className="h-6 w-6 mr-2" />
+            <Image src="/images/Customer.svg"
+              alt="Customer Icon"
+              width={24}
+              height={24}
+              className="mr-2" />
             <h3 className="text-lg font-semibold">Customer</h3>
           </div>
           <CustomerInfo customer={{ name: orderDetails.customer, email: orderDetails.email, phone: orderDetails.phone }} />
@@ -146,7 +178,11 @@ const OrderInfoPage = () => {
         {/* Order Info */}
         <div className="p-6 rounded-lg ">
           <div className="flex items-center mb-2">
-            <img src="/images/order.svg" alt="Order Icon" className="h-6 w-6 mr-2" />
+            <Image src="/images/order.svg"
+              alt="Order Icon"
+              width={24}
+              height={24}
+              className="mr-2" />
             <h3 className="text-lg font-semibold">Order Info</h3>
           </div>
           <OrderInfo order={{ shipping: "Next express", paymentMethod: "Credit Card", status: orderDetails.status }} />
@@ -155,7 +191,11 @@ const OrderInfoPage = () => {
         {/* Delivery Info */}
         <div className=" p-6 rounded-lg ">
           <div className="flex items-center mb-2">
-            <img src="/images/order.svg" alt="Delivery Icon" className="h-6 w-6 mr-2" />
+            <Image src="/images/order.svg"
+              alt="Delivery Icon"
+              width={24}
+              height={24}
+              className="mr-2" />
             <h3 className="text-lg font-semibold">Deliver To</h3>
           </div>
           <DeliveryInfo delivery={{ address: orderDetails.address }} />
@@ -167,7 +207,11 @@ const OrderInfoPage = () => {
         {/* Payment Info */}
         <div className=" p-6 rounded-lg">
           <div className="flex items-center mb-2">
-            <img src="/images/order.svg" alt="Payment Icon" className="h-6 w-6 mr-2" />
+            <Image src="/images/order.svg"
+              alt="Payment Icon"
+              width={24}
+              height={24}
+              className="mr-2" />
             <h3 className="text-lg font-semibold">Payment Info</h3>
           </div>
           <PaymentInfo payment={{ method: "MasterCard", businessName: orderDetails.customer, phone: orderDetails.phone }} />

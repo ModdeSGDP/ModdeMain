@@ -11,11 +11,11 @@ import ProductGallery from "./ProductGallery";
 import { API_POST_ADD_PRODUCTS } from "../constant/apiConstant";
 
 const dataURLtoFile = (dataUrl: string, filename: string) => {
-  let arr = dataUrl.split(",");
-  let mime = arr[0].match(/:(.*?);/)![1];
-  let bstr = atob(arr[1]);
+  const arr = dataUrl.split(",");
+  const mime = arr[0].match(/:(.*?);/)![1];
+  const bstr = atob(arr[1]);
   let n = bstr.length;
-  let u8arr = new Uint8Array(n);
+  const u8arr = new Uint8Array(n);
 
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
@@ -70,9 +70,9 @@ const ProductUploadForm = () => {
   //   });
   // };
 
-  const handleRemoveImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  };
+  // const handleRemoveImage = (index: number) => {
+  //   setImages((prev) => prev.filter((_, i) => i !== index));
+  // };
 
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {

@@ -1,7 +1,5 @@
-
-
-
 import { Dispatch, SetStateAction, useState } from "react";
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -24,17 +22,17 @@ export default function ProductGallery({ images, setImages }: { images: string[]
         file,
         url: URL.createObjectURL(file),
         progress: 0, // Start at 0
-        status: "Uploading" as "Uploading",
+        status: "Uploading" as const,
       }));
 
       setImages([...images, ...newImages.map(i => i.url)]);
       setImagesInternal([...imagesInternal, ...newImages]);
 
       // Simulate upload progress
-      newImages.forEach((image, index) => {
+      newImages.forEach((image) => {
         const interval = setInterval(() => {
           setImagesInternal((prevImages) => {
-            return prevImages.map((img, i) => {
+            return prevImages.map((img) => {
               if (img.url === image.url) {
                 const newProgress = Math.min(img.progress + 20, 100);
                 return {
@@ -81,7 +79,12 @@ export default function ProductGallery({ images, setImages }: { images: string[]
       <div className="mt-4 space-y-3">
         {imagesInternal.map((image, index) => (
           <div key={index} className="flex items-center bg-gray-50 p-2 rounded-lg shadow">
-            <img src={image.url} alt="Product thumbnail" className="w-12 h-12 rounded-md object-cover mr-3" />
+            <Image src={image.url}
+              alt="Product thumbnail"
+              width={48}
+              height={48}
+              className="w-12 h-12 rounded-md object-cover mr-3"
+            />
             <div className="flex-1">
               <p className="text-sm text-gray-700">{image.file.name}</p>
               <Progress value={image.progress} className="h-1 w-full bg-gray-200 mt-1" />

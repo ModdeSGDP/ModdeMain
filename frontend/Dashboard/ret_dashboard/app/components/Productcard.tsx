@@ -142,7 +142,6 @@
 // export default ProductCard;
 
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -155,13 +154,16 @@ import EditProductModal from "../components/EditProduct";
 import { Button } from "@/components/ui/button";
 import { API_DELETE_PRODUCT } from "../constant/apiConstant";
 
-
-interface ProductCardProps {
+// ✅ FIXED: Extended ProductCardProps to include Product fields
+interface Product {
   id: string;
-  image: string;
   title: string;
-  category: string;
   description: string;
+  category: string;
+}
+
+interface ProductCardProps extends Product { // ✅ Ensures compatibility with EditProductModal
+  image: string;
   onDelete: (id: string) => void;
   onUpdate: (updatedProduct: ProductCardProps) => void;
 }
@@ -169,9 +171,9 @@ interface ProductCardProps {
 const ProductMenu: React.FC<{ product: ProductCardProps; onDelete: () => void; onUpdate: (updatedProduct: ProductCardProps) => void }> = ({ product, onDelete, onUpdate }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSave = (updatedProduct: ProductCardProps) => {
-    localStorage.setItem(`product-${product.id}`, JSON.stringify(updatedProduct)); // Save only this product
-    onUpdate(updatedProduct); // Update UI state
+  const handleSave = (updatedProduct: Product) => { // ✅ FIXED: Ensure it only saves 'Product' fields
+    localStorage.setItem(`product-${product.id}`, JSON.stringify(updatedProduct));
+    onUpdate({ ...product, ...updatedProduct }); // ✅ Merges updated values while keeping other fields
     setIsOpen(false);
   };
 
@@ -188,17 +190,18 @@ const ProductMenu: React.FC<{ product: ProductCardProps; onDelete: () => void; o
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-48">
           <DropdownMenuItem onClick={() => setIsOpen(true)} className="flex items-center gap-2 cursor-pointer">
-            <img src="/images/editicon.svg" alt="Edit" className="w-10 h-10" />
+            <Image src="/images/editicon.svg" alt="Edit" width={40} height={40} />
             <span>Edit Product</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={onDelete} className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600">
-            <img src="/images/deleteicon.svg" alt="Delete" className="w-10 h-10" />
+            <Image src="/images/deleteicon.svg" alt="Delete" width={40} height={40} />
             <span>Delete Product</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditProductModal product={product} isOpen={isOpen} onClose={() => setIsOpen(false)} onSave={handleSave} />
+      {/* ✅ FIXED: Pass only 'Product' fields */}
+      <EditProductModal product={{ id: product.id, title: product.title, description: product.description, category: product.category }} isOpen={isOpen} onClose={() => setIsOpen(false)} onSave={handleSave} />
     </>
   );
 };
@@ -231,8 +234,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     }
   }, [id]);
 
-  const handleUpdate = (updatedProduct: ProductCardProps) => {
-    setProduct(updatedProduct);
+  const handleUpdate = (updatedProduct: Product) => {
+    setProduct((prev) => ({ ...prev, ...updatedProduct }));
   };
 
   // Function to delete the product from the backend
@@ -251,10 +254,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       }
       console.log(`Product ${id} successfully deleted`);
 
-      // Remove the product from localStorage so it does not reappear on refresh
       localStorage.removeItem(`product-${id}`);
-
-      // Remove the product from the UI state
       onDelete(id);
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -271,7 +271,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           height={300}
           className="w-full h-48 object-cover rounded-t-xl"
         />
-        {/* <ProductMenu product={product} onDelete={() => onDelete(id)} onUpdate={handleUpdate} /> */}
         <ProductMenu product={product} onDelete={handleDeleteProduct} onUpdate={handleUpdate} />
       </div>
 

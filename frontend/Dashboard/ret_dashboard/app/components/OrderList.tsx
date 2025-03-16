@@ -66,9 +66,8 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
           <button
             key={status}
             onClick={() => setSelectedStatus(status)}
-            className={`px-4 py-2 font-medium ${
-              selectedStatus === status ? "text-red-500 border-b-2 border-red-500" : "hover:text-red-400"
-            }`}
+            className={`px-4 py-2 font-medium ${selectedStatus === status ? "text-red-500 border-b-2 border-red-500" : "hover:text-red-400"
+              }`}
           >
             {status}
           </button>
@@ -83,7 +82,6 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
               <th className="text-left p-3">ORDER ID</th>
               <th className="text-left p-3">CUSTOMER</th>
               <th className="text-left p-3">TOTAL</th>
-              <th className="text-left p-3">PROFIT</th>
               {selectedStatus === "All" && <th className="text-left p-3">STATUS</th>}
             </tr>
           </thead>
@@ -98,7 +96,6 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
                 </td>
                 <td className="p-3">{order.customer}</td>
                 <td className="p-3">{order.total}</td>
-                <td className="p-3">{order.profit}</td>
 
                 {/* Show Status Dropdown only in "All" section */}
                 {selectedStatus === "All" && (

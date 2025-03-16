@@ -105,7 +105,7 @@ const AnalyticsGraphs = () => {
             width={300}
             height={250}
             slotProps={{
-              sector: { className: 'hover:scale-105 hover:drop-shadow-lg transition-transform duration-300' }, // Fix applied here
+              // sector: { className: 'hover:scale-105 hover:drop-shadow-lg transition-transform duration-300' }, // Fix applied here
               legend: { hidden: true },
             }}
           />
