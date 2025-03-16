@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,23 +44,26 @@ export const ProductMenu = ({ onDelete, onEdit }: ProductMenuProps) => {
             onSelect={() => setDialogType("edit")}
             className="flex items-center gap-2 cursor-pointer"
           >
-            
-           <img
-            src="/images/editicon.svg" // Path to your edit icon image
-            alt="Edit"
-            className="w-10 h-10"
-          />
+
+            <Image
+              src="/images/editicon.svg" // Path to your edit icon image
+              alt="Edit"
+              width={40}
+              height={40}
+
+            />
             <span>Edit Product</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setDialogType("delete")}
             className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
           >
-             <img
-            src="/images/delete icon.svg" // Path to your delete icon image
-            alt="Delete"
-            className="w-10 h-10"
-          />
+            <Image
+              src="/images/delete icon.svg" // Path to your delete icon image
+              alt="Delete"
+              width={40}
+              height={40}
+            />
             <span>Delete Product</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

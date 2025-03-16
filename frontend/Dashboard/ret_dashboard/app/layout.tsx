@@ -38,7 +38,7 @@ export default function RootLayout({
     if (authStatus && isBasePath) {
       router.push("/Dashboard")
     }
-  }, [pathname]);
+  }, [pathname, isAuthPage, isBasePath, router]);
 
   // Load the sample data into localStorage if not already loaded
   useEffect(() => {

@@ -3,14 +3,15 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { useState } from "react"
+import { useForm, FieldValues } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
+import Image from "next/image";
 import { API_POST_USER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
 import { API_POST_RETAILER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
 
@@ -83,12 +84,12 @@ const SignUpPage = () => {
 
 
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FieldValues) => {
     setServerError(null)
     try {
       console.log("Submitting Data:", data) // Debugging step
 
-      let userData = {
+      const userData = {
         firstName: data?.firstName || "",
         lastName: data?.lastName || "",
         // jobTitle: data?.jobTitle || "",
@@ -122,7 +123,7 @@ const SignUpPage = () => {
         throw new Error(errorData.message || "Registration failed. Please try again.");
       }
 
-      const userResult = await response.json();
+      // const userResult = await response.json();
 
       const formattedDataRetailer = {
         companyName: data?.companyName,
@@ -162,9 +163,11 @@ const SignUpPage = () => {
       localStorage.setItem("retailer", JSON.stringify(data))
       localStorage.setItem("authenticated", "true")
       router.push("/Dashboard")
-    } catch (error: any) {
-      setServerError(error.message)
-      console.error("Error during registration:", error)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setServerError(error.message);
+        console.error("Error during registration:", error);
+      }
     }
   }
 
@@ -172,7 +175,7 @@ const SignUpPage = () => {
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header Section */}
       <div className="w-full flex justify-between px-6 py-4">
-        <img src="/images/modde-logo.svg" alt="Modde Logo" className="w-40" />
+        <Image src="/images/modde-logo.svg" alt="Modde Logo" width={160} height={40} />
       </div>
 
       {/* Main Content */}
@@ -191,10 +194,10 @@ const SignUpPage = () => {
         {/* Right Section - Images Aligned (Updated) */}
         <div className="md:w-1/2 flex justify-center items-start relative">
           <div className="absolute -top-48 right-6">
-            <img src="/images/model1.svg" alt="Model 1" className="w-64 h-auto rounded-lg" />
+            <Image src="/images/model1.svg" alt="Model 1" width={256} height={320} className="rounded-lg" />
           </div>
           <div className="absolute -top-48 left-12">
-            <img src="/images/model2.svg" alt="Model 2" className="w-52 h-auto rounded-lg" />
+            <Image src="/images/model2.svg" alt="Model 2" width={208} height={320} className="rounded-lg" />
           </div>
         </div>
       </div>

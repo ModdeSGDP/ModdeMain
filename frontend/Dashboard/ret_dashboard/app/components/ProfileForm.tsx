@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,7 @@ const ProfileForm = () => {
     if (savedProfilePic) {
       setProfilePicture(savedProfilePic);
     }
-  }, []);
+  }, [form]);
 
   // Handle Profile Picture Upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,12 +84,12 @@ const ProfileForm = () => {
   };
 
   // Handle Form Submission (Update User Data)
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: Record<string, unknown>) => {
     console.log("Updated values:", values);
     localStorage.setItem("user", JSON.stringify(values)); // Save updated data in localStorage
     setIsEditing(false);
 
-    // ✅ Trigger event to update Retailor dynamically
+    //  Trigger event to update Retailor dynamically
     setTimeout(() => {
       window.dispatchEvent(new Event("storage"));
     }, 500);
@@ -100,7 +101,12 @@ const ProfileForm = () => {
       <div className="flex items-center space-x-4">
         <label className="flex flex-col items-center cursor-pointer">
           {profilePicture ? (
-            <img src={profilePicture} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-gray-300" />
+            <Image src={profilePicture}
+              alt="Profile"
+              width={80}
+              height={80}
+              className="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
+            />
           ) : (
             <div className="w-20 h-20 flex items-center justify-center border-2 border-gray-300 rounded-full">
               <Camera className="text-gray-400 w-8 h-8" />

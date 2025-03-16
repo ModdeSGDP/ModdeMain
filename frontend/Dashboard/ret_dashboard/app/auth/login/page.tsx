@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { API_POST_AUTH_LOGIN } from "../../constant/apiConstant";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
+import Image from "next/image";
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 
@@ -50,11 +51,15 @@ const Login = () => {
     },
   });
 
-  const onSubmit = async (data: any) => {
-    // console.log("User Logged In:", data);
-    // setLoading(true);
+  // const onSubmit = async (data: any) => {
+  //   // console.log("User Logged In:", data);
+  //   // setLoading(true);
+  //   setLoading(true);
+  //   // setError(null);
+
+  const onSubmit = async (data: FieldValues) => {
     setLoading(true);
-    // setError(null);
+
 
     try {
       console.log("User Logging In:", data);
@@ -115,16 +120,19 @@ const Login = () => {
       console.log("Navigating to Dashboard...");
 
 
-      router.push("/Dashboard"); // ✅ Redirect to Dashboard
+      router.push("/Dashboard"); //  Redirect to Dashboard
 
       // setTimeout(() => {
       //   localStorage.setItem("authenticated", "true");
       //   router.push("/Dashboard"); // Redirect to dashboard upon successful login
       // }, 1500);
 
-    } catch (err: any) {
-      // setError(err.message);
-      console.error("Login Error:", err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Login Error:", err.message);
+      } else {
+        console.error("An unknown error occurred during login.");
+      }
     } finally {
       setLoading(false);
     }
@@ -135,7 +143,7 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center  p-6 relative">
       {/* Logo Positioned at Top Left */}
       <div className="absolute top-0 left-6">
-        <img src="/images/modde-logo.svg" alt="Modde Logo" className="w-40" />
+        <Image src="/images/modde-logo.svg" alt="Modde Logo" width={160} height={40} />
       </div>
 
       <div className="max-w-3xl w-full  rounded-lg p-8 flex flex-col items-center border border-gray-300 ">
@@ -191,10 +199,10 @@ const Login = () => {
       {/* Right Section - Images Aligned Correctly with Small Gap */}
       <div className="md:w-1/2 flex justify-center items-start relative">
         <div className="absolute -top-48 right-5">
-          <img src="/images/model1.svg" alt="Model 1" className="w-64 h-auto rounded-lg" />
+          <Image src="/images/model1.svg" alt="Model 1" width={256} height={320} className="rounded-lg" />
         </div>
         <div className="absolute -top-48 left-20">
-          <img src="/images/model2.svg" alt="Model 2" className="w-52 h-auto rounded-lg" />
+          <Image src="/images/model2.svg" alt="Model 2" width={208} height={320} className="rounded-lg" />
         </div>
       </div>
     </div>

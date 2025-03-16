@@ -1,8 +1,15 @@
 import React from "react";
 
+interface OrderDetails {
+  customerName: string;
+  email: string;
+  phone: string;
+}
+
+
 interface OrderDetailCardProps {
   title: string;
-  details: any;
+  details: OrderDetails;
 }
 
 export const OrderDetailCard: React.FC<OrderDetailCardProps> = ({ title, details }) => {
