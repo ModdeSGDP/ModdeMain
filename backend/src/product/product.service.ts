@@ -12,7 +12,11 @@ import { ConfigService } from '../common/configs/config.service';
 import { S3Service } from '../common/aws/s3.service';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { createReadStream, writeFileSync } from 'fs';
+import * as FormData from 'form-data';
+import { unlinkSync } from 'fs';  // Import unlinkSync to delete files
+
 
 @Injectable()
 export class ProductService {
@@ -46,9 +50,49 @@ export class ProductService {
 
   async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File, user?: any,): Promise<Product> {
     let imageUrl = null;
+    let imageId = null;
 
     if (file) {
+      // Step 1: Upload Image to S3
       imageUrl = await this.uploadToS3(file);
+      
+      console.log('Image uploaded to S3:', imageUrl);
+
+      // Step 2: Save Image Temporarily to Send to FastAPI
+      const tempFilePath = `../fastapi/${Date.now()}_${file.originalname}`;
+      writeFileSync(tempFilePath, file.buffer);
+
+      // Step 3: Prepare Multipart/Form-Data Request
+      const formData = new FormData();
+      formData.append('file', createReadStream(tempFilePath), {
+        filename: file.originalname,
+        contentType: file.mimetype,
+      });
+
+      console.log('Sending image to FastAPI for feature extraction...');
+
+      // Step 4: Send Image to FastAPI for Feature Extraction
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/upload', formData, {
+          headers: {
+            ...formData.getHeaders(),
+          },
+        });
+
+        imageId = response.data.image_id;
+        console.log('Feature extraction complete. Image ID:', imageId);
+      } catch (error) {
+        console.error('Error sending image to FastAPI:', error.response?.data || error.message);
+        throw new Error('Failed to extract image features');
+      } finally {
+        // Step 5: Delete the temporary file
+        try {
+          unlinkSync(tempFilePath);
+          console.log('Temporary file deleted:', tempFilePath);
+        } catch (err) {
+          console.error('Error deleting temporary file:', err);
+        }
+      }
     }
 
     const retailerId = new Types.ObjectId(user.retailerId);
@@ -60,6 +104,7 @@ export class ProductService {
       ...createProductDto,
       retailerId,
       image: imageUrl,
+      image_id: imageId,
     });
     const savedProduct = await newProduct.save();
 
