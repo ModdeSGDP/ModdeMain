@@ -64,7 +64,7 @@ export default function DateStatusFilter() {
       {/* Status Dropdown */}
       <div className="relative">
         <select
-          className="bg-gray-200 px-4 py-2 rounded-md border text-gray-800 cursor-pointer shadow-sm"
+          className="bg-gray-200 px-4 py-2 rounded-md border text-gray-800 cursor-pointer shadow-sm focus:outline-none"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
         >

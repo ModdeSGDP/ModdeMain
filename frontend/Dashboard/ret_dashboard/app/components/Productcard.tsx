@@ -3,38 +3,103 @@
 // import { useState, useEffect } from "react";
 // import { useRouter } from "next/navigation";
 // import Image from "next/image";
-// import { Card, CardContent, CardFooter } from "@/components/ui/card";
+// import { Card, CardContent } from "@/components/ui/card";
 // import { MoreVertical } from "lucide-react";
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 // import EditProductModal from "../components/EditProduct";
-// // import ImageCarousel from "./ImageCarousel";
 // import { Button } from "@/components/ui/button";
+// import { API_DELETE_PRODUCT, API_PATCH_UPDATE_PRODUCT } from "../constant/apiConstant";
 
-// interface ProductCardProps {
+// //  FIXED: Extended ProductCardProps to include Product fields
+// interface Product {
 //   id: string;
-//   image: string;
 //   title: string;
-//   category: string;
-//   price: string;
 //   description: string;
-//   salesCount: number;
-//   remainingCount: number;
-//   onDelete: (id: string) => void;  // Accepts a delete function from the parent
+//   category: string;
+// }
+
+// interface ProductCardProps extends Product { //  Ensures compatibility with EditProductModal
+//   image: string;
+//   onDelete: (id: string) => void;
 //   onUpdate: (updatedProduct: ProductCardProps) => void;
 // }
 
 // const ProductMenu: React.FC<{ product: ProductCardProps; onDelete: () => void; onUpdate: (updatedProduct: ProductCardProps) => void }> = ({ product, onDelete, onUpdate }) => {
 //   const [isOpen, setIsOpen] = useState(false);
 
-//   const handleSave = (updatedProduct: ProductCardProps) => {
-//     localStorage.setItem(`product-${product.id}`, JSON.stringify(updatedProduct)); // Save only this product
-//     onUpdate(updatedProduct); // Update UI state
-//     setIsOpen(false);
+
+//   // // 🔴 Function to update product in the backend
+//   // const handleSave = async (updatedProduct: Product) => {
+//   //   try {
+//   //     const token = localStorage.getItem("token");
+//   //     const response = await fetch(API_PATCH_UPDATE_PRODUCT(updatedProduct.id), {
+//   //       method: "PATCH",
+//   //       headers: {
+//   //         "Authorization": `Bearer ${localStorage.getItem("token")}`,
+//   //         "Content-Type": "application/json",
+//   //       },
+//   //       body: JSON.stringify(updatedProduct),
+//   //     });
+
+//   //     if (!response.ok) {
+//   //       throw new Error("Failed to update product");
+//   //     }
+
+//   //     console.log(`Product ${updatedProduct.id} successfully updated`);
+
+//   //     // 🔴 Update localStorage and UI
+//   //     localStorage.setItem(`product-${product.id}`, JSON.stringify(updatedProduct));
+//   //     onUpdate({ ...product, ...updatedProduct });
+
+//   //     setIsOpen(false);
+//   //   } catch (error) {
+//   //     console.error("Error updating product:", error);
+//   //   }
+//   // };
+
+
+//   const handleSave = async (updatedProduct: Product) => {
+//     try {
+//       const token = localStorage.getItem("token");
+
+//       // 🔴 Ensure `id` and `title` are NOT included in the request body
+//       const { id, title, ...updatableFields } = updatedProduct;
+
+//       const response = await fetch(API_PATCH_UPDATE_PRODUCT(id), {
+//         method: "PATCH",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//         body: JSON.stringify(updatableFields), // ✅ Send only editable fields
+//       });
+
+//       if (!response.ok) {
+//         throw new Error("Failed to update product");
+//       }
+
+//       console.log(`Product ${id} successfully updated`);
+
+
+
+//       // 🔴 Update localStorage and UI
+//       localStorage.setItem(`product-${id}`, JSON.stringify(updatedProduct));
+//       onUpdate({ ...product, ...updatedProduct });
+
+//       setIsOpen(false);
+//     } catch (error) {
+//       console.error("Error updating product:", error);
+//     }
 //   };
+
+
+
+
+
+
 
 //   return (
 //     <>
-
 //       <DropdownMenu>
 //         <DropdownMenuTrigger asChild>
 //           <button
@@ -46,17 +111,18 @@
 //         </DropdownMenuTrigger>
 //         <DropdownMenuContent className="w-48">
 //           <DropdownMenuItem onClick={() => setIsOpen(true)} className="flex items-center gap-2 cursor-pointer">
-//             <img src="/images/editicon.svg" alt="Edit" className="w-10 h-10" />
+//             <Image src="/images/editicon.svg" alt="Edit" width={40} height={40} />
 //             <span>Edit Product</span>
 //           </DropdownMenuItem>
 //           <DropdownMenuItem onClick={onDelete} className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600">
-//             <img src="/images/deleteicon.svg" alt="Delete" className="w-10 h-10" />
+//             <Image src="/images/deleteicon.svg" alt="Delete" width={40} height={40} />
 //             <span>Delete Product</span>
 //           </DropdownMenuItem>
 //         </DropdownMenuContent>
 //       </DropdownMenu>
 
-//       <EditProductModal product={product} isOpen={isOpen} onClose={() => setIsOpen(false)} onSave={handleSave} />
+//       {/* FIXED: Pass only 'Product' fields */}
+//       <EditProductModal product={{ id: product.id, title: product.title, description: product.description, category: product.category }} isOpen={isOpen} onClose={() => setIsOpen(false)} onSave={handleSave} />
 //     </>
 //   );
 // };
@@ -66,10 +132,7 @@
 //   image,
 //   title,
 //   category,
-//   //price,
 //   description,
-//   //salesCount,
-//   //remainingCount,
 //   onDelete,
 //   onUpdate,
 // }) => {
@@ -78,63 +141,72 @@
 //     image,
 //     title,
 //     category,
-//     price,
 //     description,
-//     salesCount,
-//     remainingCount,
 //     onDelete,
 //     onUpdate,
 //   });
 
-//   const router = useRouter(); // Initialize router
+//   const router = useRouter();
 
-//   // Load only the specific product from localStorage on mount
 //   useEffect(() => {
 //     const storedProduct = localStorage.getItem(`product-${id}`);
 //     if (storedProduct) {
-//       setProduct(JSON.parse(storedProduct)); // Load the stored product
+//       setProduct(JSON.parse(storedProduct));
 //     }
 //   }, [id]);
 
-//   const handleUpdate = (updatedProduct: ProductCardProps) => {
-//     setProduct(updatedProduct);
+//   const handleUpdate = (updatedProduct: Product) => {
+//     setProduct((prev) => ({ ...prev, ...updatedProduct }));
 //   };
 
-//   // Navigate to Add Stocks Page
-//   const handleAddStockClick = () => {
-//     router.push(`/add-stocks?id=${id}`);
+//   // Function to delete the product from the backend
+//   const handleDeleteProduct = async () => {
+//     try {
+//       const response = await fetch(API_DELETE_PRODUCT(id), {
+//         method: "DELETE",
+//         headers: {
+//           "Authorization": `Bearer ${localStorage.getItem("token")}`, // Ensure you have a valid JWT token
+//           "Content-Type": "application/json",
+//         },
+//       });
+
+//       if (!response.ok) {
+//         throw new Error("Failed to delete product");
+//       }
+//       console.log(`Product ${id} successfully deleted`);
+
+//       localStorage.removeItem(`product-${id}`);
+//       onDelete(id);
+//     } catch (error) {
+//       console.error("Error deleting product:", error);
+//     }
 //   };
 
 //   return (
 //     <Card className="w-full md:w-[260px] rounded-xl shadow-md hover:shadow-lg transition-shadow bg-white p-2 flex flex-col justify-between">
 //       <div className="relative">
-//         {/* <ImageCarousel images={product.image} /> */}
 //         <Image
 //           src={product.image}
 //           alt={product.title}
-//           width={260}
-//           height={200}
+//           width={300}
+//           height={300}
 //           className="w-full h-48 object-cover rounded-t-xl"
 //         />
-
-//         <ProductMenu product={product} onDelete={() => onDelete(id)} onUpdate={handleUpdate} />
+//         <ProductMenu product={product} onDelete={handleDeleteProduct} onUpdate={handleUpdate} />
 //       </div>
 
 //       <CardContent className="mt-2 p-4">
 //         <h2 className="text-lg font-semibold text-gray-900">{product.title}</h2>
 //         <p className="text-sm text-gray-500">{product.category}</p>
-//         <p className="text-md font-bold text-gray-800 mt-1">{product.price}</p>
 //         <p className="text-sm text-gray-600 mt-2">{product.description}</p>
-//         {/* Add Stocks Button */}
+
 //         <Button
 //           className="mt-3 w-full bg-blue-500 text-white hover:bg-blue-600 transition"
-//           onClick={handleAddStockClick}
+//           onClick={() => router.push(`/add-stocks?id=${id}`)}
 //         >
 //           Add Stocks
 //         </Button>
 //       </CardContent>
-
-
 //     </Card>
 //   );
 // };
@@ -152,29 +224,67 @@ import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EditProductModal from "../components/EditProduct";
 import { Button } from "@/components/ui/button";
-import { API_DELETE_PRODUCT } from "../constant/apiConstant";
+import { API_DELETE_PRODUCT, API_PATCH_UPDATE_PRODUCT } from "../constant/apiConstant";
 
-// ✅ FIXED: Extended ProductCardProps to include Product fields
+// Product Interface
 interface Product {
   id: string;
   title: string;
   description: string;
   category: string;
+  image?: string;
 }
 
-interface ProductCardProps extends Product { // ✅ Ensures compatibility with EditProductModal
-  image: string;
+// Props for ProductCard
+interface ProductCardProps extends Product {
   onDelete: (id: string) => void;
   onUpdate: (updatedProduct: ProductCardProps) => void;
 }
 
+// Product Menu Component (Handles Edit & Delete)
 const ProductMenu: React.FC<{ product: ProductCardProps; onDelete: () => void; onUpdate: (updatedProduct: ProductCardProps) => void }> = ({ product, onDelete, onUpdate }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSave = (updatedProduct: Product) => { // ✅ FIXED: Ensure it only saves 'Product' fields
-    localStorage.setItem(`product-${product.id}`, JSON.stringify(updatedProduct));
-    onUpdate({ ...product, ...updatedProduct }); // ✅ Merges updated values while keeping other fields
-    setIsOpen(false);
+  // 🔴 Function to update product in the backend
+  const handleSave = async (updatedProduct: Product) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // 🔴 Ensure `id` and `title` are NOT included in the request body
+      const { id, title, ...updatableFields } = updatedProduct;
+
+      const response = await fetch(API_PATCH_UPDATE_PRODUCT(id), {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatableFields), // ✅ Send only editable fields
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update product");
+      }
+
+      const responseData = await response.json();
+
+      console.log(`Product ${id} successfully updated`);
+
+      // 🔴 Ensure the updated image is included (fallback to previous image)
+      const updatedProductWithImage = {
+        ...product,
+        ...updatedProduct,
+        image: updatedProduct.image || responseData.image || product.image || "/images/default-product.png",
+      };
+
+      // 🔴 Update localStorage and UI
+      localStorage.setItem(`product-${id}`, JSON.stringify(updatedProductWithImage));
+      onUpdate(updatedProductWithImage); // ✅ Ensure UI reflects updated image
+
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
   };
 
   return (
@@ -200,12 +310,13 @@ const ProductMenu: React.FC<{ product: ProductCardProps; onDelete: () => void; o
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* ✅ FIXED: Pass only 'Product' fields */}
+      {/* 🔴 Pass only necessary product fields */}
       <EditProductModal product={{ id: product.id, title: product.title, description: product.description, category: product.category }} isOpen={isOpen} onClose={() => setIsOpen(false)} onSave={handleSave} />
     </>
   );
 };
 
+// Product Card Component (Displays Individual Product)
 export const ProductCard: React.FC<ProductCardProps> = ({
   id,
   image,
@@ -217,7 +328,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const [product, setProduct] = useState<ProductCardProps>({
     id,
-    image,
+    image: image || "/images/default-product.png", // ✅ Ensure default image is used
     title,
     category,
     description,
@@ -230,12 +341,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   useEffect(() => {
     const storedProduct = localStorage.getItem(`product-${id}`);
     if (storedProduct) {
-      setProduct(JSON.parse(storedProduct));
+      setProduct((prev) => ({
+        ...prev,
+        ...JSON.parse(storedProduct),
+        image: prev.image || "/images/default-product.png", // ✅ Ensure image is not missing
+      }));
     }
   }, [id]);
 
   const handleUpdate = (updatedProduct: Product) => {
-    setProduct((prev) => ({ ...prev, ...updatedProduct }));
+    setProduct((prev) => ({
+      ...prev,
+      ...updatedProduct,
+      image: updatedProduct.image || prev.image || "/images/default-product.png", // ✅ Preserve image
+    }));
   };
 
   // Function to delete the product from the backend
@@ -244,7 +363,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       const response = await fetch(API_DELETE_PRODUCT(id), {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token")}`, // Ensure you have a valid JWT token
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
       });
@@ -265,11 +384,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <Card className="w-full md:w-[260px] rounded-xl shadow-md hover:shadow-lg transition-shadow bg-white p-2 flex flex-col justify-between">
       <div className="relative">
         <Image
-          src={product.image}
+          src={product.image ?? "/images/default-product.png"}
           alt={product.title}
           width={300}
           height={300}
           className="w-full h-48 object-cover rounded-t-xl"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/images/default-product.png"; // ✅ Fallback for broken images
+          }}
         />
         <ProductMenu product={product} onDelete={handleDeleteProduct} onUpdate={handleUpdate} />
       </div>

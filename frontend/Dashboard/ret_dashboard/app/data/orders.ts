@@ -1,6 +1,6 @@
 export const orders = [
     {
-        id: 25426, customer: "Komal", total: "LKR 4500.00", profit: "LKR 150.00", status: "Pending", phone: "+94 774 231 121", address: "No 123, Duplication Rd, Colombo, Sri Lanka",
+        id: 25427, customer: "Komal", total: "LKR 4500.00", profit: "LKR 150.00", status: "Pending", phone: "+94 774 231 121", address: "No 123, Duplication Rd, Colombo, Sri Lanka",
         products: [{ id: 101, name: "T-Shirt", quantity: 2, total: "LKR 2000" }, { id: 102, name: "Jeans", quantity: 1, total: "LKR 2500" }]
     },
     {
@@ -36,19 +36,19 @@ export const orders = [
         products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
     },
     {
-        id: 25417, customer: "Kumal", total: "LKR 4500.00", profit: "LKR 135.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        id: 25418, customer: "Kumal", total: "LKR 4500.00", profit: "LKR 135.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
         products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
     },
     {
-        id: 25412, customer: "Priyanka", total: "LKR 4500.00", profit: "LKR 125.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        id: 25419, customer: "Priyanka", total: "LKR 4500.00", profit: "LKR 125.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
         products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
     },
     {
-        id: 25413, customer: "Nuwan", total: "LKR 4500.00", profit: "LKR 175.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        id: 25420, customer: "Nuwan", total: "LKR 4500.00", profit: "LKR 175.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
         products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
     },
     {
-        id: 254, customer: "Dumal", total: "LKR 4500.00", profit: "LKR 190.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
+        id: 25421, customer: "Dumal", total: "LKR 4500.00", profit: "LKR 190.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
         products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
     }
 ];
