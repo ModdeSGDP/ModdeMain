@@ -21,101 +21,13 @@ interface Product {
 }
 
 export default function Products() {
-    // const initialProducts: Product[] = [
-    //     {
-    //         id: "1",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Women",
-    //         price: "LKR 4850",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1269,
-    //         remainingCount: 1269,
-    //     },
-    //     {
-    //         id: "2",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Men",
-    //         price: "LKR 5750",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 854,
-    //         remainingCount: 450,
-    //     },
-    //     {
-    //         id: "3",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Women",
-    //         price: "LKR 7200",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 940,
-    //         remainingCount: 220,
-    //     },
-    //     {
-    //         id: "4",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 6300",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 2034,
-    //         remainingCount: 530,
-    //     },
-    //     {
-    //         id: "5",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 9100",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1100,
-    //         remainingCount: 320,
-    //     },
-    //     {
-    //         id: "6",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Men",
-    //         price: "LKR 10200",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 765,
-    //         remainingCount: 120,
-    //     },
-    //     {
-    //         id: "7",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 4700",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1560,
-    //         remainingCount: 360,
-    //     },
-    //     {
-    //         id: "8",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 3200",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1320,
-    //         remainingCount: 480,
-    //     },
-    // ];
+
 
     const [products, setProducts] = useState<Product[]>([]);
 
     // Load product data from localStorage on mount
     useEffect(() => {
-        // const storedProducts = localStorage.getItem("products");
 
-        // if (storedProducts) {
-        //     setProducts(JSON.parse(storedProducts)); // Load stored products
-        // } else {
-        //     setProducts(initialProducts); // Set initial data if no stored data
-        //     localStorage.setItem("products", JSON.stringify(initialProducts));
-        // }
 
         const fetchProducts = async () => {
             try {
@@ -138,17 +50,7 @@ export default function Products() {
                 // setProducts(data);
 
 
-                // Map API response to match the frontend component structure
-                // const formattedProducts: Product[] = data.products.map((product: any) => ({
-                //     id: product._id, // Use _id from backend
-                //     image: product.image || "/images/default-product.png", // Handle missing images
-                //     title: product.name,
-                //     category: product.category,
-                //     price: product.price ? `LKR ${product.price}` : "Price Not Available",
-                //     description: product.description,
-                //     salesCount: 0, // Default to 0 if not provided
-                //     remainingCount: 0, // Default to 0 if not provided
-                // }));  // before the below code
+
 
                 const formattedProducts: Product[] = data.products.map(
                     (product: { _id: string; image?: string; name: string; category: string; price?: number; description: string }) => ({
@@ -176,26 +78,27 @@ export default function Products() {
     }, []);
 
     // Function to update a single product
-    const updateProduct = (updatedProduct: Product) => {
+    const updateProduct = (updatedProduct: Partial<Product> & { id: string }) => {
         // const updatedProducts = products.map((product) =>
         //     product.id === updatedProduct.id ? updatedProduct : product
         // );   //before the below code
 
+        // setProducts((prevProducts) =>
+        //     prevProducts.map((product) =>
+        //         (product.id === updatedProduct.id ? updatedProduct : product))
+        // ); //  FIXED: Removed unused `updatedProducts` variable
+
         setProducts((prevProducts) =>
-            prevProducts.map((product) => (product.id === updatedProduct.id ? updatedProduct : product))
-        ); //  FIXED: Removed unused `updatedProducts` variable
+            prevProducts.map((product) =>
+                product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
+            )
+        );
 
-
-
-        // setProducts(updatedProducts);
-        // localStorage.setItem("products", JSON.stringify(updatedProducts)); // Store updated product list in localStorage
     };
 
     // Function to delete a product
     const deleteProduct = (productId: string) => {
-        // const updatedProducts = products.filter((product) => product.id !== productId);
-        // setProducts(updatedProducts);
-        // localStorage.setItem("products", JSON.stringify(updatedProducts)); // Update storage
+
         setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
     };
 
@@ -233,7 +136,7 @@ export default function Products() {
                     <div className="flex flex-row flex-wrap gap-5">
                         {products.map((product) => (
                             // <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
-                            <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
+                            <ProductCard key={product.id} {...product} onUpdate={(updatedProduct) => updateProduct(updatedProduct)} onDelete={deleteProduct} />
                         ))}
                     </div>
                 </div>

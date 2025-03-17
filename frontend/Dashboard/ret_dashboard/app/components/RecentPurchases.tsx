@@ -35,7 +35,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
               <th className="text-left p-3">Order ID</th>
               <th className="text-left p-3">Date</th>
               <th className="text-left p-3">Customer</th>
-              <th className="text-left p-3">Status</th>
+              {/* <th className="text-left p-3">Status</th> */}
               <th className="text-left p-3">Amount</th>
             </tr>
           </thead>
@@ -65,7 +65,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
                 </td>
 
                 {/* Status with colored dot */}
-                <td className="p-3">
+                {/* <td className="p-3">
                   <div className="flex items-center space-x-2">
                     <span
                       className={`w-3 h-3 rounded-full ${order.status === "Delivered"
@@ -77,7 +77,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
                     ></span>
                     <span>{order.status}</span>
                   </div>
-                </td>
+                </td> */}
 
                 <td className="p-3">{order.amount}</td>
               </tr>

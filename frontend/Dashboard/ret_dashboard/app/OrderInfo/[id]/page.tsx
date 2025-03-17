@@ -10,7 +10,6 @@ import OrderInfo from "../../components/orderinfocomponents/OrderInfo";
 import DeliveryInfo from "../../components/orderinfocomponents/DeliveryInfo";
 import PaymentInfo from "../../components/orderinfocomponents/PaymentInfo";
 import { Badge } from "@/components/ui/badge";
-// import { orders as ordersConst } from "../../data/orders";
 
 interface Product {
   id: number;
@@ -19,7 +18,7 @@ interface Product {
   total: string;
 }
 
-interface OrderDetails {  // Explicitly define OrderDetails
+interface OrderDetails {
   id: string;
   customer: string;
   email: string;
@@ -48,87 +47,34 @@ const OrderInfoPage = () => {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
 
   useEffect(() => {
-    if (!orderId) return;
+    if (!orderId) return; // Prevent execution if orderId is undefined
 
-    // const orders = [
-    //   {
-    //     id: "25426", customer: "Komal", total: "LKR 4500.00", status: "Pending", phone: "+94 774 231 121", address: "No 123, Duplication Rd, Colombo, Sri Lanka",
-    //     products: [{ id: 101, name: "T-Shirt", quantity: 2, total: "LKR 2000" }, { id: 102, name: "Jeans", quantity: 1, total: "LKR 2500" }]
-    //   },
-    //   {
-    //     id: "25426", customer: "Komal", total: "LKR 4500.00", status: "Delivered", phone: "+94 774 231 121", address: "No 123, Duplication Rd, Colombo, Sri Lanka",
-    //     products: [{ id: 101, name: "T-Shirt", quantity: 2, total: "LKR 2000" }, { id: 102, name: "Jeans", quantity: 1, total: "LKR 2500" }]
-    //   },
-    //   {
-    //     id: "25425", customer: "Nikhil", total: "LKR 4500.00", status: "Canceled", phone: "+94 774 232 222", address: "No 45, Main St, Kandy, Sri Lanka",
-    //     products: [{ id: 103, name: "Hoodie", quantity: 1, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25424", customer: "Nimal", total: "LKR 4500.00", status: "Delivered", phone: "+94 775 123 123", address: "No 78, Galle Rd, Galle, Sri Lanka",
-    //     products: [{ id: 104, name: "Sweater", quantity: 2, total: "LKR 3000" }]
-    //   },
-    //   {
-    //     id: "25423", customer: "Kushan", total: "LKR 4500.00", status: "Pending", phone: "+94 776 999 888", address: "No 22, Main St, Negombo, Sri Lanka",
-    //     products: [{ id: 105, name: "Shoes", quantity: 1, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25422", customer: "Kidura", total: "LKR 4500.00", status: "Delivered", phone: "+94 778 456 789", address: "No 5, Lotus Rd, Jaffna, Sri Lanka",
-    //     products: [{ id: 106, name: "Watch", quantity: 1, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25421", customer: "Yougesh", total: "LKR 4500.00", status: "Processing", phone: "+94 779 333 222", address: "No 90, Liberty Plaza, Colombo, Sri Lanka",
-    //     products: [{ id: 107, name: "Backpack", quantity: 2, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25420", customer: "Priyantha", total: "LKR 4500.00", status: "Canceled", phone: "+94 770 987 654", address: "No 34, Market Rd, Kandy, Sri Lanka",
-    //     products: [{ id: 108, name: "Sunglasses", quantity: 1, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25419", customer: "Kishan", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
-    //     products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25417", customer: "Kumal", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
-    //     products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25412", customer: "Priyanka", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
-    //     products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "25413", customer: "Nuwan", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
-    //     products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
-    //   },
-    //   {
-    //     id: "254", customer: "Dumal", total: "LKR 4500.00", status: "Shipped", phone: "+94 771 654 321", address: "No 76, Fort, Colombo, Sri Lanka",
-    //     products: [{ id: 109, name: "Hat", quantity: 3, total: "LKR 4500" }]
-    //   }
-    // ];
+    console.log("Fetching Order ID:", orderId); // Debugging log
+
     const orderData = localStorage.getItem("orderData");
+
     if (!orderData) {
+      console.warn("No order data found in localStorage."); // Debugging log
       router.push("/Orders");
       return;
     }
 
-    // const order = (JSON.parse(orderData as string) as typeof ordersConst).find((order) => order.id === +orderId);
-    // if (!order) router.push("/Orders");
-    // else {
-    //   setOrderDetails(order);
-    // }
+    try {
+      const parsedOrders: OrderDetails[] = JSON.parse(orderData);
+      console.log("Parsed Orders from LocalStorage:", parsedOrders); // Debugging log
 
-    const order = (JSON.parse(orderData) as OrderDetails[]).find(
-      (order) => order.id === orderId
-    );
+      const order = parsedOrders.find((order) => String(order.id) === String(orderId));
 
-
-    if (!order) {
+      if (!order) {
+        console.warn("Order not found for ID:", orderId); // Debugging log
+        router.push("/Orders");
+      } else {
+        setOrderDetails(order);
+      }
+    } catch (error) {
+      console.error("Error parsing order data:", error); // Debugging log
       router.push("/Orders");
-    } else {
-      setOrderDetails(order);
     }
-
-
-
   }, [orderId, router]);
 
   if (!orderDetails) return <p>Loading order details...</p>;
@@ -165,11 +111,7 @@ const OrderInfoPage = () => {
         {/* Customer Info */}
         <div className=" p-6 rounded-lg ">
           <div className="flex items-center mb-2">
-            <Image src="/images/Customer.svg"
-              alt="Customer Icon"
-              width={24}
-              height={24}
-              className="mr-2" />
+            <Image src="/images/Customer.svg" alt="Customer Icon" width={24} height={24} className="mr-2" />
             <h3 className="text-lg font-semibold">Customer</h3>
           </div>
           <CustomerInfo customer={{ name: orderDetails.customer, email: orderDetails.email, phone: orderDetails.phone }} />
@@ -178,11 +120,7 @@ const OrderInfoPage = () => {
         {/* Order Info */}
         <div className="p-6 rounded-lg ">
           <div className="flex items-center mb-2">
-            <Image src="/images/order.svg"
-              alt="Order Icon"
-              width={24}
-              height={24}
-              className="mr-2" />
+            <Image src="/images/order.svg" alt="Order Icon" width={24} height={24} className="mr-2" />
             <h3 className="text-lg font-semibold">Order Info</h3>
           </div>
           <OrderInfo order={{ shipping: "Next express", paymentMethod: "Credit Card", status: orderDetails.status }} />
@@ -191,11 +129,7 @@ const OrderInfoPage = () => {
         {/* Delivery Info */}
         <div className=" p-6 rounded-lg ">
           <div className="flex items-center mb-2">
-            <Image src="/images/order.svg"
-              alt="Delivery Icon"
-              width={24}
-              height={24}
-              className="mr-2" />
+            <Image src="/images/order.svg" alt="Delivery Icon" width={24} height={24} className="mr-2" />
             <h3 className="text-lg font-semibold">Deliver To</h3>
           </div>
           <DeliveryInfo delivery={{ address: orderDetails.address }} />
@@ -207,11 +141,7 @@ const OrderInfoPage = () => {
         {/* Payment Info */}
         <div className=" p-6 rounded-lg">
           <div className="flex items-center mb-2">
-            <Image src="/images/order.svg"
-              alt="Payment Icon"
-              width={24}
-              height={24}
-              className="mr-2" />
+            <Image src="/images/order.svg" alt="Payment Icon" width={24} height={24} className="mr-2" />
             <h3 className="text-lg font-semibold">Payment Info</h3>
           </div>
           <PaymentInfo payment={{ method: "MasterCard", businessName: orderDetails.customer, phone: orderDetails.phone }} />
@@ -220,10 +150,7 @@ const OrderInfoPage = () => {
         {/* Notes Section */}
         <div className=" p-6 rounded-lg ">
           <h3 className="text-lg font-semibold mb-2">Note</h3>
-          <textarea
-            className="w-full h-20 p-2 border border-gray-300 rounded-md"
-            placeholder="Type some notes"
-          ></textarea>
+          <textarea className="w-full h-20 p-2 border border-gray-300 rounded-md" placeholder="Type some notes"></textarea>
         </div>
       </div>
 
@@ -256,3 +183,4 @@ const OrderInfoPage = () => {
 };
 
 export default OrderInfoPage;
+
