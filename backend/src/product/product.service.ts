@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectQueue } from '@nestjs/bull';
 import { Model, Types } from 'mongoose';
@@ -16,6 +16,7 @@ import axios, { AxiosResponse } from 'axios';
 import { createReadStream, writeFileSync } from 'fs';
 import * as FormData from 'form-data';
 import { unlinkSync } from 'fs';  // Import unlinkSync to delete files
+import { lastValueFrom } from 'rxjs';
 
 
 @Injectable()
@@ -217,35 +218,35 @@ export class ProductService {
 
   
  //Sending to fastapi though nestJS
- async searchSimilarProducts(file: Express.Multer.File): Promise<Product[]> {
+ async searchSimilarProducts(file: Express.Multer.File) {
+  const formData = new FormData();
+  formData.append('file', file.buffer, file.originalname);
+
   try {
-    console.log('Searching for similar products...');
+    // Call FastAPI service
+    const response = await lastValueFrom(
+      this.httpService.post('http://localhost:8000/search', formData, {
+        headers: formData.getHeaders(),
+      }),
+    );
 
-    // Call FastAPI for similar image search
-    const response = await this.httpService
-      .post('http://127.0.0.1:8000/search', file.buffer, {
-        headers: {
-          'Content-Type': file.mimetype,
-          'Content-Length': file.buffer.length.toString(),
-        },
-      })
-      .toPromise();
+    const similarProductIds: string[] = response.data.similar_images;
 
-    const similarImageIds: string[] = response.data.similar_images;
-    console.log('Similar image IDs:', similarImageIds);
+    if (!similarProductIds.length) {
+      return [];
+    }
 
-    // Fetch products that match the similar image IDs
-    const products = await this.productModel
-      .find({
-        image_id: { $in: similarImageIds },
-      })
-      .exec();
+    // Fetch full product details from the database
+    const similarProducts = await this.productModel.find({
+      image_id: { $in: similarProductIds },
+    });
 
-    console.log('Found similar products:', products);
-    return products;
+    return similarProducts;
   } catch (error) {
-    console.error('Error in searchSimilarProducts:', error.response?.data || error.message);
-    throw new Error('Failed to search similar products');
+    throw new HttpException(
+      `Failed to search similar products: ${error.message}`,
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
 }
 
