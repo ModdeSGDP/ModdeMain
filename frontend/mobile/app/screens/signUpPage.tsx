@@ -1,5 +1,4 @@
 "use client"
-
 import React, { useState, useEffect } from "react"
 import {
   View,
@@ -87,7 +86,7 @@ const SignupPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://192.168.8.100:4000/user/register", {
+      const response = await fetch("http://192.168.1.134:4000/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +110,6 @@ const SignupPage: React.FC = () => {
       Alert.alert("Error", "Something went wrong. Please try again.")
     }
   }
-
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <LinearGradient colors={["#fff8f8", "#fff"]} style={styles.background} />

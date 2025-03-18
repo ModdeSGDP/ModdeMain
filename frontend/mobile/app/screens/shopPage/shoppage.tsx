@@ -1,5 +1,4 @@
 "use client"
-
 import React, { useState, useCallback, useEffect } from "react"
 import {
   StyleSheet,
@@ -19,7 +18,7 @@ import { useCartStore } from "./cartState"
 const { width } = Dimensions.get("window")
 
 // API endpoint - consider moving to environment config
-const API_BASE_URL = "http://192.168.8.100:4000"
+const API_BASE_URL = "http://192.168.1.134:4000"
 
 // Authentication token - should be stored securely and fetched from secure storage
 const AUTH_TOKEN = "usertoken" // Replace with your actual auth token or token retrieval logic
@@ -64,10 +63,8 @@ const fixS3ImageUrl = (url: string | null): string | null => {
     // Replace undefined region with a valid one (us-east-1 in this case)
     return url.replace('modde.s3.undefined.amazonaws.com', 'modde.s3.us-east-1.amazonaws.com');
   }
-
   return url;
 }
-
 const ShopsPageInfinityScroll = () => {
   const navigation = useNavigation<ShopsPageNavigationProp>()
   const [searchQuery, setSearchQuery] = useState("")
@@ -93,7 +90,6 @@ const ShopsPageInfinityScroll = () => {
           name: "Unknown Retailer",
         }
       }
-
       // Check if we have an auth token
       if (!authToken) {
         console.log("No auth token available for retailer fetch")
@@ -102,7 +98,6 @@ const ShopsPageInfinityScroll = () => {
           name: "Unknown Retailer",
         }
       }
-
       const response = await fetch(`${API_BASE_URL}/retailer/${retailerId}`, {
         headers: {
           "Accept": "application/json",
@@ -110,7 +105,6 @@ const ShopsPageInfinityScroll = () => {
           "Authorization": `Bearer ${authToken}`, // Add auth token
         },
       })
-
       if (!response.ok) {
         // Handle different error codes
         if (response.status === 401) {
@@ -130,7 +124,6 @@ const ShopsPageInfinityScroll = () => {
         }
         throw new Error(`Failed to fetch retailer details: ${response.status}`)
       }
-
       const retailerData = await response.json()
       return {
         id: retailerData._id || retailerId,
@@ -161,11 +154,9 @@ const ShopsPageInfinityScroll = () => {
         "Accept": "application/json",
         "Content-Type": "application/json",
       }
-      
       if (authToken) {
         headers["Authorization"] = `Bearer ${authToken}`
       }
-
       const response = await fetch(API_ENDPOINT, { headers })
       
       if (!response.ok) {
@@ -216,7 +207,6 @@ const ShopsPageInfinityScroll = () => {
       } else {
         setProducts((prevProducts) => [...prevProducts, ...mappedProducts])
       }
-      
       return true
     } catch (error) {
       console.error("Fetch error:", error)
@@ -273,7 +263,6 @@ const ShopsPageInfinityScroll = () => {
     ({ item }: { item: Product }) => {
       // Check if this image previously had an error
       const hasError = item.image ? imageLoadErrors[item.image] : true
-      
       // Determine image source with fallback
       const imageSource = (() => {
         // If we already know this image has an error, use fallback
@@ -415,26 +404,15 @@ const ShopsPageInfinityScroll = () => {
       </Pressable>
       
       <View style={styles.searchBar}>
-        <Pressable onPress={() => navigation.navigate("Camera")}>
-          <Image 
-            style={styles.searchCamera} 
-            resizeMode="cover" 
-            source={require("../../assets/Vector1.png")} 
-          />
-        </Pressable>
+      
         <TextInput
           style={styles.searchInput}
           placeholder="Search products"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <Pressable onPress={() => { /* Handle search */ }}>
-          <Image 
-            style={styles.searchIcon} 
-            resizeMode="cover" 
-            source={require("../../assets/vector.png")} 
-          />
-        </Pressable>
+        
+        
       </View>
       
       <Image 
@@ -598,10 +576,10 @@ const styles = StyleSheet.create({
     color: "#321919",
   },
   bannerImage: {
-    width: "90%",
-    height: 165,
+    width: "80%",
+    height: 155,
     borderRadius: 10,
-    left: 20,
+    left: 35,
     marginVertical: 10,
   },
   productGrid: {

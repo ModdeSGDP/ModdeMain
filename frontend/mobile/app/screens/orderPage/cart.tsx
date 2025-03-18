@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react"
-import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import { useCartStore } from "../shopPage/cartState"
-import type { StackNavigationProp } from "@react-navigation/stack"
-import type { RouteProp } from "@react-navigation/native"
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useCartStore } from "../shopPage/cartState";
+import type { StackNavigationProp } from "@react-navigation/stack";
+import type { RouteProp } from "@react-navigation/native";
 
 // Define RootStackParamList for type safety
 type RootStackParamList = {
@@ -139,7 +139,11 @@ const Cart = () => {
             <Image style={styles.tag} resizeMode="cover" source={require("../../assets/tag.png")} />
             <Text style={styles.totalPrice}>{`LKR ${displayTotal.toFixed(2)}`}</Text>
             <Pressable
-              style={styles.checkoutButton}
+              style={[
+                styles.checkoutButton,
+                selectedItems.size === 0 && styles.checkoutButtonDisabled, // Apply disabled style if no items selected
+              ]}
+              disabled={selectedItems.size === 0} // Disable button if no items are selected
               onPress={() => {
                 navigation.navigate("CheckoutPage", {
                   selectedItems: items.filter((item) => selectedItems.has(item.id)),
@@ -415,6 +419,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 9,
     borderRadius: 10,
+  },
+  checkoutButtonDisabled: {
+    backgroundColor: "#d3d3d3", // Grayed out color for disabled state
+    opacity: 0.6, // Reduce opacity to indicate disabled state
   },
   checkoutText: {
     fontSize: 14,

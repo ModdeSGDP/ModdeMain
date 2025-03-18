@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
+import ProductDetailPage from "../shopPage/ProductDetailPage"
 
 type Address = {
   name: string
@@ -20,7 +21,6 @@ type CartItem = {
   quantity: number
 }
 
-// Updated RootStackParamList to include OrderComplete screen
 type RootStackParamList = {
   HomePage: undefined
   ShopPage: undefined
@@ -78,14 +78,19 @@ const CheckoutScreen = ({
         status: "Processing",
       }
 
-      // Navigate to OrderComplete page instead of showing Alert
+      // Navigate to OrderComplete page
       navigation.navigate("orderComplete", { order: newOrder })
     }, 1500)
   }
 
   const renderCartItem = (item: CartItem) => (
     <View key={item.id} style={styles.cartItem}>
-      <Image style={styles.itemImage} resizeMode="cover" source={item.image} />
+      {/* Product image rendering */}
+      <Image 
+        style={styles.itemImage} 
+        resizeMode="cover" 
+        source={item.image}// Fallback image
+      />
       <View style={styles.itemDetails}>
         <View style={styles.shopContainer}>
           <Image style={styles.shopIcon} source={require("../../assets/home.png")} />
@@ -111,6 +116,7 @@ const CheckoutScreen = ({
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
+            {/* Uncomment and style address section if needed */}
             {/* <Text style={styles.sectionTitle}>Address</Text> */}
             <Pressable
               onPress={() => {
@@ -118,23 +124,11 @@ const CheckoutScreen = ({
               }}
             ></Pressable>
           </View>
-          {/* <View style={styles.addressInfo}>
-            <Text style={styles.addressName}>{address.name}</Text>
-            <Text style={styles.addressDetails}>{address.phone}</Text>
-            <Text style={styles.addressDetails}>{address.fullAddress}</Text>
-          </View> */}
         </View>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Payment method</Text>
-            <Pressable
-              onPress={() => {
-                /* Handle edit payment */
-              }}
-            >
-              <Text style={styles.editButton}>Edit</Text>
-            </Pressable>
           </View>
           <View style={styles.paymentOptions}>
             <Pressable style={styles.paymentOption} onPress={() => setPaymentMethod("card")}>
@@ -150,7 +144,7 @@ const CheckoutScreen = ({
           </View>
         </View>
 
-        {/* Order Items Section */}
+        {/* Order Items Section with Product Images */}
         {selectedItems.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -198,7 +192,7 @@ const CheckoutScreen = ({
             <Image style={styles.navIcon} source={require("../../assets/smart_home1.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
-            <Image style={styles.navIcon} source={require("../../assets/shirt1.png")} />
+            <Image style={styles.navIcon} source={require("../../assets/shirt.png")} />
           </Pressable>
           <Pressable onPress={() => {}}>
             <Image style={styles.navIcon} source={require("../../assets/cameraplus.png")} />
@@ -440,4 +434,3 @@ const styles = StyleSheet.create({
 })
 
 export default CheckoutScreen
-

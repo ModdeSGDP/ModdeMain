@@ -94,7 +94,7 @@ const CameraScreen = () => {
 
     try {
       setIsProcessing(true)
-      const response = await fetch("http://192.168.8.100:4000/product/search-similar", {
+      const response = await fetch("http://192.168.1.134:4000/product/search-similar", {
         method: "POST",
         body: formData,
         headers: {
@@ -105,7 +105,6 @@ const CameraScreen = () => {
         const errorData = await response.json()
         throw new Error(errorData.message || "Upload failed")
       }
-
       const data = await response.json()
       navigation.navigate("HomePage", { products: data })
     } catch (error) {
@@ -135,7 +134,7 @@ const CameraScreen = () => {
             <View style={styles.loaderCard}>
               <ActivityIndicator size="large" color="#FF69B4" />
               <Text style={styles.loaderText}>Processing your image...</Text>
-              <Text style={styles.loaderSubtext}>Finding similar products</Text>
+              <Text style={styles.loaderSubtext}>Might take some time</Text>
             </View>
           </View>
         ) : (
@@ -167,10 +166,8 @@ const CameraScreen = () => {
             <TouchableOpacity style={styles.closeButton} onPress={goBack}>
               <Ionicons name="close" size={28} color="white" />
             </TouchableOpacity>
-            <Text style={styles.cameraTitle}>Take a Photo</Text>
             <View style={styles.placeholder} />
           </View>
-
           <View style={styles.cameraGuide}>
             <View style={styles.cameraGuideFrame} />
             <Text style={styles.cameraGuideText}>Position your product in the frame</Text>
@@ -243,11 +240,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     paddingTop: 30,
-  },
-  cameraTitle: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
   },
   cameraGuide: {
     alignItems: "center",
@@ -408,4 +400,3 @@ const styles = StyleSheet.create({
 })
 
 export default CameraScreen
-

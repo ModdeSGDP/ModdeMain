@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
 type RootStackParamList = {
-  IntroScreen: undefined;
+    Intro1: undefined;
   Intro2: undefined;
   Intro3: undefined;
   Login: undefined;
@@ -25,7 +25,7 @@ const IntroScreen2 = () => {
             <Text style={[styles.exclusivelyCuratedSelection, styles.xploreThe2024sClr]}>
                 Exclusively curated selection of brands in the palm of your hand...
             </Text>
-            <Pressable style={styles.wrapper} onPress={() => navigation.navigate("IntroScreen")}>
+            <Pressable style={styles.wrapper} onPress={() => navigation.navigate("Intro1")}>
                 <Image style={styles.icon} resizeMode="cover" source={require("../assets/chevron_left.png")} />
             </Pressable>
             <Pressable style={styles.container} onPress={() => navigation.navigate("Intro3")}>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
         position: "absolute",
     },
     introScreen2Child: {
-        top: -6,
+        top: 0,
         left: -139,
         width: 449,
         height: 353,
@@ -72,8 +72,8 @@ const styles = StyleSheet.create({
         top: "50%",
     },
     introScreen2Item: {
-        top: 559,
-        left: 180,
+        top: 550,
+        left: 195,
         width: 24,
         height: 4,
         position: "absolute"
@@ -87,13 +87,13 @@ const styles = StyleSheet.create({
     },
     skip: {
         left: 321,
-        top: 67,
+        top: 75,
         position: "absolute"
     },
     exclusivelyCuratedSelection: {
         top: 616,
         left: 52,
-        lineHeight: 24,
+        lineHeight: 20,
         fontWeight: "500",
         fontFamily: "Rosario-Medium",
         width: 294,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
         height: "80%",
         width: "80%",
         top: 20,
-        left: 17
+        left: 27
     },
     wrapper: {
         left: 23,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         position: "absolute",
     },
     introScreen2Inner: {
-        marginTop: -179,
+        marginTop: -200,
         marginLeft: -109.5,
         width: 218,
         height: 299,
