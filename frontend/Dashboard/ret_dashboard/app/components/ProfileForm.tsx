@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Camera, Pencil } from "lucide-react";
-import { API_PATCH_UPDATE_RETAILER, API_UPDATE_USER_DETAILS } from "../constant/apiConstant";
+
 
 // **Validation Schema**
 const formSchema = z.object({
@@ -219,3 +219,4 @@ const ProfileForm = () => {
 };
 
 export default ProfileForm;
+

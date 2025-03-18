@@ -24,6 +24,9 @@ export default function Products() {
 
 
     const [products, setProducts] = useState<Product[]>([]);
+    const [currentPage, setCurrentPage] = useState(1); // CHANGED: Added pagination state
+    const [totalPages, setTotalPages] = useState(1); // CHANGED: Store total pages
+    const itemsPerPage = 8; // CHANGED: Define items per page
 
     // Load product data from localStorage on mount
     useEffect(() => {
@@ -33,7 +36,7 @@ export default function Products() {
             try {
                 const token = localStorage.getItem("token");
                 // const response = await fetch("/api/product"); // Update this endpoint as needed
-                const response = await fetch(API_GET_PRODUCT, {
+                const response = await fetch(`${API_GET_PRODUCT}?page=${currentPage}&limit=${itemsPerPage}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -67,6 +70,7 @@ export default function Products() {
 
 
                 setProducts(formattedProducts);
+                setTotalPages(data.totalPages); // CHANGED: Set total pages from API
             } catch (error) {
                 console.error("Error fetching products:", error);
             }
@@ -75,7 +79,7 @@ export default function Products() {
         fetchProducts();
 
 
-    }, []);
+    }, [currentPage]);
 
     // Function to update a single product
     const updateProduct = (updatedProduct: Partial<Product> & { id: string }) => {
@@ -142,26 +146,53 @@ export default function Products() {
                 </div>
             </div>
 
+            {/* CHANGED: Dynamic Pagination */}
             <div className="mt-6 w-full flex">
                 <div className="w-fit">
                     <Pagination>
                         <PaginationContent>
                             <PaginationItem>
-                                <PaginationPrevious href="#" />
+                                <PaginationPrevious
+                                    onClick={() => {
+                                        if (currentPage > 1) {
+                                            setCurrentPage((prev) => prev - 1);
+                                        }
+                                    }}
+                                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                                />
                             </PaginationItem>
+                            {/* Fix: Ensure at least 1 page before mapping */}
+                            {totalPages > 0 &&
+                                [...Array(Math.max(1, totalPages))].map((_, index) => (
+                                    <PaginationItem key={index}>
+                                        <PaginationLink
+                                            isActive={currentPage === index + 1}
+                                            onClick={() => setCurrentPage(index + 1)}
+                                        >
+                                            {index + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+
+
+
+
                             <PaginationItem>
-                                <PaginationLink href="#">1</PaginationLink>
-                            </PaginationItem>
-                            <PaginationItem>
-                                <PaginationEllipsis />
-                            </PaginationItem>
-                            <PaginationItem>
-                                <PaginationNext href="#" />
+                                <PaginationNext
+                                    onClick={() => {
+                                        if (currentPage < totalPages) {
+                                            setCurrentPage((prev) => prev + 1);
+                                        }
+                                    }}
+                                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                                />
                             </PaginationItem>
                         </PaginationContent>
                     </Pagination>
                 </div>
             </div>
+
+
         </div>
     );
 }
