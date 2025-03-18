@@ -20,7 +20,7 @@ export class OrderService {
       if (!stock) {
         throw new NotFoundException(`Stock item with ID ${item.stockId} not found`);
       }
-      if (stock.quantity < item.quantity) {
+      if (stock.get('quantity') < item.quantity) {
         throw new BadRequestException(`Insufficient stock for item with ID ${item.stockId}`);
       }
     }
