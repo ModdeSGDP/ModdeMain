@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   introScreen3Item: {
     top: 559,
-    left: 180,
+    left: 195,
     width: 24,
     height: 4,
     position: "absolute",
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     height: "80%",
     width: "80%",
     top: 20,
-    left: 17,
+    left: 27,
   },
   wrapper: {
     left: 23,
@@ -120,12 +120,12 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   introScreen3Inner: {
-    height: 300,
+    height: 305,
     width: 220,
-    top: "28.57%",
+    top: 230,
     right: "25.29%",
     bottom: "34.61%",
-    left: "19.47%",
+    left: 100,
     maxWidth: "100%",
     maxHeight: "100%",
     position: "absolute",

@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      const loginResponse = await fetch("http://192.168.8.100:4000/auth/login", {
+      const loginResponse = await fetch("http://192.168.1.134:4000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -121,13 +121,6 @@ const LoginPage: React.FC = () => {
               {rememberMe && <MaterialCommunityIcons name="check" size={16} color="#fff" />}
             </View>
             <Text style={styles.rememberMeText}>Remember me</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              /* Handle forgot password */
-            }}
-          >
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </Pressable>
         </View>
 

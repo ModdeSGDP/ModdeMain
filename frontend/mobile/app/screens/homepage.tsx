@@ -5,7 +5,6 @@ import { View, Text, StyleSheet, Image, Pressable, Dimensions, PanResponder, Ale
 import * as ImagePicker from "expo-image-picker"
 import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native"
 import SideMenu from "./sideBars/homeSideBar"
-import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage" // Import useAsyncStorage
 
 type RootStackParamList = {
   Home: undefined
@@ -14,7 +13,7 @@ type RootStackParamList = {
   ShopPage: undefined
   CartPage: undefined
   ProfilePage: undefined
-  Login: undefined // Add Login route
+  Login: undefined
 }
 
 const { width } = Dimensions.get("window")
@@ -25,7 +24,7 @@ const HomePage = () => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const { getData } = useAsyncStorage() // Use hook for token retrieval
+  const [products, setProducts] = useState<any[]>([]) // State to hold products from response
 
   useEffect(() => {
     if (route.params?.capturedImage) {
@@ -34,6 +33,16 @@ const HomePage = () => {
       uploadImage(route.params.capturedImage) // Upload captured image
     }
   }, [route.params?.capturedImage])
+
+  useEffect(() => {
+    if (route.params?.products) {
+      console.log("Received products:", route.params.products)
+      setProducts(route.params.products)
+      setUploadedImage(null) // Reset image after successful upload
+      setUploadProgress(0) // Reset progress
+      // Optionally navigate elsewhere or update UI with products
+    }
+  }, [route.params?.products])
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -84,12 +93,8 @@ const HomePage = () => {
   }
 
   const uploadImage = async (imageUri: string) => {
-    // Retrieve token
-    const token = await getData("userToken")
-    console.log("Retrieved token for uploadImage:", token)
-    if (!token) {
-      Alert.alert("Authentication Error", "Please log in to upload images.")
-      navigation.navigate("Login")
+    if (!imageUri) {
+      Alert.alert("No image", "Please select an image first.")
       return
     }
 
@@ -100,20 +105,14 @@ const HomePage = () => {
       type: "image/jpeg",
     } as any)
 
-    console.log("FormData prepared with image URI:", imageUri)
-
     try {
-      setUploadProgress(10)
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      }
-      console.log("Request headers:", headers)
-
-      const response = await fetch("http://192.168.8.100:4000/product/search-similar", {
+      setUploadProgress(10) // Start progress
+      const response = await fetch("http://192.168.1.134:4000/product/search-similar", {
         method: "POST",
         body: formData,
-        headers,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       })
 
       console.log("Server response status:", response.status)
@@ -130,11 +129,10 @@ const HomePage = () => {
         }
         throw new Error(errorMessage)
       }
-
-      setUploadProgress(100)
+      setUploadProgress(100) // Complete progress
       const data = JSON.parse(responseText)
       console.log("Upload successful, server response:", data)
-      navigation.navigate("Home", { products: data })
+      navigation.navigate("HomePage", { products: data })
     } catch (error) {
       console.error("Upload error:", error)
       setUploadProgress(0)
@@ -200,6 +198,18 @@ const HomePage = () => {
             <Image style={styles.fileIcon} resizeMode="cover" source={{ uri: uploadedImage }} />
             <Text style={styles.uploadingText}>Uploading</Text>
             <Text style={styles.percentageText}>{`${uploadProgress}%`}</Text>
+          </View>
+        )}
+
+        {/* Display products if available */}
+        {products.length > 0 && (
+          <View style={styles.productsContainer}>
+            <Text style={styles.productsTitle}>Similar Products Found:</Text>
+            {products.map((product, index) => (
+              <Text key={index} style={styles.productItem}>
+                {product.name || `Product ${index + 1}`} {/* Adjust based on your API response */}
+              </Text>
+            ))}
           </View>
         )}
 
@@ -304,13 +314,13 @@ const styles = StyleSheet.create({
     color: "#321919",
     flex: 1,
     left: 25,
-    top: -30,
+    top: 0,
   },
   menuIcon: {
     width: 30,
     height: 20,
-    left: -290,
-    top: -45,
+    right: 310,
+    bottom: 15,
   },
   mainImage: {
     marginLeft: -160,
@@ -432,7 +442,7 @@ const styles = StyleSheet.create({
     left: -2,
     width: 21,
     height: 23,
-    top: -50,
+    bottom:20,
   },
   uploadingText: {
     position: "absolute",
@@ -499,7 +509,32 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fba3a3",
   },
+  productsContainer: {
+    position: "absolute",
+    top: 200,
+    left: 20,
+    right: 20,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  productsTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-SemiBold",
+    color: "#321919",
+    marginBottom: 10,
+  },
+  productItem: {
+    fontSize: 14,
+    fontFamily: "Inter-Regular",
+    color: "#321919",
+    marginBottom: 5,
+  },
 })
 
 export default HomePage
-
