@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useCartStore } from "../shopPage/cartState";
+import { Ionicons } from "@expo/vector-icons"; // Added for back button
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
 
@@ -14,7 +15,6 @@ type RootStackParamList = {
   Camera: undefined;
   NotificationPage: undefined;
   CheckoutPage: { selectedItems: any[]; total: number };
-  ItemDetails: { item: any };
 };
 
 type CartNavigationProp = StackNavigationProp<RootStackParamList, "CartPage">;
@@ -67,16 +67,15 @@ const Cart = () => {
     <Pressable
       key={item.id}
       style={styles.cartItem}
-      onPress={() => navigation.navigate("ItemDetails", { item })}
     >
       <Pressable onPress={() => toggleItemSelection(item.id)} style={styles.radioButton}>
         <View style={[styles.radio, selectedItems.has(item.id) && styles.radioSelected]} />
       </Pressable>
       <View style={styles.dressCard}>
-        <Image 
-          style={styles.itemImage} 
-          resizeMode="cover" 
-          source={item.image ? { uri: item.image } : require("../../assets/user.png")} 
+        <Image
+          style={styles.itemImage}
+          resizeMode="cover"
+          source={item.image ? { uri: item.image } : require("../../assets/user.png")}
         />
       </View>
       <View style={styles.itemDetails}>
@@ -105,16 +104,15 @@ const Cart = () => {
   return (
     <View style={styles.cart}>
       <View style={styles.top}></View>
-      <Pressable onPress={() => navigation.navigate("ShopPage")}>
-        <Image style={styles.backbutton} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
-      </Pressable>
-      <View style={styles.cart1}>
+      {/* Updated Header */}
+      <View style={styles.header}>
+        <Pressable onPress={() => navigation.navigate("ShopPage")}>
+          <Ionicons name="chevron-back" size={24} color="#333" />
+        </Pressable>
         <Text style={styles.headerTitle}>Cart {items.length > 0 ? `(${items.length})` : ""}</Text>
-        <View style={styles.groupParent}>
-          <Pressable onPress={() => navigation.navigate("NotificationPage")}>
-            <Image style={styles.bellIcon} resizeMode="cover" source={require("../../assets/bell.png")} />
-          </Pressable>
-        </View>
+        <Pressable onPress={() => navigation.navigate("NotificationPage")}>
+          <Image style={styles.bellIcon} resizeMode="cover" source={require("../../assets/bell.png")} />
+        </Pressable>
       </View>
       {items.length > 0 ? (
         <ScrollView style={styles.carangeCartClothParent}>{items.map(renderCartItem)}</ScrollView>
@@ -122,7 +120,9 @@ const Cart = () => {
         <View style={styles.oops}>
           <Image style={styles.empty} resizeMode="cover" source={require("../../assets/empty.png")} />
           <Text style={[styles.ooops, styles.ooopsLayout]}>Ooops!</Text>
-          <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>Once you add items, your items will appear here.</Text>
+          <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>
+            Once you add items, your items will appear here.
+          </Text>
           <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
             <Text style={styles.shopButtonText}>Shop Now</Text>
             <Image style={styles.angleRight} resizeMode="contain" source={require("../../assets/angle-right.png")} />
@@ -141,9 +141,9 @@ const Cart = () => {
             <Pressable
               style={[
                 styles.checkoutButton,
-                selectedItems.size === 0 && styles.checkoutButtonDisabled, // Apply disabled style if no items selected
+                selectedItems.size === 0 && styles.checkoutButtonDisabled,
               ]}
-              disabled={selectedItems.size === 0} // Disable button if no items are selected
+              disabled={selectedItems.size === 0}
               onPress={() => {
                 navigation.navigate("CheckoutPage", {
                   selectedItems: items.filter((item) => selectedItems.has(item.id)),
@@ -235,18 +235,6 @@ const styles = StyleSheet.create({
     height: 250,
     top: -150,
   },
-  home: {
-    width: 20,
-    height: 20,
-    left: 25,
-    bottom: 5,
-  },
-  shopText: {
-    fontSize: 20,
-    fontWeight: 700,
-    left: 50,
-    top: -30,
-  },
   radio: {
     width: 20,
     height: 20,
@@ -258,12 +246,6 @@ const styles = StyleSheet.create({
   radioSelected: {
     backgroundColor: "#f97c7c",
   },
-  backbutton: {
-    width: 35,
-    height: 35,
-    top: -48,
-    left: 30,
-  },
   cart: {
     flex: 1,
     backgroundColor: "#fff",
@@ -273,52 +255,21 @@ const styles = StyleSheet.create({
     width: "100%",
     top: 40,
   },
-  sideFlexBox: {
-    alignItems: "center",
-  },
-  leftSide: {
-    flex: 1,
-  },
-  statusbarTime: {
-    borderRadius: 24,
-  },
-  time: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#000",
-  },
-  rightSide: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  signalWifiBattery: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  cart1: {
+  header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    top: -40,
-    backgroundColor: "#fffff",
-    marginTop: -60,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "600",
-    color: "#321919",
-    left: 160,
-  },
-  groupParent: {
-    flexDirection: "row",
-    alignItems: "center",
+    fontWeight: "bold", // Updated to match PromotionsPage
+    color: "#333", // Updated to match PromotionsPage
   },
   bellIcon: {
     width: 22,
     height: 24,
-    left: -20,
   },
   carangeCartClothParent: {
     flex: 1,
@@ -341,14 +292,6 @@ const styles = StyleSheet.create({
     height: 81,
     borderRadius: 10,
   },
-  dressCardChild: {
-    position: "absolute",
-    bottom: -80,
-    left: 0,
-    right: 0,
-    height: 14,
-    backgroundColor: "#d9d9d9",
-  },
   itemDetails: {
     marginLeft: 10,
     flex: 1,
@@ -363,10 +306,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#000",
   },
-  leftText: {
-    fontSize: 10,
-    color: "#321919",
-  },
   quantitySelector: {
     marginTop: 10,
     flexDirection: "row",
@@ -376,10 +315,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     paddingHorizontal: 10,
-  },
-  quantityText: {
-    fontSize: 16,
-    marginHorizontal: 10,
   },
   removeButton: {
     color: "red",
@@ -421,8 +356,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   checkoutButtonDisabled: {
-    backgroundColor: "#d3d3d3", // Grayed out color for disabled state
-    opacity: 0.6, // Reduce opacity to indicate disabled state
+    backgroundColor: "#d3d3d3",
+    opacity: 0.6,
   },
   checkoutText: {
     fontSize: 14,

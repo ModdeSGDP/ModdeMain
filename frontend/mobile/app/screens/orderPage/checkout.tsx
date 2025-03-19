@@ -125,7 +125,6 @@ const CheckoutScreen = ({
             ></Pressable>
           </View>
         </View>
-
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Payment method</Text>
@@ -143,7 +142,6 @@ const CheckoutScreen = ({
             </Pressable>
           </View>
         </View>
-
         {/* Order Items Section with Product Images */}
         {selectedItems.length > 0 && (
           <View style={styles.section}>
@@ -153,7 +151,6 @@ const CheckoutScreen = ({
             <View style={styles.orderItemsContainer}>{selectedItems.map(renderCartItem)}</View>
           </View>
         )}
-
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Promotions</Text>

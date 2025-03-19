@@ -18,7 +18,12 @@ type RootStackParamList = {
 
 type SideMenuNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
 
-const SideMenu: React.FC = () => {
+// Add props interface for the component
+interface SideMenuProps {
+  orderCount: number
+}
+
+const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
   const navigation = useNavigation<SideMenuNavigationProp>()
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [animation] = useState(new Animated.Value(0))
@@ -73,6 +78,11 @@ const SideMenu: React.FC = () => {
           >
             <Image style={[styles.icon, selectedItem === name && styles.selectedIcon]} source={icon} />
             <Text style={[styles.navText, selectedItem === name && styles.selectedNavText]}>{label}</Text>
+            {name === "OrdersPage" && orderCount > 0 && (
+              <View style={styles.orderBadge}>
+                <Text style={styles.orderBadgeText}>{orderCount}</Text>
+              </View>
+            )}
           </LinearGradient>
         </Pressable>
       </Animated.View>
@@ -82,10 +92,6 @@ const SideMenu: React.FC = () => {
   return (
     <LinearGradient colors={["#fff8f8", "#fff"]} style={styles.sideMenu}>
       <Image style={styles.background} source={require("../../assets/Ellipse1.png")} />
-      {/* <Pressable style={styles.closeButton} onPress={() => navigation.navigate("HomePage")}>
-        <Image style={styles.closeIcon} source={require("../../assets/close.png")} />
-      </Pressable> */}
-
       <Animated.Image
         style={[
           styles.logoIcon,
@@ -129,13 +135,6 @@ const styles = StyleSheet.create({
     left: 0,
     opacity: 0.5,
   },
-  closeButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    zIndex: 10,
-    padding: 10,
-  },
   logoIcon: {
     width: 150,
     height: 80,
@@ -169,6 +168,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 20,
+    position: "relative", // Added for badge positioning
   },
   selectedItem: {
     ...Platform.select({
@@ -205,11 +205,24 @@ const styles = StyleSheet.create({
     bottom: 0,
     opacity: 0.5,
   },
-  closeIcon: {
-    width: 24,
-    height: 24,
+  // New styles for the order badge
+  orderBadge: {
+    position: "absolute",
+    right: 10,
+    top: -8,
+    backgroundColor: "#ff4d4d",
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 5,
+  },
+  orderBadgeText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 })
 
 export default SideMenu
-
