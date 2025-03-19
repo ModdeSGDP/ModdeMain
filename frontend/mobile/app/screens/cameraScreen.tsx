@@ -119,7 +119,7 @@ const CameraScreen = () => {
 
     try {
       setIsProcessing(true)
-      const response = await fetch("http://192.168.8.102:4000/product/search-similar", {
+      const response = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/product/search-similar", {
         method: "POST",
         body: formData,
       })
