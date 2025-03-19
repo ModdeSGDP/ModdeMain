@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { InjectQueue } from '@nestjs/bull';
 import { Model, Types } from 'mongoose';
@@ -12,12 +12,7 @@ import { ConfigService } from '../common/configs/config.service';
 import { S3Service } from '../common/aws/s3.service';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { HttpService } from '@nestjs/axios';
-import axios, { AxiosResponse } from 'axios';
-import { createReadStream, writeFileSync } from 'fs';
-import * as FormData from 'form-data';
-import { unlinkSync } from 'fs';  // Import unlinkSync to delete files
-import { lastValueFrom } from 'rxjs';
-
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class ProductService {
@@ -48,52 +43,11 @@ export class ProductService {
   private async uploadToS3(file: Express.Multer.File): Promise<string> {
     return this.s3Service.uploadFile(file);
   }
-
   async createProduct(createProductDto: CreateProductDto, file?: Express.Multer.File, user?: any,): Promise<Product> {
     let imageUrl = null;
-    let imageId = null;
 
     if (file) {
-      // Step 1: Upload Image to S3
       imageUrl = await this.uploadToS3(file);
-      
-      console.log('Image uploaded to S3:', imageUrl);
-
-      // Step 2: Save Image Temporarily to Send to FastAPI
-      const tempFilePath = `../fastapi/${Date.now()}_${file.originalname}`;
-      writeFileSync(tempFilePath, file.buffer);
-
-      // Step 3: Prepare Multipart/Form-Data Request
-      const formData = new FormData();
-      formData.append('file', createReadStream(tempFilePath), {
-        filename: file.originalname,
-        contentType: file.mimetype,
-      });
-
-      console.log('Sending image to FastAPI for feature extraction...');
-
-      // Step 4: Send Image to FastAPI for Feature Extraction
-      try {
-        const response = await axios.post('http://127.0.0.1:8000/upload', formData, {
-          headers: {
-            ...formData.getHeaders(),
-          },
-        });
-
-        imageId = response.data.image_id;
-        console.log('Feature extraction complete. Image ID:', imageId);
-      } catch (error) {
-        console.error('Error sending image to FastAPI:', error.response?.data || error.message);
-        throw new Error('Failed to extract image features');
-      } finally {
-        // Step 5: Delete the temporary file
-        try {
-          unlinkSync(tempFilePath);
-          console.log('Temporary file deleted:', tempFilePath);
-        } catch (err) {
-          console.error('Error deleting temporary file:', err);
-        }
-      }
     }
 
     const retailerId = new Types.ObjectId(user.retailerId);
@@ -105,7 +59,6 @@ export class ProductService {
       ...createProductDto,
       retailerId,
       image: imageUrl,
-      image_id: imageId,
     });
     const savedProduct = await newProduct.save();
 
@@ -218,35 +171,34 @@ export class ProductService {
 
   
  //Sending to fastapi though nestJS
- async searchSimilarProducts(file: Express.Multer.File) {
-  const formData = new FormData();
-  formData.append('file', file.buffer, file.originalname);
-
+ async searchSimilarProducts(file: Express.Multer.File): Promise<Product[]> {
   try {
-    // Call FastAPI service
-    const response = await lastValueFrom(
-      this.httpService.post('http://localhost:8000/search', formData, {
-        headers: formData.getHeaders(),
-      }),
-    );
+    console.log('Searching for similar products...');
 
-    const similarProductIds: string[] = response.data.similar_images;
+    // Call FastAPI for similar image search
+    const response = await this.httpService
+      .post('http://127.0.0.1:8000/search', file.buffer, {
+        headers: {
+          'Content-Type': file.mimetype,
+          'Content-Length': file.buffer.length.toString(),
+        },
+      })
+      .toPromise();
 
-    if (!similarProductIds.length) {
-      return [];
-    }
+    const similarImageIds: string[] = response.data.similar_images;
+    console.log('Similar image IDs:', similarImageIds);
 
-    // Fetch full product details from the database
-    const similarProducts = await this.productModel.find({
-      image_id: { $in: similarProductIds },
-    });
-
-    return similarProducts;
+    // Fetch products that match the similar image IDs
+    const products = await this.productModel
+      .find({
+        image_id: { $in: similarImageIds },
+      })
+      .exec();
+    console.log('Found similar products:', products);
+    return products;
   } catch (error) {
-    throw new HttpException(
-      `Failed to search similar products: ${error.message}`,
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
+    console.error('Error in searchSimilarProducts:', error.response?.data || error.message);
+    throw new Error('Failed to search similar products');
   }
 }
 

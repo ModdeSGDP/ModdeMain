@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   View,
   Text,
@@ -19,18 +19,35 @@ import { useCartStore } from "../shopPage/cartState"
 
 const { width } = Dimensions.get("window")
 
+const API_BASE_URL = "http://192.168.8.102:4000"
+const AUTH_TOKEN = "usertoken" // Replace with secure token retrieval logic
+
 type RootStackParamList = {
   ProductDetail: { product: Product }
 }
 
-type Product = {
+type Retailer = {
   id: string
   name: string
-  brand: string
-  price: string
-  image: any
+  logo?: string | null
+  location?: string | null
+}
+
+type Product = {
+  id: string
+  productId: string
+  name: string
+  description: string
+  category: string
   color: string
-  sizes: string[]
+  image: string | null
+  retailerId: string
+  image_id: string
+  createdAt: string
+  updatedAt: string
+  price?: string // Optional, added for compatibility with your UI
+  sizes?: string[] // Optional, added for compatibility with your UI
+  brand?: string // Optional, will be replaced by retailer name
 }
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, "ProductDetail">
@@ -43,16 +60,54 @@ type Props = {
 const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
   const { product } = route.params
   const [selectedColor, setSelectedColor] = useState(product.color || "black")
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "M")
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "M")
   const [quantity, setQuantity] = useState(1)
   const [userRating, setUserRating] = useState(0)
   const [reviewText, setReviewText] = useState("")
   const [showReviewInput, setShowReviewInput] = useState(false)
+  const [retailer, setRetailer] = useState<Retailer | null>(null)
+  const [loadingRetailer, setLoadingRetailer] = useState(true)
 
   const { addItem } = useCartStore()
 
-  const colors = ["black", "white", "gray"]
-  const sizes = product.sizes.length > 0 ? product.sizes : ["XS", "S", "M", "L", "XL", "XXL"]
+  const colors = ["black", "white", "gray"] // Customize based on your data if needed
+  const sizes = product.sizes?.length > 0 ? product.sizes : ["XS", "S", "M", "L", "XL", "XXL"]
+
+  // Fetch retailer details
+  useEffect(() => {
+    const fetchRetailerDetails = async () => {
+      if (!product.retailerId) {
+        setRetailer(null)
+        setLoadingRetailer(false)
+        return
+      }
+      try {
+        const response = await fetch(`${API_BASE_URL}/retailers/${product.retailerId}`, {
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${AUTH_TOKEN}`,
+          },
+        })
+        if (!response.ok) {
+          throw new Error(`Failed to fetch retailer: ${response.status}`)
+        }
+        const retailerData = await response.json()
+        setRetailer({
+          id: retailerData._id || product.retailerId,
+          name: retailerData.name || "Retailer Not Specified",
+          logo: retailerData.logo || null,
+          location: retailerData.location || null,
+        })
+      } catch (error) {
+        console.error("Error fetching retailer:", error)
+        setRetailer(null)
+      } finally {
+        setLoadingRetailer(false)
+      }
+    }
+    fetchRetailerDetails()
+  }, [product.retailerId])
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1)
   const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
@@ -68,13 +123,13 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
     const cartItem = {
       id: `${product.id}-${selectedColor}-${selectedSize}`,
       name: product.name,
-      price: product.price,
+      price: product.price || "N/A",
       image: product.image,
       quantity: quantity,
       color: selectedColor,
       size: selectedSize,
-      brand: product.brand,
-      shop: product.brand,
+      brand: retailer?.name || "Unknown Brand",
+      shop: retailer?.name || "Unknown Shop",
     }
     addItem(cartItem)
     alert(`Added ${quantity} ${product.name} to your cart!`)
@@ -92,14 +147,10 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
-        {[1, 2, 3, 4].map((img) => (
+        {[product.image].map((img, index) => (
           <Image
-            key={img}
-            source={
-              typeof product.image === "string" && product.image.startsWith("http")
-                ? { uri: product.image }
-                : require("../../assets/user.png")
-            }
+            key={index}
+            source={img && img.startsWith("http") ? { uri: img } : require("../../assets/user.png")}
             style={styles.productImage}
             onError={(e) => console.log("Image load error:", e.nativeEvent.error)}
           />
@@ -107,12 +158,16 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
       </ScrollView>
       <View style={styles.productInfo}>
         <Text style={styles.productTitle}>{product.name}</Text>
+        <Text style={styles.retailerText}>
+          {loadingRetailer ? "Loading retailer..." : retailer?.name || "Retailer Not Specified"}
+        </Text>
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>{product.price}</Text>
-          <Text style={styles.originalPrice}>LKR 4850</Text>
+          <Text style={styles.price}>{product.price || "LKR N/A"}</Text>
+          {/* Uncomment if you have original price data */}
+          {/* <Text style={styles.originalPrice}>LKR 4850</Text>
           <View style={styles.discountBadge}>
             <Text style={styles.discountText}>10%</Text>
-          </View>
+          </View> */}
         </View>
         <View style={styles.ratingContainer}>
           <View style={styles.stars}>
@@ -161,10 +216,11 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
         <Text style={styles.sectionTitle}>Description</Text>
-        <Text style={styles.description}>
-          Shop {product.brand} for trendy sportswear for ladies in Sri Lanka. Stay stylish and comfortable during your
-          workouts with our premium women's sportswear collection.
-        </Text>
+        <Text style={styles.description}>{product.description}</Text>
+        <Text style={styles.sectionTitle}>Category</Text>
+        <Text style={styles.description}>{product.category}</Text>
+        <Text style={styles.sectionTitle}>Added On</Text>
+        <Text style={styles.description}>{new Date(product.createdAt).toLocaleDateString()}</Text>
         <Text style={styles.sectionTitle}>Reviews</Text>
         <View style={styles.reviewsContainer}>
           <View style={styles.overallRating}>
@@ -253,6 +309,11 @@ const styles = StyleSheet.create({
   productTitle: {
     fontSize: 24,
     fontWeight: "bold",
+    marginBottom: 8,
+  },
+  retailerText: {
+    fontSize: 16,
+    color: "#555",
     marginBottom: 8,
   },
   priceContainer: {

@@ -12,10 +12,29 @@ import {
   Dimensions,
   Animated,
 } from "react-native"
-import { CameraView, type CameraType, useCameraPermissions } from "expo-camera"
-import { useNavigation } from "@react-navigation/native"
+import { CameraView, type CameraType, type CameraCapturedPicture, useCameraPermissions } from "expo-camera"
+import { useNavigation, type NavigationProp } from "@react-navigation/native"
 import { MaterialIcons, Ionicons, FontAwesome5 } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
+
+// Define the navigation stack param list
+type RootStackParamList = {
+  Home: { products?: Product[] } | undefined
+  Camera: { capturedImage?: string } | undefined
+  NotificationPage: undefined
+  ShopPage: undefined
+  CartPage: undefined
+  ProfilePage: undefined
+  Login: undefined
+}
+
+// Define Product interface
+interface Product {
+  _id?: string
+  name?: string
+  image_url?: string
+  [key: string]: any
+}
 
 const { width, height } = Dimensions.get("window")
 
@@ -25,7 +44,7 @@ const CameraScreen = () => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const cameraRef = useRef<CameraView | null>(null)
-  const navigation = useNavigation()
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const fadeAnim = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
@@ -69,8 +88,14 @@ const CameraScreen = () => {
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync({ quality: 0.8 })
-      setCapturedImage(photo.uri)
+      const photo: CameraCapturedPicture | undefined = await cameraRef.current.takePictureAsync({ quality: 0.8 })
+      if (photo) {
+        setCapturedImage(photo.uri)
+      } else {
+        Alert.alert("Error", "Failed to capture photo. Please try again.")
+      }
+    } else {
+      Alert.alert("Error", "Camera is not available.")
     }
   }
 
@@ -94,23 +119,34 @@ const CameraScreen = () => {
 
     try {
       setIsProcessing(true)
-      const response = await fetch("http://192.168.1.134:4000/product/search-similar", {
+      const response = await fetch("http://192.168.8.102:4000/product/search-similar", {
         method: "POST",
         body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
       })
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Upload failed")
+        const errorText = await response.text()
+        let errorMessage = "Upload failed"
+        try {
+          const errorData = JSON.parse(errorText)
+          errorMessage = errorData.message || `Upload failed with status: ${response.status}`
+        } catch {
+          errorMessage = `Server error: ${response.status}`
+        }
+        throw new Error(errorMessage)
       }
-      const data = await response.json()
-      navigation.navigate("HomePage", { products: data })
+
+      const products: Product[] = await response.json()
+      setIsProcessing(false)
+      navigation.navigate("Home", { products })
     } catch (error) {
       console.error("Upload error:", error)
       setIsProcessing(false)
-      Alert.alert("Upload Failed", "There was a problem uploading your image. Please try again.", [{ text: "OK" }])
+      Alert.alert(
+        "Upload Failed",
+        error instanceof Error ? error.message : "There was a problem uploading your image. Please try again.",
+        [{ text: "OK" }]
+      )
     }
   }
 
