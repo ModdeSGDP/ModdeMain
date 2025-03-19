@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, Image, Pressable, Dimensions, PanResponder, Alert } from "react-native"
 import * as ImagePicker from "expo-image-picker"
-import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native"
-import SideMenu from "./sideBars/homeSideBar"
+import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native"
 
+// Define the navigation stack param list with explicit types
 type RootStackParamList = {
-  Home: undefined
-  Camera: undefined
+  Home: { products?: any[] } | undefined // Allow products or undefined
+  Camera: { capturedImage?: string } | undefined // Allow capturedImage or undefined
   NotificationPage: undefined
   ShopPage: undefined
   CartPage: undefined
@@ -16,21 +16,29 @@ type RootStackParamList = {
   Login: undefined
 }
 
+// Define the type for a Product (adjust based on your actual Product schema)
+interface Product {
+  _id?: string
+  name?: string
+  image_url?: string
+  [key: string]: any // Allow additional fields
+}
+
 const { width } = Dimensions.get("window")
 
 const HomePage = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
-  const route = useRoute()
+  const route = useRoute<RouteProp<RootStackParamList, "Home" | "Camera">>()
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [products, setProducts] = useState<any[]>([]) // State to hold products from response
+  const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
     if (route.params?.capturedImage) {
       setUploadedImage(route.params.capturedImage)
       simulateUpload()
-      uploadImage(route.params.capturedImage) // Upload captured image
+      uploadImage(route.params.capturedImage)
     }
   }, [route.params?.capturedImage])
 
@@ -38,9 +46,8 @@ const HomePage = () => {
     if (route.params?.products) {
       console.log("Received products:", route.params.products)
       setProducts(route.params.products)
-      setUploadedImage(null) // Reset image after successful upload
-      setUploadProgress(0) // Reset progress
-      // Optionally navigate elsewhere or update UI with products
+      setUploadedImage(null)
+      setUploadProgress(0)
     }
   }, [route.params?.products])
 
@@ -87,8 +94,10 @@ const HomePage = () => {
       simulateUpload()
       await uploadImage(selectedImage)
     } catch (error) {
-      console.error("Image picker error:", error)
-      Alert.alert("Error", "Failed to select image. Please try again.")
+      // Type assertion for error to handle as Error
+      const err = error as Error
+      console.error("Image picker error:", err)
+      Alert.alert("Error", err.message || "Failed to select image. Please try again.")
     }
   }
 
@@ -106,13 +115,12 @@ const HomePage = () => {
     } as any)
 
     try {
-      setUploadProgress(10) // Start progress
-      const response = await fetch("http://192.168.1.134:4000/product/search-similar", {
+      console.log("Uploading to:", "https://2a1a-124-43-246-34.ngrok-free.app/product/search-similar")
+      setUploadProgress(10)
+
+      const response = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/product/search-similar", {
         method: "POST",
         body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
       })
 
       console.log("Server response status:", response.status)
@@ -120,23 +128,27 @@ const HomePage = () => {
       console.log("Server response text:", responseText)
 
       if (!response.ok) {
-        let errorMessage
+        let errorMessage = "Upload failed"
         try {
           const errorData = JSON.parse(responseText)
-          errorMessage = errorData.message || "Upload failed"
+          errorMessage = errorData.message || `Upload failed with status: ${response.status}`
         } catch {
-          errorMessage = `Upload failed with status: ${response.status}`
+          errorMessage = `Server error: ${response.status}`
         }
         throw new Error(errorMessage)
       }
-      setUploadProgress(100) // Complete progress
-      const data = JSON.parse(responseText)
-      console.log("Upload successful, server response:", data)
-      navigation.navigate("HomePage", { products: data })
+
+      setUploadProgress(100)
+      const products: Product[] = JSON.parse(responseText)
+      console.log("Upload successful, products:", products)
+
+      navigation.navigate("Home", { products })
     } catch (error) {
-      console.error("Upload error:", error)
+      // Type assertion for error to handle as Error
+      const err = error as Error
+      console.error("Upload error:", err)
       setUploadProgress(0)
-      Alert.alert("Upload Failed", error.message || "Failed to upload image. Please try again.", [{ text: "OK" }])
+      Alert.alert("Upload Failed", err.message || "Failed to upload image. Please check your network and try again.")
     }
   }
 
@@ -201,13 +213,12 @@ const HomePage = () => {
           </View>
         )}
 
-        {/* Display products if available */}
         {products.length > 0 && (
           <View style={styles.productsContainer}>
             <Text style={styles.productsTitle}>Similar Products Found:</Text>
             {products.map((product, index) => (
               <Text key={index} style={styles.productItem}>
-                {product.name || `Product ${index + 1}`} {/* Adjust based on your API response */}
+                {product.name || `Product ${index + 1}`}
               </Text>
             ))}
           </View>
@@ -442,7 +453,7 @@ const styles = StyleSheet.create({
     left: -2,
     width: 21,
     height: 23,
-    bottom:20,
+    bottom: 20,
   },
   uploadingText: {
     position: "absolute",
