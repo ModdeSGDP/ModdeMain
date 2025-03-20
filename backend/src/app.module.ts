@@ -10,6 +10,7 @@ import { EmailModule } from "./common/email/email.module"
 import { RetailerModule } from "./retailer/retailer.module"
 import { StocksModule } from "./stocks/stocks.module"
 import { ProductModule } from "./product/product.module"
+import { OrderModule } from "./order/order.module"
 import { S3Service } from './common/aws/s3.service';  
 import { UploadController } from './common/aws/upload.controller';
 
@@ -29,6 +30,7 @@ import { UploadController } from './common/aws/upload.controller';
     RetailerModule,
     ProductModule,
     StocksModule,
+    OrderModule,
   ],
   controllers: [AppController,UploadController],
   providers: [AppService,S3Service], 
