@@ -43,7 +43,11 @@ export class StocksService {
     if (regularPrice !== undefined) existingStock.regularPrice = regularPrice;
     if (salePrice !== undefined) existingStock.salePrice = salePrice;
 
-    return existingStock.save();
+    // Ensure Mongoose detects changes
+    existingStock.markModified('stock');
+
+    // Save and return the updated stock
+    return await existingStock.save();
   }
 
   // If no existing stock, create a new one

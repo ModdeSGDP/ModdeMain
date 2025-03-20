@@ -11,7 +11,7 @@ import { ProductModule } from 'src/product/product.module';
     ProductModule],
   controllers: [StocksController],
   providers: [StocksService],
-  exports: [StocksService], // Export if used in other modules
+  exports: [StocksService, MongooseModule], // Export if used in other modules
 })
 export class StocksModule {}
 
