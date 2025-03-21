@@ -1,3 +1,4 @@
+
 // HomePage.tsx
 "use client"
 import { useState, useEffect } from "react"
@@ -397,7 +398,7 @@ const HomePage = () => {
             <Image style={styles.bell} source={require("../assets/bell.png")} />
           </Pressable>
         </View>
-        <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/homepic.jpeg")} />
+        <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/intro.jpg")} />
         <View style={[styles.mainButtons, styles.buttonPosition]}>
           <Pressable style={styles.uploadButton} onPress={handleUploadImage}>
             <Image style={styles.buttonBg} resizeMode="cover" source={require("../assets/ellipse16.png")} />
