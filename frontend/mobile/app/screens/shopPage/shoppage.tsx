@@ -1,6 +1,5 @@
 "use client"
-
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useMemo } from "react"
 import {
   StyleSheet,
   View,
@@ -12,8 +11,8 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import type { StackNavigationProp } from "@react-navigation/stack"
+import { useNavigation, useRoute } from "@react-navigation/native"
+import type { StackNavigationProp, RouteProp } from "@react-navigation/stack"
 import { useCartStore } from "./cartState"
 
 const { width } = Dimensions.get("window")
@@ -23,7 +22,7 @@ const AUTH_TOKEN = "usertoken" // Replace with secure token retrieval logic
 
 type RootStackParamList = {
   HomePage: undefined
-  ShopPage: undefined
+  ShopPage: { products?: Product[] } | undefined
   ProductDetail: { product: Product }
   CartPage: undefined
   ProfilePage: undefined
@@ -69,6 +68,7 @@ const fixS3ImageUrl = (url: string | null): string | null => {
 
 const ShopsPageInfinityScroll = () => {
   const navigation = useNavigation<ShopsPageNavigationProp>()
+  const route = useRoute<RouteProp<RootStackParamList, "ShopPage">>()
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -78,9 +78,51 @@ const ShopsPageInfinityScroll = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [authToken, setAuthToken] = useState<string | null>(AUTH_TOKEN)
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({})
+  const [initialProductsLoaded, setInitialProductsLoaded] = useState(false)
 
   const { items, addItem } = useCartStore()
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0)
+
+  // Filter products based on search query
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return products;
+    
+    return products.filter(product => 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.brand && product.brand.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.retailer?.name && product.retailer.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [products, searchQuery]);
+
+  // Handle products passed from HomePage
+  useEffect(() => {
+    if (route.params?.products && !initialProductsLoaded) {
+      const mappedProducts = route.params.products.map((item: any) => ({
+        id: item._id || item.id,
+        productId: item.productId || "N/A",
+        name: item.name || "Unnamed Product",
+        description: item.description || "",
+        category: item.category || "Uncategorized",
+        color: item.color || "",
+        image: fixS3ImageUrl(item.image_url || item.image),
+        retailerId: item.retailerId || "",
+        retailer: item.retailer || null,
+        createdAt: item.createdAt || "",
+        updatedAt: item.updatedAt || "",
+        price: item.price || 0,
+        sizes: item.sizes || [],
+        brand: item.brand || "Unknown Brand",
+        tag: item.tag || "none",
+        gender: item.gender || "unisex",
+        material: item.material || "unknown",
+      }))
+      setProducts(mappedProducts)
+      setInitialProductsLoaded(true)
+      setIsLoading(false)
+    }
+  }, [route.params?.products, initialProductsLoaded])
 
   const fetchRetailerDetails = async (retailerId: string): Promise<Retailer | null> => {
     if (!retailerId || retailerId.trim() === "") {
@@ -122,7 +164,14 @@ const ShopsPageInfinityScroll = () => {
     }
   }
 
-  const fetchProducts = async (pageNum: number, retryCount = 0) => {
+  const fetchProducts = async (pageNum: number, retryCount = 0): Promise<boolean> => {
+    // Don't fetch if search is active
+    if (searchQuery.trim() !== "") {
+      setIsLoading(false)
+      setIsRefreshing(false)
+      return false
+    }
+    
     if (retryCount === 0) setIsLoading(true)
     setError(null)
     try {
@@ -187,8 +236,8 @@ const ShopsPageInfinityScroll = () => {
       console.error("Fetch error:", error)
       if (retryCount < 3) {
         console.log(`Retrying fetch (attempt ${retryCount + 1})...`)
-        setTimeout(() => fetchProducts(pageNum, retryCount + 1), 1000 * (retryCount + 1))
-        return false
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)))
+        return fetchProducts(pageNum, retryCount + 1)
       }
       setError(error instanceof Error ? error.message : "Failed to fetch products")
       return false
@@ -200,18 +249,38 @@ const ShopsPageInfinityScroll = () => {
     }
   }
 
+  // Fetch products only if no initial products were passed from HomePage
+  // and no search query is active
   useEffect(() => {
-    fetchProducts(page)
-  }, [page])
+    if (!initialProductsLoaded && searchQuery.trim() === "") {
+      fetchProducts(page)
+    }
+  }, [page, initialProductsLoaded, searchQuery])
+
+  // Reset search when clearing the search field
+  useEffect(() => {
+    if (searchQuery.trim() === "" && products.length === 0 && !isLoading) {
+      // If search is cleared and we have no products, fetch them
+      setPage(1)
+      fetchProducts(1)
+    }
+  }, [searchQuery, products.length, isLoading])
 
   const handleRefresh = () => {
-    setIsRefreshing(true)
-    setPage(1)
-    fetchProducts(1)
+    if (searchQuery.trim() !== "") {
+      // Just clear search when refreshing during search
+      setSearchQuery("")
+    } else {
+      setIsRefreshing(true)
+      setPage(1)
+      setInitialProductsLoaded(false) // Reset to allow fetching new products
+      fetchProducts(1)
+    }
   }
 
   const loadMoreProducts = () => {
-    if (page < totalPages && !isLoading) {
+    // Only load more if no search is active
+    if (page < totalPages && !isLoading && !initialProductsLoaded && searchQuery.trim() === "") {
       setPage((prevPage) => prevPage + 1)
     }
   }
@@ -292,10 +361,9 @@ const ShopsPageInfinityScroll = () => {
     },
     [navigation, addItem, imageLoadErrors]
   )
-
   const renderItem = useCallback(({ item }: { item: Product }) => <ProductCard item={item} />, [ProductCard])
 
-  if (isLoading && page === 1) {
+  if (isLoading && page === 1 && !initialProductsLoaded && searchQuery.trim() === "") {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#F97C7C" />
@@ -304,23 +372,12 @@ const ShopsPageInfinityScroll = () => {
     )
   }
 
-  if (error && products.length === 0) {
+  if (error && products.length === 0 && searchQuery.trim() === "") {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error}</Text>
         <Pressable style={styles.retryButton} onPress={() => fetchProducts(1)}>
           <Text style={styles.retryButtonText}>Retry</Text>
-        </Pressable>
-      </View>
-    )
-  }
-
-  if (products.length === 0 && !isLoading) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text>No products found.</Text>
-        <Pressable style={styles.retryButton} onPress={() => fetchProducts(1)}>
-          <Text style={styles.retryButtonText}>Refresh</Text>
         </Pressable>
       </View>
     )
@@ -343,25 +400,37 @@ const ShopsPageInfinityScroll = () => {
           onChangeText={setSearchQuery}
         />
       </View>
-      <Image
-        style={styles.bannerImage}
-        resizeMode="cover"
-        source={require("../../assets/Rectangle41.png")}
-      />
+      {searchQuery.trim() === "" && (
+        <Image
+          style={styles.bannerImage}
+          resizeMode="cover"
+          source={require("../../assets/Rectangle41.png")}
+        />
+      )}
       <FlatList
-        data={products}
+        data={filteredProducts}
         renderItem={renderItem}
         keyExtractor={(item, index) => `${item.id}-${index}`}
         numColumns={2}
-        contentContainerStyle={styles.productGrid}
+        contentContainerStyle={[
+          styles.productGrid,
+          searchQuery.trim() !== "" && styles.searchResultsGrid
+        ]}
         columnWrapperStyle={styles.columnWrapper}
         onEndReached={loadMoreProducts}
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
         onRefresh={handleRefresh}
         ListFooterComponent={
-          isLoading && page > 1 ? (
+          isLoading && page > 1 && !initialProductsLoaded && searchQuery.trim() === "" ? (
             <ActivityIndicator size="small" color="#F97C7C" style={styles.footerLoader} />
+          ) : null
+        }
+        ListEmptyComponent={
+          searchQuery.trim() !== "" ? (
+            <View style={styles.emptyResultsContainer}>
+              <Text style={styles.emptyResultsText}>No products found matching "{searchQuery}"</Text>
+            </View>
           ) : null
         }
       />
@@ -440,11 +509,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   retryButton: {
     backgroundColor: "#F97C7C",
     paddingHorizontal: 20,
@@ -501,6 +565,9 @@ const styles = StyleSheet.create({
   productGrid: {
     paddingHorizontal: 10,
     paddingBottom: 120,
+  },
+  searchResultsGrid: {
+    paddingTop: 20,
   },
   columnWrapper: {
     justifyContent: "space-between",
@@ -656,6 +723,18 @@ const styles = StyleSheet.create({
   },
   footerLoader: {
     marginVertical: 20,
+  },
+  emptyResultsContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 50,
+  },
+  emptyResultsText: {
+    fontFamily: "Inter-Medium",
+    fontSize: 16,
+    color: "#321919",
+    textAlign: "center",
   },
 })
 
