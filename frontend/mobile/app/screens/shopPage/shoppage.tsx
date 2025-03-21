@@ -71,7 +71,7 @@ const ShopsPageInfinityScroll = () => {
   const route = useRoute<RouteProp<RootStackParamList, "ShopPage">>()
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -85,7 +85,7 @@ const ShopsPageInfinityScroll = () => {
 
   // Filter products based on search query
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
+    if (!searchQuery.trim()) return products
     
     return products.filter(product => 
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -93,12 +93,13 @@ const ShopsPageInfinityScroll = () => {
       (product.brand && product.brand.toLowerCase().includes(searchQuery.toLowerCase())) ||
       product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (product.retailer?.name && product.retailer.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  }, [products, searchQuery]);
+    )
+  }, [products, searchQuery])
 
-  // Handle products passed from HomePage
+  // Handle products passed from HomePage or CameraScreen
   useEffect(() => {
     if (route.params?.products && !initialProductsLoaded) {
+      // Only set search-similar products when explicitly passed
       const mappedProducts = route.params.products.map((item: any) => ({
         id: item._id || item.id,
         productId: item.productId || "N/A",
@@ -123,6 +124,13 @@ const ShopsPageInfinityScroll = () => {
       setIsLoading(false)
     }
   }, [route.params?.products, initialProductsLoaded])
+
+  // Fetch all products only on direct navigation (not from search-similar)
+  useEffect(() => {
+    if (!route.params?.products && !initialProductsLoaded && products.length === 0) {
+      fetchProducts(1)
+    }
+  }, [route.params?.products, initialProductsLoaded, products.length])
 
   const fetchRetailerDetails = async (retailerId: string): Promise<Retailer | null> => {
     if (!retailerId || retailerId.trim() === "") {
@@ -165,13 +173,6 @@ const ShopsPageInfinityScroll = () => {
   }
 
   const fetchProducts = async (pageNum: number, retryCount = 0): Promise<boolean> => {
-    // Don't fetch if search is active
-    if (searchQuery.trim() !== "") {
-      setIsLoading(false)
-      setIsRefreshing(false)
-      return false
-    }
-    
     if (retryCount === 0) setIsLoading(true)
     setError(null)
     try {
@@ -249,39 +250,18 @@ const ShopsPageInfinityScroll = () => {
     }
   }
 
-  // Fetch products only if no initial products were passed from HomePage
-  // and no search query is active
-  useEffect(() => {
-    if (!initialProductsLoaded && searchQuery.trim() === "") {
-      fetchProducts(page)
-    }
-  }, [page, initialProductsLoaded, searchQuery])
-
-  // Reset search when clearing the search field
-  useEffect(() => {
-    if (searchQuery.trim() === "" && products.length === 0 && !isLoading) {
-      // If search is cleared and we have no products, fetch them
-      setPage(1)
-      fetchProducts(1)
-    }
-  }, [searchQuery, products.length, isLoading])
-
   const handleRefresh = () => {
-    if (searchQuery.trim() !== "") {
-      // Just clear search when refreshing during search
-      setSearchQuery("")
-    } else {
-      setIsRefreshing(true)
-      setPage(1)
-      setInitialProductsLoaded(false) // Reset to allow fetching new products
-      fetchProducts(1)
-    }
+    setIsRefreshing(true)
+    setPage(1)
+    setSearchQuery("")
+    setInitialProductsLoaded(false) // Reset to allow fetching full product list
+    fetchProducts(1)
   }
 
   const loadMoreProducts = () => {
-    // Only load more if no search is active
     if (page < totalPages && !isLoading && !initialProductsLoaded && searchQuery.trim() === "") {
       setPage((prevPage) => prevPage + 1)
+      fetchProducts(page + 1)
     }
   }
 
@@ -361,6 +341,7 @@ const ShopsPageInfinityScroll = () => {
     },
     [navigation, addItem, imageLoadErrors]
   )
+
   const renderItem = useCallback(({ item }: { item: Product }) => <ProductCard item={item} />, [ProductCard])
 
   if (isLoading && page === 1 && !initialProductsLoaded && searchQuery.trim() === "") {
@@ -414,7 +395,7 @@ const ShopsPageInfinityScroll = () => {
         numColumns={2}
         contentContainerStyle={[
           styles.productGrid,
-          searchQuery.trim() !== "" && styles.searchResultsGrid
+          searchQuery.trim() !== "" && styles.searchResultsGrid,
         ]}
         columnWrapperStyle={styles.columnWrapper}
         onEndReached={loadMoreProducts}
@@ -430,6 +411,10 @@ const ShopsPageInfinityScroll = () => {
           searchQuery.trim() !== "" ? (
             <View style={styles.emptyResultsContainer}>
               <Text style={styles.emptyResultsText}>No products found matching "{searchQuery}"</Text>
+            </View>
+          ) : products.length === 0 && !isLoading ? (
+            <View style={styles.emptyResultsContainer}>
+              <Text style={styles.emptyResultsText}>No products available</Text>
             </View>
           ) : null
         }
