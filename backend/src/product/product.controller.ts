@@ -1,3 +1,5 @@
+
+
 import {
   Controller,
   Post,
@@ -24,12 +26,13 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { PaginationDto } from '../common/dtos/pagination.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { RetailerGuard } from 'src/auth/guards/retailer.guard';
+import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @Controller('product')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
+// @UseGuards(JwtAuthGuard)
+// @ApiBearerAuth()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -37,8 +40,8 @@ export class ProductController {
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
   @Post('add')
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
@@ -102,3 +105,4 @@ export class ProductController {
     return this.productService.searchSimilarProducts(file);
   }
 }
+

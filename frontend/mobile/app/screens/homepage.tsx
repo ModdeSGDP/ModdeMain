@@ -1,5 +1,5 @@
+// HomePage.tsx
 "use client"
-
 import { useState, useEffect } from "react"
 import {
   View,
@@ -24,14 +24,13 @@ type RootStackParamList = {
   Home: { products?: any[] } | undefined
   Camera: { capturedImage?: string } | undefined
   NotificationPage: undefined
-  ShopPage: undefined
+  ShopPage: { products?: Product[] } | undefined // Updated to pass products
   CartPage: undefined
   ProfilePage: undefined
   Login: undefined
   OrdersPage: { newOrder?: any; deleteAll?: boolean } | undefined
 }
 
-// Define types for Product and Order
 interface Product {
   _id?: string
   name?: string
@@ -50,16 +49,14 @@ interface Order {
 
 const { width } = Dimensions.get("window")
 
-// SideMenu Component
+// SideMenu Component (unchanged)
 interface SideMenuProps {
   orderCount: number
 }
-
 const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [animation] = useState(new Animated.Value(0))
-
   useEffect(() => {
     Animated.timing(animation, {
       toValue: 1,
@@ -68,7 +65,6 @@ const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
       useNativeDriver: true,
     }).start()
   }, [animation])
-
   const menuItems = [
     { name: "OrdersPage", label: "My Orders", icon: require("../assets/truck.png") },
     { name: "Favorites", label: "Favorites", icon: require("../assets/heart.png") },
@@ -76,7 +72,6 @@ const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
     { name: "PromotionPage", label: "Promotions", icon: require("../assets/fire.png") },
     { name: "Camera", label: "Camera", icon: require("../assets/camera-photo.png") },
   ]
-
   const NavigationItem: React.FC<{ name: string; label: string; icon: any; index: number }> = ({
     name,
     label,
@@ -87,7 +82,6 @@ const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
       inputRange: [0, 1],
       outputRange: [50, 0],
     })
-
     return (
       <Animated.View
         style={{
@@ -120,7 +114,6 @@ const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
       </Animated.View>
     )
   }
-
   return (
     <LinearGradient colors={["#fff8f8", "#fff"]} style={sideStyles.sideMenu}>
       <Image style={sideStyles.background} source={require("../assets/Ellipse1.png")} />
@@ -255,7 +248,6 @@ const sideStyles = StyleSheet.create({
   },
 })
 
-// HomePage Component
 const HomePage = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "Home" | "Camera">>()
@@ -266,7 +258,6 @@ const HomePage = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<Order[]>([])
 
-  // Load orders from AsyncStorage
   useEffect(() => {
     const loadOrders = async () => {
       const storedOrders = await getData("orders")
@@ -286,15 +277,6 @@ const HomePage = () => {
       uploadImage(route.params.capturedImage)
     }
   }, [route.params?.capturedImage])
-
-  useEffect(() => {
-    if (route.params?.products) {
-      console.log("Received products:", route.params.products)
-      setProducts(route.params.products)
-      setUploadedImage(null)
-      setUploadProgress(0)
-    }
-  }, [route.params?.products])
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -340,21 +322,18 @@ const HomePage = () => {
       Alert.alert("No image", "Please select an image first.")
       return
     }
-
     const formData = new FormData()
     formData.append("file", {
       uri: imageUri,
       name: "image.jpg",
       type: "image/jpeg",
     } as any)
-
     try {
       setUploadProgress(10)
       const response = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/product/search-similar", {
         method: "POST",
         body: formData,
       })
-
       if (!response.ok) {
         const responseText = await response.text()
         let errorMessage = "Upload failed"
@@ -366,10 +345,12 @@ const HomePage = () => {
         }
         throw new Error(errorMessage)
       }
-
       setUploadProgress(100)
-      const products: Product[] = await response.json()
-      navigation.navigate("Home", { products })
+      const productsData = await response.json()
+      // Navigate to ShopPage with the returned products
+      navigation.navigate("ShopPage", { products: productsData })
+      setUploadedImage(null) // Reset uploaded image
+      setUploadProgress(0) // Reset progress
     } catch (error) {
       const err = error as Error
       console.error("Upload error:", err)
@@ -403,7 +384,6 @@ const HomePage = () => {
       </View>
     )
   }
-
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <View style={styles.homePage}>
@@ -417,9 +397,7 @@ const HomePage = () => {
             <Image style={styles.bell} source={require("../assets/bell.png")} />
           </Pressable>
         </View>
-
-        <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/Rectangle23.png")} />
-
+        <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/homepic.jpeg")} />
         <View style={[styles.mainButtons, styles.buttonPosition]}>
           <Pressable style={styles.uploadButton} onPress={handleUploadImage}>
             <Image style={styles.buttonBg} resizeMode="cover" source={require("../assets/ellipse16.png")} />
@@ -437,7 +415,6 @@ const HomePage = () => {
             <Image style={styles.arrowIcon} resizeMode="cover" source={require("../assets/chevron-left1.png")} />
           </Pressable>
         </View>
-
         {uploadedImage && (
           <View style={styles.uploadingBar}>
             <View style={styles.uploadingBarBg} />
@@ -445,16 +422,6 @@ const HomePage = () => {
             <Image style={styles.fileIcon} resizeMode="cover" source={{ uri: uploadedImage }} />
             <Text style={styles.uploadingText}>Uploading</Text>
             <Text style={styles.percentageText}>{`${uploadProgress}%`}</Text>
-          </View>
-        )}
-        {products.length > 0 && (
-          <View style={styles.productsContainer}>
-            <Text style={styles.productsTitle}>Similar Products Found:</Text>
-            {products.map((product, index) => (
-              <Text key={index} style={styles.productItem}>
-                {product.name || `Product ${index + 1}`}
-              </Text>
-            ))}
           </View>
         )}
         <View style={styles.navigationBar}>
@@ -489,7 +456,6 @@ const HomePage = () => {
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -561,7 +527,7 @@ const styles = StyleSheet.create({
     top: 0,
   },
   menuButton: {
-    position: "relative", // Added to position the badge relative to the button
+    position: "relative",
   },
   menuIcon: {
     width: 30,
@@ -571,8 +537,8 @@ const styles = StyleSheet.create({
   },
   menuBadge: {
     position: "absolute",
-    top: -5, // Adjust position as needed
-    right: 305, // Adjust based on your layout
+    top: -5,
+    right: 305,
     width: 10,
     height: 10,
     backgroundColor: "#ff4d4d",
@@ -764,32 +730,6 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: "#fba3a3",
-  },
-  productsContainer: {
-    position: "absolute",
-    top: 200,
-    left: 20,
-    right: 20,
-    padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  productsTitle: {
-    fontSize: 16,
-    fontFamily: "Inter-SemiBold",
-    color: "#321919",
-    marginBottom: 10,
-  },
-  productItem: {
-    fontSize: 14,
-    fontFamily: "Inter-Regular",
-    color: "#321919",
-    marginBottom: 5,
   },
 })
 
