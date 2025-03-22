@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native"
 import { useAsyncStorage } from "../AsyncStorage/useAsyncStorage" // Adjust path as needed
 import { LinearGradient } from "expo-linear-gradient"
 import type { StackNavigationProp } from "@react-navigation/stack"
+import { Ionicons } from "@expo/vector-icons" // Added Ionicons import
 
 type RootStackParamList = {
   Login: undefined
@@ -79,7 +80,7 @@ const Profile: React.FC = () => {
   const handleEdit = async () => {
     if (isEditing) {
       // Save changes to AsyncStorage
-      await storeData("userData", profileData) // No need to stringify here, useAsyncStorage does it
+      await storeData("userData", profileData)
       console.log("Saving changes:", profileData)
     }
     setIsEditing(!isEditing)
@@ -105,7 +106,7 @@ const Profile: React.FC = () => {
   if (isLoading) {
     return (
       <View style={styles.profile}>
-        <Text>Loading profile...</Text>
+        <Text>Loading profile...</Text> {/* Wrapped in Text component */}
       </View>
     )
   }
@@ -117,7 +118,7 @@ const Profile: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButtonContainer} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-          <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
+          <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
 
         <Text style={styles.profileTitle}>My Profile</Text>
@@ -286,16 +287,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
+    paddingVertical: 12,
     paddingTop: Platform.OS === "ios" ? 50 : 20,
-    paddingBottom: 10,
   },
   backButtonContainer: {
     width: 40,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 226, 230, 0.5)",
   },
   backButton: {
     width: 24,
@@ -312,12 +311,10 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 20,
-    backgroundColor: "rgba(255, 226, 230, 0.5)",
   },
   bell: {
-    width: 20,
-    height: 20,
+    width: 22,
+    height: 24,
   },
   profileOptions: {
     paddingHorizontal: 20,
