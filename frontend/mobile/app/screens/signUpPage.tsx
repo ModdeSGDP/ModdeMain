@@ -96,11 +96,9 @@ const SignupPage: React.FC = () => {
       const data = await response.json()
 
       if (response.ok) {
-        console.log("Received token:", data.token) // Debug token
+        console.log("Received token:", data.token)
         await storeData("userToken", data.token)
         await storeData("userData", userData)
-        
-        // Navigate to RegistrationComplete page instead of ProfilePage
         navigation.navigate("Registration")
       } else {
         Alert.alert("Error", data.message || "Signup failed. Please try again.")
@@ -110,6 +108,7 @@ const SignupPage: React.FC = () => {
       Alert.alert("Error", "Something went wrong. Please try again.")
     }
   }
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <LinearGradient colors={["#fff8f8", "#fff"]} style={styles.background} />
@@ -209,13 +208,17 @@ const SignupPage: React.FC = () => {
                   style={styles.input}
                   placeholder="Minimum 8 characters"
                   placeholderTextColor="#aaa"
-                  secureTextEntry={!showPassword}
+                  secureTextEntry={!showPassword} // Password hidden when showPassword is false
                   value={password}
                   onChangeText={setPassword}
                   autoCapitalize="none"
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIconWrapper}>
-                  <MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={24} color="#aaa" />
+                  <MaterialCommunityIcons
+                    name={showPassword ? "eye" : "eye-off"} // "eye" when visible, "eye-off" when hidden
+                    size={24}
+                    color="#aaa"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -227,7 +230,7 @@ const SignupPage: React.FC = () => {
                   style={styles.input}
                   placeholder="Re-enter your password"
                   placeholderTextColor="#aaa"
-                  secureTextEntry={!showConfirmPassword}
+                  secureTextEntry={!showConfirmPassword} // Confirm password hidden when showConfirmPassword is false
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   autoCapitalize="none"
@@ -236,7 +239,11 @@ const SignupPage: React.FC = () => {
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={styles.eyeIconWrapper}
                 >
-                  <MaterialCommunityIcons name={showConfirmPassword ? "eye-off" : "eye"} size={24} color="#aaa" />
+                  <MaterialCommunityIcons
+                    name={showConfirmPassword ? "eye" : "eye-off"} // "eye" when visible, "eye-off" when hidden
+                    size={24}
+                    color="#aaa"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -285,7 +292,6 @@ const styles = StyleSheet.create({
     left: -100,
     width: 619,
     height: 350,
-    opacity: 0.7,
   },
   backgroundDecoration2: {
     position: "absolute",
@@ -293,7 +299,6 @@ const styles = StyleSheet.create({
     right: -100,
     width: 450,
     height: 470,
-    opacity: 0.7,
   },
   scrollContainer: {
     flexGrow: 1,
