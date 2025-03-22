@@ -10,10 +10,12 @@ import {
   FlatList,
   Dimensions,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import type { StackNavigationProp, RouteProp } from "@react-navigation/stack"
 import { useCartStore } from "./cartState"
+import { Ionicons } from "@expo/vector-icons"
 
 const { width } = Dimensions.get("window")
 
@@ -27,6 +29,7 @@ type RootStackParamList = {
   CartPage: undefined
   ProfilePage: undefined
   Camera: undefined
+  NotificationPage: undefined
 }
 
 type ShopsPageNavigationProp = StackNavigationProp<RootStackParamList, "ShopPage">
@@ -83,7 +86,6 @@ const ShopsPageInfinityScroll = () => {
   const { items, addItem } = useCartStore()
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0)
 
-  // Filter products based on search query
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return products
     
@@ -96,10 +98,8 @@ const ShopsPageInfinityScroll = () => {
     )
   }, [products, searchQuery])
 
-  // Handle products passed from HomePage or CameraScreen
   useEffect(() => {
     if (route.params?.products && !initialProductsLoaded) {
-      // Only set search-similar products when explicitly passed
       const mappedProducts = route.params.products.map((item: any) => ({
         id: item._id || item.id,
         productId: item.productId || "N/A",
@@ -125,7 +125,6 @@ const ShopsPageInfinityScroll = () => {
     }
   }, [route.params?.products, initialProductsLoaded])
 
-  // Fetch all products only on direct navigation (not from search-similar)
   useEffect(() => {
     if (!route.params?.products && !initialProductsLoaded && products.length === 0) {
       fetchProducts(1)
@@ -133,14 +132,9 @@ const ShopsPageInfinityScroll = () => {
   }, [route.params?.products, initialProductsLoaded, products.length])
 
   const fetchRetailerDetails = async (retailerId: string): Promise<Retailer | null> => {
-    if (!retailerId || retailerId.trim() === "") {
-      return null
-    }
+    if (!retailerId || retailerId.trim() === "") return null
     try {
-      if (!authToken) {
-        console.log("No auth token available for retailer fetch")
-        return null
-      }
+      if (!authToken) return null
       const response = await fetch(`${API_BASE_URL}/retailers/${retailerId}`, {
         headers: {
           "Accept": "application/json",
@@ -149,15 +143,8 @@ const ShopsPageInfinityScroll = () => {
         },
       })
       if (!response.ok) {
-        if (response.status === 401) {
-          console.log(`Authentication failed for retailer ${retailerId}`)
-          setAuthToken(null)
-          return null
-        } else if (response.status === 404) {
-          console.log(`Retailer ${retailerId} not found`)
-          return null
-        }
-        throw new Error(`Failed to fetch retailer details: ${response.status}`)
+        if (response.status === 401) setAuthToken(null)
+        return null
       }
       const retailerData = await response.json()
       return {
@@ -177,7 +164,6 @@ const ShopsPageInfinityScroll = () => {
     setError(null)
     try {
       const API_ENDPOINT = `${API_BASE_URL}/product?page=${pageNum}&limit=10`
-      console.log("Fetching products from:", API_ENDPOINT)
       const headers: Record<string, string> = {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -187,7 +173,6 @@ const ShopsPageInfinityScroll = () => {
       const response = await fetch(API_ENDPOINT, { headers })
       if (!response.ok) {
         if (response.status === 401) {
-          console.log("Authentication failed for product fetch")
           setAuthToken(null)
           throw new Error("Authentication failed. Please log in again.")
         }
@@ -195,9 +180,9 @@ const ShopsPageInfinityScroll = () => {
       }
 
       const result = await response.json()
-      console.log("API Response received:", result)
-
-      const productsArray = result.products || []
+      console.log("API Response:", result)
+      
+      const productsArray = Array.isArray(result) ? result : result.products || []
       setTotalPages(result.totalPages || 1)
 
       const mappedProducts = await Promise.all(
@@ -206,7 +191,7 @@ const ShopsPageInfinityScroll = () => {
           const fixedImageUrl = fixS3ImageUrl(item.image)
 
           return {
-            id: item._id,
+            id: item._id || item.id,
             productId: item.productId || "N/A",
             name: item.name || "Unnamed Product",
             description: item.description || "",
@@ -236,7 +221,6 @@ const ShopsPageInfinityScroll = () => {
     } catch (error) {
       console.error("Fetch error:", error)
       if (retryCount < 3) {
-        console.log(`Retrying fetch (attempt ${retryCount + 1})...`)
         await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)))
         return fetchProducts(pageNum, retryCount + 1)
       }
@@ -254,7 +238,7 @@ const ShopsPageInfinityScroll = () => {
     setIsRefreshing(true)
     setPage(1)
     setSearchQuery("")
-    setInitialProductsLoaded(false) // Reset to allow fetching full product list
+    setInitialProductsLoaded(false)
     fetchProducts(1)
   }
 
@@ -290,10 +274,7 @@ const ShopsPageInfinityScroll = () => {
             resizeMode="cover"
             source={imageSource}
             defaultSource={require("../../assets/user.png")}
-            onError={(e) => {
-              console.log("Image load error:", e.nativeEvent.error, "URL:", item.image)
-              handleImageError(item.image)
-            }}
+            onError={() => handleImageError(item.image)}
           />
           <View style={styles.inStockLabel}>
             <Text style={styles.inStockText}>In stock</Text>
@@ -365,117 +346,146 @@ const ShopsPageInfinityScroll = () => {
   }
 
   return (
-    <View style={styles.shopsPageInfinityScroll}>
-      <Pressable style={styles.backButton} onPress={() => navigation.navigate("HomePage")}>
-        <Image
-          style={styles.backButtonIcon}
-          resizeMode="cover"
-          source={require("../../assets/chevron_left.png")}
-        />
-      </Pressable>
-      <View style={styles.searchBar}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search products"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-      {searchQuery.trim() === "" && (
-        <Image
-          style={styles.bannerImage}
-          resizeMode="cover"
-          source={require("../../assets/Rectangle41.png")}
-        />
-      )}
-      <FlatList
-        data={filteredProducts}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
-        numColumns={2}
-        contentContainerStyle={[
-          styles.productGrid,
-          searchQuery.trim() !== "" && styles.searchResultsGrid,
-        ]}
-        columnWrapperStyle={styles.columnWrapper}
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.5}
-        refreshing={isRefreshing}
-        onRefresh={handleRefresh}
-        ListFooterComponent={
-          isLoading && page > 1 && !initialProductsLoaded && searchQuery.trim() === "" ? (
-            <ActivityIndicator size="small" color="#F97C7C" style={styles.footerLoader} />
-          ) : null
-        }
-        ListEmptyComponent={
-          searchQuery.trim() !== "" ? (
-            <View style={styles.emptyResultsContainer}>
-              <Text style={styles.emptyResultsText}>No products found matching "{searchQuery}"</Text>
-            </View>
-          ) : products.length === 0 && !isLoading ? (
-            <View style={styles.emptyResultsContainer}>
-              <Text style={styles.emptyResultsText}>No products available</Text>
-            </View>
-          ) : null
-        }
-      />
-      <View style={styles.navigationBar}>
-        <View style={styles.navBarBg} />
-        <View style={styles.navIcons}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.shopsPageInfinityScroll}>
+        <View style={styles.header}>
           <Pressable onPress={() => navigation.navigate("HomePage")}>
-            <Image
-              style={styles.navIcon}
-              resizeMode="cover"
-              source={require("../../assets/smart_home1.png")}
-            />
+            <Ionicons name="chevron-back" size={24} color="#333" />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate("ShopPage")}>
-            <View style={styles.lineView} />
+          <Text style={styles.headerTitle}>Shop</Text>
+          <Pressable onPress={() => navigation.navigate("NotificationPage")}>
             <Image
-              style={styles.navIcon}
+              style={styles.bellIcon}
               resizeMode="cover"
-              source={require("../../assets/shirt1.png")}
-            />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("Camera")}>
-            <Image
-              style={styles.navIcon}
-              resizeMode="cover"
-              source={require("../../assets/cameraplus.png")}
-            />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("CartPage")}>
-            <View style={styles.cartBadgeContainer}>
-              <Image
-                style={styles.navIcon}
-                resizeMode="cover"
-                source={require("../../assets/shopping_cart.png")}
-              />
-              {totalQuantity > 0 && (
-                <View style={styles.cartBadge}>
-                  <Text style={styles.cartBadgeText}>{totalQuantity}</Text>
-                </View>
-              )}
-            </View>
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
-            <Image
-              style={styles.navIcon}
-              resizeMode="cover"
-              source={require("../../assets/user.png")}
+              source={require("../../assets/bell.png")}
             />
           </Pressable>
         </View>
-        <View style={styles.activeIndicator} />
+
+        <View style={styles.searchBar}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search products"
+            placeholderTextColor="#999"  // Added for better visibility of placeholder
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        {searchQuery.trim() === "" && (
+          <Image
+            style={styles.bannerImage}
+            resizeMode="cover"
+            source={require("../../assets/Rectangle41.png")}
+          />
+        )}
+        <FlatList
+          data={filteredProducts}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          numColumns={2}
+          contentContainerStyle={[
+            styles.productGrid,
+            searchQuery.trim() !== "" && styles.searchResultsGrid,
+          ]}
+          columnWrapperStyle={styles.columnWrapper}
+          onEndReached={loadMoreProducts}
+          onEndReachedThreshold={0.5}
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          ListFooterComponent={
+            isLoading && page > 1 && !initialProductsLoaded && searchQuery.trim() === "" ? (
+              <ActivityIndicator size="small" color="#F97C7C" style={styles.footerLoader} />
+            ) : null
+          }
+          ListEmptyComponent={
+            searchQuery.trim() !== "" ? (
+              <View style={styles.emptyResultsContainer}>
+                <Text style={styles.emptyResultsText}>No products found matching "{searchQuery}"</Text>
+              </View>
+            ) : products.length === 0 && !isLoading ? (
+              <View style={styles.emptyResultsContainer}>
+                <Text style={styles.emptyResultsText}>No products available</Text>
+              </View>
+            ) : null
+          }
+        />
+        <View style={styles.navigationBar}>
+          <View style={styles.navBarBg} />
+          <View style={styles.navIcons}>
+            <Pressable onPress={() => navigation.navigate("HomePage")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/smart_home1.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ShopPage")}>
+              <View style={styles.lineView} />
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/shirt1.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("Camera")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/cameraplus.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("CartPage")}>
+              <View style={styles.cartBadgeContainer}>
+                <Image
+                  style={styles.navIcon}
+                  resizeMode="cover"
+                  source={require("../../assets/shopping_cart.png")}
+                />
+                {totalQuantity > 0 && (
+                  <View style={styles.cartBadge}>
+                    <Text style={styles.cartBadgeText}>{totalQuantity}</Text>
+                  </View>
+                )}
+              </View>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ProfilePage")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/user.png")}
+              />
+            </Pressable>
+          </View>
+          <View style={styles.activeIndicator} />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  shopsPageInfinityScroll: {
+  container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  shopsPageInfinityScroll: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  bellIcon: {
+    width: 22,
+    height: 24,
   },
   loadingContainer: {
     flex: 1,
@@ -505,17 +515,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  backButton: {
-    position: "absolute",
-    top: 15,
-    left: 10,
-    zIndex: 1,
-  },
-  backButtonIcon: {
-    width: 37,
-    height: 27,
-    top: 12,
-  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -525,8 +524,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
     margin: 10,
-    marginTop: 5,
-    top: 10,
     padding: 6,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -539,6 +536,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold",
     fontSize: 14,
     color: "#321919",
+    fontStyle: "italic", // Added to make input text italic
   },
   bannerImage: {
     width: "80%",

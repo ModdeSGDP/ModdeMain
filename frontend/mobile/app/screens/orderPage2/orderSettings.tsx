@@ -1,7 +1,8 @@
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { useState } from "react";
-import { Text, StyleSheet, View, Image, Pressable, Switch } from "react-native";
+import { Text, StyleSheet, View, Image, Pressable, Switch, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons"; // Added for chevron-back
 
 // Define RootStackParamList for type safety
 type RootStackParamList = {
@@ -33,98 +34,85 @@ const OrderSettings = () => {
   };
 
   return (
-    <View style={styles.orderSettings}>
-      <View style={[styles.top, styles.topPosition]}>
-        <View style={styles.statusbar}>
-          <View style={[styles.leftSide, styles.sideFlexBox]}></View>
-          <View style={[styles.dynamicIsland, styles.sideFlexBox]} />
-          <View style={[styles.rightSide, styles.sideFlexBox]}></View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.orderSettings}>
+        {/* Updated Header */}
+        <View style={styles.header}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons name="chevron-back" size={24} color="#333" />
+          </Pressable>
+          <Text style={styles.orderSettings1}>Order Settings</Text>
+          <Pressable onPress={() => navigation.navigate("NotificationPage")}>
+            <Image style={styles.bell} resizeMode="cover" source={require("../../assets/bell.png")} />
+          </Pressable>
         </View>
-      </View>
-      <View style={styles.groupParent}>
-        <Pressable style={styles.pressable} onPress={() => navigation.goBack()}>
-          <Image style={styles.backButton} resizeMode="cover" source={require("../../assets/chevron_left.png")} />
-        </Pressable>
-        <Text style={styles.orderSettings1}>Order Settings</Text>
-      </View>
-      <Pressable style={styles.pressable} onPress={() => navigation.navigate("NotificationPage")}>
-        <Image style={styles.bell} resizeMode="cover" source={require("../../assets/bell.png")} />
-      </Pressable>
-      <View style={[styles.orderSettingsChild, styles.orderLayout]} />
-      <Text style={[styles.allowOrdersNotifications, styles.deleteAllMessagesTypo]}>Allow Orders notifications</Text>
-      <Switch
-        style={styles.notificationSwitch}
-        value={allowNotifications}
-        onValueChange={toggleNotifications}
-        trackColor={{ false: "#767577", true: "#2ecc71" }}
-        thumbColor={allowNotifications ? "#f4f3f4" : "#f4f3f4"}
-      />
-      <Text style={[styles.ifTurnedOff, styles.ifTurnedOffPosition]}>
-        If turned off, you will no longer see how many unread Orders messages you have
-      </Text>
-      <View style={[styles.orderSettingsItem, styles.orderLayout]} />
-      <Pressable onPress={deleteAllMessages} style={styles.deleteAllMessagesButton}>
-        <Text style={[styles.deleteAllMessages, styles.ifTurnedOffPosition]}>Delete all messages</Text>
-        <Image style={styles.trashBinIcon} resizeMode="cover" source={require("../../assets/trash-bin.png")} />
-      </Pressable>
 
-      <View style={styles.navigationBar}>
-        <View style={styles.navBarBg} />
-        <View style={styles.navIcons}>
-          <Pressable onPress={() => navigation.navigate("HomePage")} style={styles.navItem}>
-            <View style={styles.lineView} />
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ShopPage")} style={styles.navItem}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
-          </Pressable>
-          <Pressable onPress={() => {}} style={styles.navItem}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("CartPage")} style={styles.navItem}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ProfilePage")} style={styles.navItem}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
-          </Pressable>
+        <View style={[styles.orderSettingsChild, styles.orderLayout]} />
+        <Text style={[styles.allowOrdersNotifications, styles.deleteAllMessagesTypo]}>
+          Allow Orders notifications
+        </Text>
+        <Switch
+          style={styles.notificationSwitch}
+          value={allowNotifications}
+          onValueChange={toggleNotifications}
+          trackColor={{ false: "#767577", true: "#2ecc71" }}
+          thumbColor={allowNotifications ? "#f4f3f4" : "#f4f3f4"}
+        />
+        <Text style={[styles.ifTurnedOff, styles.ifTurnedOffPosition]}>
+          If turned off, you will no longer see how many unread Orders messages you have
+        </Text>
+        <View style={[styles.orderSettingsItem, styles.orderLayout]} />
+        <Pressable onPress={deleteAllMessages} style={styles.deleteAllMessagesButton}>
+          <Text style={[styles.deleteAllMessages, styles.ifTurnedOffPosition]}>Delete all messages</Text>
+          <Image style={styles.trashBinIcon} resizeMode="cover" source={require("../../assets/trash-bin.png")} />
+        </Pressable>
+
+        <View style={styles.navigationBar}>
+          <View style={styles.navBarBg} />
+          <View style={styles.navIcons}>
+            <Pressable onPress={() => navigation.navigate("HomePage")} style={styles.navItem}>
+              <View style={styles.lineView} />
+              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home.png")} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ShopPage")} style={styles.navItem}>
+              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
+            </Pressable>
+            <Pressable onPress={() => {}} style={styles.navItem}>
+              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("CartPage")} style={styles.navItem}>
+              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ProfilePage")} style={styles.navItem}>
+              <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
+            </Pressable>
+          </View>
+          <View style={styles.activeIndicator} />
         </View>
-        <View style={styles.activeIndicator} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  topPosition: {
-    left: 0,
-    width: 375,
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  orderSettings: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   navItem: {},
-  headerIcon: {
-    width: 24,
-    height: 24,
-  },
-  backButton: {
-    width: 32,
-    height: 32,
-    position: "absolute",
-    bottom: 80,
-    right: 290,
-  },
   bell: {
     width: 22,
     height: 24,
-    position: "absolute",
-    top: -50,
-    right: -50,
-  },
-  sideFlexBox: {
-    alignSelf: "stretch",
-    alignItems: "center",
-  },
-  timeLayout: {
-    height: 20,
-    position: "absolute",
   },
   orderLayout: {
     height: 60,
@@ -143,89 +131,13 @@ const styles = StyleSheet.create({
     left: 20,
     position: "absolute",
   },
-  barLayout: {
-    height: 69,
-    width: 316,
-    left: "50%",
-    position: "absolute",
-  },
-  time: {
-    fontSize: 17,
-    letterSpacing: 0,
-    fontFamily: "SF Pro Text",
-    textAlign: "center",
-    color: "#000",
-    fontWeight: "600",
-    height: 20,
-    width: 54,
-    left: 0,
-    top: 1,
-  },
-  statusbarTime: {
-    borderRadius: 24,
-    height: 21,
-    width: 54,
-  },
-  leftSide: {
-    justifyContent: "center",
-    flex: 1,
-  },
-  dynamicIsland: {
-    width: 125,
-  },
-  signalWifiBattery: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  rightSide: {
-    justifyContent: "center",
-    flexDirection: "row",
-    flex: 1,
-  },
-  statusbar: {
-    height: 59,
-    alignItems: "flex-end",
-    justifyContent: "center",
-    flexDirection: "row",
-    width: 375,
-  },
-  top: {
-    top: 1,
-    position: "absolute",
-  },
-  homeIndicator1: {
-    marginLeft: -66.5,
-    bottom: 8,
-    borderRadius: 100,
-    backgroundColor: "#000",
-    width: 134,
-    height: 5,
-    left: "50%",
-    position: "absolute",
-  },
-  homeIndicator: {
-    top: 778,
-    height: 34,
-    position: "absolute",
-  },
   orderSettings1: {
     fontFamily: "Inter-SemiBold",
-    width: 140,
-    left: 120,
-    bottom: 40,
     letterSpacing: -0.7,
     fontSize: 18,
     textAlign: "center",
     color: "#000",
     fontWeight: "600",
-  },
-  groupParent: {
-    top: 60,
-    left: 12,
-    gap: 61,
-    alignItems: "center",
-    flexDirection: "row",
-    position: "absolute",
   },
   orderSettingsChild: {
     top: 103,
@@ -243,20 +155,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#000",
     position: "absolute",
-  },
-  orderSettingsInner: {
-    top: 118,
-    left: 313,
-    borderRadius: 60,
-    backgroundColor: "#2ecc71",
-    width: 40,
-  },
-  ellipseIcon: {
-    top: 120,
-    left: 334,
-    position: "absolute",
-    width: 17,
-    height: 16,
   },
   deleteAllMessages: {
     top: 0,
@@ -332,27 +230,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 1,
     top: -20,
-  },
-  text: {
-    fontFamily: "SF Pro",
-    color: "#040502",
-    fontWeight: "500",
-    letterSpacing: -0.7,
-    fontSize: 18,
-    textAlign: "center",
-  },
-  pressable: {
-    left: 329,
-    top: 69,
-    position: "absolute",
-  },
-  orderSettings: {
-    borderRadius: 0,
-    backgroundColor: "#fff",
-    height: 812,
-    overflow: "hidden",
-    width: "100%",
-    flex: 1,
   },
   notificationSwitch: {
     position: "absolute",

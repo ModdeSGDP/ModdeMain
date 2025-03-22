@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Dimensions,
   TextInput,
+  SafeAreaView,
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import type { RouteProp } from "@react-navigation/native"
@@ -45,9 +46,9 @@ type Product = {
   image_id: string
   createdAt: string
   updatedAt: string
-  price?: string // Optional, added for compatibility with your UI
-  sizes?: string[] // Optional, added for compatibility with your UI
-  brand?: string // Optional, will be replaced by retailer name
+  price?: string
+  sizes?: string[]
+  brand?: string
 }
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, "ProductDetail">
@@ -70,10 +71,9 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
 
   const { addItem } = useCartStore()
 
-  const colors = ["black", "white", "gray"] // Customize based on your data if needed
+  const colors = ["black", "white", "gray"]
   const sizes = product.sizes?.length > 0 ? product.sizes : ["XS", "S", "M", "L", "XL", "XXL"]
 
-  // Fetch retailer details
   useEffect(() => {
     const fetchRetailerDetails = async () => {
       if (!product.retailerId) {
@@ -136,155 +136,154 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{product.name}</Text>
-        <TouchableOpacity>
-          <Ionicons name="heart-outline" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
-        {[product.image].map((img, index) => (
-          <Image
-            key={index}
-            source={img && img.startsWith("http") ? { uri: img } : require("../../assets/user.png")}
-            style={styles.productImage}
-            onError={(e) => console.log("Image load error:", e.nativeEvent.error)}
-          />
-        ))}
-      </ScrollView>
-      <View style={styles.productInfo}>
-        <Text style={styles.productTitle}>{product.name}</Text>
-        <Text style={styles.retailerText}>
-          {loadingRetailer ? "Loading retailer..." : retailer?.name || "Retailer Not Specified"}
-        </Text>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>{product.price || "LKR N/A"}</Text>
-          {/* Uncomment if you have original price data */}
-          {/* <Text style={styles.originalPrice}>LKR 4850</Text>
-          <View style={styles.discountBadge}>
-            <Text style={styles.discountText}>10%</Text>
-          </View> */}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{product.name}</Text>
+          <TouchableOpacity>
+            <Ionicons name="heart-outline" size={24} color="black" />
+          </TouchableOpacity>
         </View>
-        <View style={styles.ratingContainer}>
-          <View style={styles.stars}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Ionicons key={star} name="star" size={16} color={star <= 4 ? "#FFD700" : "#D3D3D3"} />
-            ))}
-          </View>
-          <Text style={styles.reviewCount}>(1000+)</Text>
-        </View>
-        <Text style={styles.sectionTitle}>Color</Text>
-        <View style={styles.colorOptions}>
-          {colors.map((color) => (
-            <TouchableOpacity
-              key={color}
-              style={[
-                styles.colorOption,
-                { backgroundColor: color },
-                selectedColor === color && styles.selectedColorOption,
-              ]}
-              onPress={() => setSelectedColor(color)}
+        <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
+          {[product.image].map((img, index) => (
+            <Image
+              key={index}
+              source={img && img.startsWith("http") ? { uri: img } : require("../../assets/user.png")}
+              style={styles.productImage}
+              onError={(e) => console.log("Image load error:", e.nativeEvent.error)}
             />
           ))}
-        </View>
-        <Text style={styles.sectionTitle}>Size</Text>
-        <View style={styles.sizeOptions}>
-          {sizes.map((size) => (
-            <TouchableOpacity
-              key={size}
-              style={[styles.sizeOption, selectedSize === size && styles.selectedSizeOption]}
-              onPress={() => setSelectedSize(size)}
-            >
-              <Text style={[styles.sizeOptionText, selectedSize === size && styles.selectedSizeOptionText]}>
-                {size}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <Text style={styles.sectionTitle}>Quantity</Text>
-        <View style={styles.quantitySelector}>
-          <TouchableOpacity style={styles.quantityButton} onPress={decrementQuantity}>
-            <Text style={styles.quantityButtonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.quantityText}>{quantity}</Text>
-          <TouchableOpacity style={styles.quantityButton} onPress={incrementQuantity}>
-            <Text style={styles.quantityButtonText}>+</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.sectionTitle}>Description</Text>
-        <Text style={styles.description}>{product.description}</Text>
-        <Text style={styles.sectionTitle}>Category</Text>
-        <Text style={styles.description}>{product.category}</Text>
-        <Text style={styles.sectionTitle}>Added On</Text>
-        <Text style={styles.description}>{new Date(product.createdAt).toLocaleDateString()}</Text>
-        <Text style={styles.sectionTitle}>Reviews</Text>
-        <View style={styles.reviewsContainer}>
-          <View style={styles.overallRating}>
-            <Text style={styles.overallRatingText}>4.5</Text>
-            <View style={styles.starsContainer}>
+        </ScrollView>
+        <View style={styles.productInfo}>
+          <Text style={styles.productTitle}>{product.name}</Text>
+          <Text style={styles.retailerText}>
+            {loadingRetailer ? "Loading retailer..." : retailer?.name || "Retailer Not Specified"}
+          </Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>{product.price || "LKR N/A"}</Text>
+          </View>
+          <View style={styles.ratingContainer}>
+            <View style={styles.stars}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <Ionicons key={star} name="star" size={16} color={star <= 4 ? "#FFD700" : "#D3D3D3"} />
               ))}
             </View>
-            <Text style={styles.reviewCount}>Based on 1000+ reviews</Text>
+            <Text style={styles.reviewCount}>(1000+)</Text>
           </View>
-          <TouchableOpacity style={styles.addReviewButton} onPress={() => setShowReviewInput(!showReviewInput)}>
-            <Text style={styles.addReviewButtonText}>{showReviewInput ? "Cancel Review" : "Add Review"}</Text>
-          </TouchableOpacity>
-          {showReviewInput && (
-            <View style={styles.reviewInputContainer}>
-              <Text style={styles.userRatingText}>Your Rating:</Text>
-              <View style={styles.userStarsContainer}>
+          <Text style={styles.sectionTitle}>Color</Text>
+          <View style={styles.colorOptions}>
+            {colors.map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  styles.colorOption,
+                  { backgroundColor: color },
+                  selectedColor === color && styles.selectedColorOption,
+                ]}
+                onPress={() => setSelectedColor(color)}
+              />
+            ))}
+          </View>
+          <Text style={styles.sectionTitle}>Size</Text>
+          <View style={styles.sizeOptions}>
+            {sizes.map((size) => (
+              <TouchableOpacity
+                key={size}
+                style={[styles.sizeOption, selectedSize === size && styles.selectedSizeOption]}
+                onPress={() => setSelectedSize(size)}
+              >
+                <Text style={[styles.sizeOptionText, selectedSize === size && styles.selectedSizeOptionText]}>
+                  {size}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={styles.sectionTitle}>Quantity</Text>
+          <View style={styles.quantitySelector}>
+            <TouchableOpacity style={styles.quantityButton} onPress={decrementQuantity}>
+              <Text style={styles.quantityButtonText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.quantityText}>{quantity}</Text>
+            <TouchableOpacity style={styles.quantityButton} onPress={incrementQuantity}>
+              <Text style={styles.quantityButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.description}>{product.description}</Text>
+          <Text style={styles.sectionTitle}>Category</Text>
+          <Text style={styles.description}>{product.category}</Text>
+          <Text style={styles.sectionTitle}>Added On</Text>
+          <Text style={styles.description}>{new Date(product.createdAt).toLocaleDateString()}</Text>
+          <Text style={styles.sectionTitle}>Reviews</Text>
+          <View style={styles.reviewsContainer}>
+            <View style={styles.overallRating}>
+              <Text style={styles.overallRatingText}>4.5</Text>
+              <View style={styles.starsContainer}>
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <TouchableOpacity key={star} onPress={() => setUserRating(star)}>
-                    <Ionicons name="star" size={32} color={star <= userRating ? "#FFD700" : "#D3D3D3"} />
-                  </TouchableOpacity>
+                  <Ionicons key={star} name="star" size={16} color={star <= 4 ? "#FFD700" : "#D3D3D3"} />
                 ))}
               </View>
-              <TextInput
-                style={styles.reviewInput}
-                multiline
-                numberOfLines={4}
-                placeholder="Write your review here..."
-                value={reviewText}
-                onChangeText={setReviewText}
-              />
-              <TouchableOpacity style={styles.submitReviewButton} onPress={handleSubmitReview}>
-                <Text style={styles.submitReviewButtonText}>Submit Review</Text>
-              </TouchableOpacity>
+              <Text style={styles.reviewCount}>Based on 1000+ reviews</Text>
             </View>
-          )}
-          <View style={styles.reviewList}>
-            <View style={styles.reviewItem}>
-              <View style={styles.reviewHeader}>
-                <Text style={styles.reviewerName}>John Doe</Text>
-                <View style={styles.reviewStars}>
+            <TouchableOpacity style={styles.addReviewButton} onPress={() => setShowReviewInput(!showReviewInput)}>
+              <Text style={styles.addReviewButtonText}>{showReviewInput ? "Cancel Review" : "Add Review"}</Text>
+            </TouchableOpacity>
+            {showReviewInput && (
+              <View style={styles.reviewInputContainer}>
+                <Text style={styles.userRatingText}>Your Rating:</Text>
+                <View style={styles.userStarsContainer}>
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Ionicons key={star} name="star" size={14} color={star <= 4 ? "#FFD700" : "#D3D3D3"} />
+                    <TouchableOpacity key={star} onPress={() => setUserRating(star)}>
+                      <Ionicons name="star" size={32} color={star <= userRating ? "#FFD700" : "#D3D3D3"} />
+                    </TouchableOpacity>
                   ))}
                 </View>
+                <TextInput
+                  style={styles.reviewInput}
+                  multiline
+                  numberOfLines={4}
+                  placeholder="Write your review here..."
+                  value={reviewText}
+                  onChangeText={setReviewText}
+                />
+                <TouchableOpacity style={styles.submitReviewButton} onPress={handleSubmitReview}>
+                  <Text style={styles.submitReviewButtonText}>Submit Review</Text>
+                </TouchableOpacity>
               </View>
-              <Text style={styles.reviewText}>Great product! Very comfortable and stylish. Highly recommended.</Text>
+            )}
+            <View style={styles.reviewList}>
+              <View style={styles.reviewItem}>
+                <View style={styles.reviewHeader}>
+                  <Text style={styles.reviewerName}>John Doe</Text>
+                  <View style={styles.reviewStars}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Ionicons key={star} name="star" size={14} color={star <= 4 ? "#FFD700" : "#D3D3D3"} />
+                    ))}
+                  </View>
+                </View>
+                <Text style={styles.reviewText}>Great product! Very comfortable and stylish. Highly recommended.</Text>
+              </View>
             </View>
           </View>
+          <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
+            <Text style={styles.addToCartButtonText}>Add to Cart</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
-          <Text style={styles.addToCartButtonText}>Add to Cart</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#FFF0F5",
-    paddingTop: 5,
+  },
+  container: {
+    flex: 1,
     paddingBottom: 80,
   },
   header: {
@@ -294,6 +293,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
+    backgroundColor: "#FFF0F5", // Match safe area background
   },
   headerTitle: {
     fontSize: 18,
