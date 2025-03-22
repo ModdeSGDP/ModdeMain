@@ -10,12 +10,14 @@ import { useRouter } from "next/navigation";
 import ProductGallery from "./ProductGallery";
 import { API_POST_ADD_PRODUCTS } from "../constant/apiConstant";
 
+
 const dataURLtoFile = (dataUrl: string, filename: string) => {
   const arr = dataUrl.split(",");
   const mime = arr[0].match(/:(.*?);/)![1];
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
+
 
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
@@ -47,32 +49,10 @@ const ProductUploadForm = () => {
   const [category, setCategory] = useState("All");
   // const [size, setSize] = useState("All");
   const [color, setColor] = useState("#000000");
-  // const [stockQuantity, setStockQuantity] = useState(0);
-  // const [regularPrice, setRegularPrice] = useState(0);
-  // const [salePrice, setSalePrice] = useState(0);
   const [images, setImages] = useState<string[]>([]);
 
-  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (!e.target.files) return;
-  //   const files = Array.from(e.target.files);
-  //   const validTypes = ["image/jpeg", "image/jpg", "image/png"];
 
-  //   files.forEach((file) => {
-  //     if (validTypes.includes(file.type)) {
-  //       const reader = new FileReader();
-  //       reader.onload = () => {
-  //         setImages((prev) => [...prev, reader.result as string]);
-  //       };
-  //       reader.readAsDataURL(file);
-  //     } else {
-  //       alert("Invalid file type. Only JPG, JPEG, and PNG are allowed.");
-  //     }
-  //   });
-  // };
 
-  // const handleRemoveImage = (index: number) => {
-  //   setImages((prev) => prev.filter((_, i) => i !== index));
-  // };
 
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -120,24 +100,20 @@ const ProductUploadForm = () => {
         const responseData = await response.json();
 
         console.log("Product Added Successfully:", responseData);
+        const existingNotifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+
+        const newNotification = {
+          id: Date.now(),
+          message: `New Product Added!\nProduct ID: ${productId}\nProduct Name: ${productName}`,
+        };
+
+        localStorage.setItem("notifications", JSON.stringify([newNotification, ...existingNotifications]));
+        window.dispatchEvent(new Event("storage"));
+
         alert("Product uploaded successfully!");
 
-        // const newProduct = {
-        //   id: responseData.id || Date.now().toString(), // Use backend ID if available
-        //   image: responseData.image || firstImage, // Store image URL if provided by backend
-        //   title: productName,
-        //   category,
-        //   description,
-        //   color,
-        //   retailerId: responseData.retailerId || "65a8f2e24b5e4a001c3d9b21",
-        // };
 
-        // // Retrieve existing products from localStorage
-        // const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
-        // const updatedProducts = [...storedProducts, newProduct];
 
-        // Save updated products in localStorage
-        //localStorage.setItem("products", JSON.stringify(updatedProducts));
 
         // Redirect to product page after adding
         router.push("/Product");
@@ -152,30 +128,7 @@ const ProductUploadForm = () => {
 
 
 
-  // const handleSubmit = (e: { preventDefault: () => void }) => {
-  //   e.preventDefault();
 
-  //   const newProduct = {
-  //     id: Date.now().toString(), // Unique ID for the product
-  //     image: images,
-  //     title: productName,
-  //     category,
-  //     // price: `LKR ${salePrice}`,
-  //     description,
-  //     // salesCount: 0,
-  //     // remainingCount: stockQuantity,
-  //   };
-
-  //   // Retrieve existing products from localStorage
-  //   const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
-  //   const updatedProducts = [...storedProducts, newProduct];
-
-  //   // Save updated products in localStorage
-  //   localStorage.setItem("products", JSON.stringify(updatedProducts));
-
-  //   // Redirect to product page after adding
-  //   router.push("/Product");
-  // };
 
   return (
     <div className="flex flex-col md:flex-row gap-8 p-6">
@@ -190,7 +143,7 @@ const ProductUploadForm = () => {
               id="productName"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
-              maxLength={20}
+              maxLength={40}
               required
             />
           </div>
@@ -229,31 +182,14 @@ const ProductUploadForm = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => setCategory("All")}>All</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setCategory("Unisex")}>Unisex</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => setCategory("Female")}>Female</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => setCategory("Male")}>Male</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
 
-            {/* Size Dropdown */}
-            {/* <div className="flex-1">
-              <Label>Select Size</Label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex items-center justify-between w-full">
-                    {size}
-                    <Image src="/images/chevron_down.svg" alt="Dropdown Icon" width={16} height={16} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => setSize("All")}>All</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setSize("Small")}>Small</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setSize("Medium")}>Medium</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setSize("Extra Large")}>Extra Large</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div> */}
+
           </div>
 
           {/* Color Picker */}
@@ -286,52 +222,28 @@ const ProductUploadForm = () => {
               </div>
             </div>
 
-            {/* Stock Quantity */}
-            {/* <div className="flex-1">
-              <Label htmlFor="stockQuantity">Stock Quantity</Label>
-              <Input
-                id="stockQuantity"
-                type="number"
-                value={stockQuantity}
-                onChange={(e) => setStockQuantity(parseInt(e.target.value))}
-                required
-              />
-            </div> */}
+
           </div>
 
-          {/* Prices */}
-          {/* <div className="flex gap-4">
-            <div>
-              <Label htmlFor="regularPrice">Regular Price</Label>
-              <Input
-                id="regularPrice"
-                type="number"
-                value={regularPrice}
-                onChange={(e) => setRegularPrice(parseInt(e.target.value))}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="salePrice">Sale Price</Label>
-              <Input
-                id="salePrice"
-                type="number"
-                value={salePrice}
-                onChange={(e) => setSalePrice(parseInt(e.target.value))}
-                required
-              />
-            </div>
-          </div> */}
+
+
 
           {/* Submit Button */}
-          <div className="flex gap-4">
-            <Button type="submit" className="w-1/4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full">
+            <Button
+              type="submit"
+              className="w-full sm:w-1/2 bg-black text-white hover:bg-gray-800 transition duration-200">
               Upload Product
             </Button>
-            <Button type="reset" className="w-1/4 border border-red-500 text-red-500 bg-white hover:bg-red-500 hover:text-white transition">
+
+            <Button
+              type="reset"
+              className="w-full sm:w-1/2 border border-red-500 text-red-500 bg-white hover:bg-red-500 hover:text-white transition duration-200">
               Cancel
             </Button>
           </div>
+
+
         </form>
       </Card>
 

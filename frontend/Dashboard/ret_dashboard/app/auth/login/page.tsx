@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import { API_POST_AUTH_LOGIN } from "../../constant/apiConstant";
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 import Image from "next/image";
-// import { toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
+
 
 
 // **Validation Schema**
@@ -30,13 +29,7 @@ const Login = () => {
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
 
-  // const form = useForm({
-  //   resolver: zodResolver(loginSchema),
-  //   defaultValues: {
-  //     email: "",
-  //     password: "",
-  //   },
-  // });
+
 
   const {
     register,
@@ -51,11 +44,7 @@ const Login = () => {
     },
   });
 
-  // const onSubmit = async (data: any) => {
-  //   // console.log("User Logged In:", data);
-  //   // setLoading(true);
-  //   setLoading(true);
-  //   // setError(null);
+
 
   const onSubmit = async (data: FieldValues) => {
     setLoading(true);
@@ -65,7 +54,7 @@ const Login = () => {
       console.log("User Logging In:", data);
 
       const requestData = {
-        email: data.email, // Adjusting field name for backend
+        email: data.email,
         password: data.password,
       };
 
@@ -80,11 +69,7 @@ const Login = () => {
         body: JSON.stringify(requestData)
       });
 
-      // if (!response.ok) {
-      //   console.error("Login failed:", response);
-      //   setLoading(false);
-      //   return;
-      // }
+
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -122,10 +107,7 @@ const Login = () => {
 
       router.push("/Dashboard"); //  Redirect to Dashboard
 
-      // setTimeout(() => {
-      //   localStorage.setItem("authenticated", "true");
-      //   router.push("/Dashboard"); // Redirect to dashboard upon successful login
-      // }, 1500);
+
 
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -140,13 +122,13 @@ const Login = () => {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center  p-6 relative">
+    <div className="flex  flex-col md:flex-row min-h-screen items-center justify-center p-6 relative">
       {/* Logo Positioned at Top Left */}
       <div className="absolute top-0 left-6">
-        <Image src="/images/modde-logo.svg" alt="Modde Logo" width={160} height={40} />
+        <Image src="/images/modde-logo.svg" alt="Modde Logo" width={160} height={40} className="w-32 md:w-40" />
       </div>
 
-      <div className="max-w-3xl w-full  rounded-lg p-8 flex flex-col items-center border border-gray-300 ">
+      <div className="bg-gray-100 max-w-3xl w-full  rounded-lg p-8 flex flex-col items-center border border-gray-300 ">
         <h1 className="text-4xl font-bold text-center">Welcome back!</h1>
         <h2 className="text-gray-600 text-center mb-6">Enter your credentials to access your account</h2>
 
@@ -156,7 +138,7 @@ const Login = () => {
           <div>
             <label className="text-gray-700 font-medium">Email address</label>
             <Input {...register("email")} placeholder="Enter your email" />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}  {/* ✅ Show error message */}
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
 
           {/* Password Input Field with Label and Forgot Password */}
@@ -170,7 +152,7 @@ const Login = () => {
             >
               {showPassword ? <FaEyeSlash /> : <FaRegEye />}
             </button>
-            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}  {/* ✅ Show error message */}
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
             <a href="#" className="absolute right-2 top-0 text-blue-600 text-sm hover:underline">
               Forgot password?
             </a>
@@ -191,20 +173,38 @@ const Login = () => {
 
           {/* Sign Up Redirect */}
           <p className="text-sm text-center mt-4">
-            Don’t have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign Up</a>
+            Don’t have an account? <a href="/signup" className="text-blue-600 hover:underline" >Sign Up</a>
           </p>
         </form>
       </div>
 
-      {/* Right Section - Images Aligned Correctly with Small Gap */}
-      <div className="md:w-1/2 flex justify-center items-start relative">
-        <div className="absolute -top-48 right-5">
-          <Image src="/images/model1.svg" alt="Model 1" width={256} height={320} className="rounded-lg" />
+
+      <div className="hidden md:flex md:w-1/2 justify-center items-start flex-wrap gap-4 mt-[-20px]">
+        {/* Image 1 */}
+        <div className="w-full sm:w-[65%] max-w-[240px]">
+          <Image
+            src="/images/login_new_img2.jpg"
+            alt="Model 1"
+            width={350}
+            height={420}
+            className="rounded-lg w-full h-auto object-cover"
+          />
         </div>
-        <div className="absolute -top-48 left-20">
-          <Image src="/images/model2.svg" alt="Model 2" width={208} height={320} className="rounded-lg" />
+
+        {/* Image 2 */}
+        <div className="w-full sm:w-[45%] max-w-[280px]">
+          <Image
+            src="/images/login_new_img.jpg"
+            alt="Model 2"
+            width={350}
+            height={420}
+            className="rounded-lg w-full h-auto object-cover"
+          />
         </div>
       </div>
+
+
+
     </div>
   );
 };

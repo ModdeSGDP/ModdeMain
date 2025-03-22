@@ -1,23 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Header = () => {
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      const storedNotifications = JSON.parse(localStorage.getItem("notifications") || "[]");
+      setNotificationCount(storedNotifications.length);
+    };
+
+    updateCount(); // Load initially
+    window.addEventListener("storage", updateCount); // Update on change
+
+    return () => window.removeEventListener("storage", updateCount);
+  }, []);
   return (
     <header className="bg-white-800 py-4 ">
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-8">
         {/* Welcome Section */}
         <div className="flex items-center space-x-2 md:space-x-12 md:ml-40">
-          {/* <Image
-            src="/images/maleavatar.svg"
-            alt="Profile Picture"
-            width={50}
-            height={50}
-            className="rounded-full object-contain"
-          />
-          <div>
-            <p className="text-sm text-gray-500">Hi, Joel !</p>
-            <h1 className="text-xl font-bold text-gray-900">Welcome Back! Incarange</h1>
-          </div> */}
+
         </div>
 
         {/* Search Bar Section */}
@@ -31,31 +35,25 @@ const Header = () => {
               height={24}
               className="cursor-pointer"
             />
-            <div className="relative">
-              <Image
-                src="/images/notification-bing.svg"
-                alt="Notification Icon"
-                width={40}
-                height={40}
-                className="cursor-pointer"
-              />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full"></span>
-            </div>
+            <Link href="/notifications">
+              <div className="relative">
+                <Image
+                  src="/images/notification-bing.svg"
+                  alt="Notification Icon"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer"
+                />
+                {notificationCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-4 flex items-center justify-center rounded-full">
+                    {notificationCount}
+                  </span>
+                )}
+
+              </div>
+            </Link>
           </div>
-          <div className="relative w-full max-w-xs">
-            <input
-              type="text"
-              placeholder="Search products..."
-              // className="form-control block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              className="block w-full px-4 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-12"
-            />
-            <button
-              type="button"
-              className="absolute right-0 top-0 bottom-0 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-r-lg flex items-center justify-center"
-            >
-              Search
-            </button>
-          </div>
+
 
 
         </div>

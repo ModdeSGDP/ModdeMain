@@ -1,5 +1,3 @@
-
-
 "use client"
 
 import { useRouter } from "next/navigation"
@@ -12,8 +10,8 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { FaRegEye, FaEyeSlash } from "react-icons/fa";
 import Image from "next/image";
-import { API_POST_USER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
-import { API_POST_RETAILER_REGISTER } from "../../constant/apiConstant";// Update the import path as needed
+import { API_POST_USER_REGISTER } from "../../constant/apiConstant";
+import { API_POST_RETAILER_REGISTER } from "../../constant/apiConstant";
 
 
 // Validation Schema
@@ -55,11 +53,7 @@ const SignUpPage = () => {
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
-  // useEffect(() => {
-  //   if (localStorage.getItem("authenticated") === "true") {
-  //     router.push("/Dashboard");
-  //   }
-  // }, []);
+
 
   const {
     register,
@@ -108,22 +102,14 @@ const SignUpPage = () => {
         },
         body: JSON.stringify(userData),
       })
-      // Check if response is valid JSON
-      // const contentType = response.headers.get("content-type")
-      // if (!response.ok) {
-      //   const errorData = await response.json()
-      //   throw new Error(errorData.message || "Registration failed. Please try again.")
-      // }
-      // if (!contentType || !contentType.includes("application/json")) {
-      //   throw new Error("Received unexpected response format. Expected JSON.")
-      // }
+
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Registration failed. Please try again.");
       }
 
-      // const userResult = await response.json();
+
 
       const formattedDataRetailer = {
         companyName: data?.companyName,
@@ -172,14 +158,14 @@ const SignUpPage = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen">
       {/* Header Section */}
-      <div className="w-full flex justify-between px-6 py-4">
-        <Image src="/images/modde-logo.svg" alt="Modde Logo" width={160} height={40} />
+      <div className="w-full px-6 pt-2 pb-0">
+        <Image src="/images/modde-logo.svg" alt="Modde Logo" width={140} height={40} />
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col md:flex-row items-center justify-center px-10">
+      <div className="flex flex-col md:flex-row items-center justify-center px-6 pt-2 gap-6">
         {/* Left Section */}
         <div className="md:w-1/2 text-left">
           <h1 className="text-4xl font-bold">Get started with Modde!</h1>
@@ -191,20 +177,39 @@ const SignUpPage = () => {
           <Button className="mt-6 bg-black text-white px-6 py-3 rounded-md">Learn More</Button>
         </div>
 
-        {/* Right Section - Images Aligned (Updated) */}
-        <div className="md:w-1/2 flex justify-center items-start relative">
-          <div className="absolute -top-48 right-6">
-            <Image src="/images/model1.svg" alt="Model 1" width={256} height={320} className="rounded-lg" />
+
+        {/* Right Section - Responsive Images */}
+        <div className="hidden md:flex md:w-1/2 justify-center items-start flex-wrap gap-4 mt-[-20px]">
+          {/* Image 1 */}
+          <div className="w-full sm:w-[65%] max-w-[240px]">
+            <Image
+              src="/images/login_new_img.jpg"
+              alt="Model 1"
+              width={250}
+              height={200}
+              className="rounded-lg w-full h-auto object-cover"
+            />
           </div>
-          <div className="absolute -top-48 left-12">
-            <Image src="/images/model2.svg" alt="Model 2" width={208} height={320} className="rounded-lg" />
+
+          {/* Image 2 */}
+          <div className="w-full sm:w-[45%] max-w-[280px]">
+            <Image
+              src="/images/login_new_img2.jpg"
+              alt="Model 2"
+              width={250}
+              height={200}
+              className="rounded-lg w-full h-auto object-cover"
+            />
           </div>
         </div>
+
+
+
       </div>
 
       {/* Form Section */}
-      <div className="flex justify-center mt-12">
-        <div className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-4xl">
+      <div className="flex justify-center mt-8 px-4">
+        <div className="w-full max-w-screen-lg">
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
             {/* First Name */}
             <div>
@@ -220,17 +225,7 @@ const SignUpPage = () => {
               {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
             </div>
 
-            {/* <div className="col-span-2">
-              <label className="text-gray-700 font-medium">Password *</label>
-              <Input type="password" {...register("password")} placeholder="Enter a strong password" />
-              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-            </div>
 
-            <div className="col-span-2">
-              <label className="text-gray-700 font-medium">Confirm Password *</label>
-              <Input type="password" {...register("confirmPassword")} placeholder="Re-enter your password" />
-              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
-            </div> */}
 
             {/* Job Title */}
             <div>
@@ -253,18 +248,7 @@ const SignUpPage = () => {
               {errors.mobileNumber && <p className="text-red-500 text-sm">{errors.mobileNumber.message}</p>}
             </div>
 
-            {/* <div className="col-span-2">
-              <label className="text-gray-700 font-medium">Password *</label>
-              <Input type={showPassword ? "text" : "password"} {...register("password")} placeholder="Enter a strong password" />
-              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-              <button
-                type="button"
-                className="absolute inset-y-0 right-3 flex items-center"
-                onClick={togglePasswordVisibility}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaRegEye />}
-              </button>
-            </div> */}
+
 
             <div className="col-span-2 relative">
               <label className="text-gray-700 font-medium">Password *</label>
@@ -290,11 +274,7 @@ const SignUpPage = () => {
             </div>
 
 
-            {/* <div className="col-span-2">
-              <label className="text-gray-700 font-medium">Confirm Password *</label>
-              <Input type="password" {...register("confirmPassword")} placeholder="Re-enter your password" />
-              {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
-            </div> */}
+
 
             {/* Company Name */}
             <div>
