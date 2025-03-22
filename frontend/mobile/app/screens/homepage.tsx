@@ -160,12 +160,11 @@ const sideStyles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
-    opacity: 0.5,
   },
   logoIcon: {
-    width: 150,
-    height: 80,
-    marginTop: -10,
+    width: 100,
+    height: 60,
+    marginTop: 5,
     marginBottom: 100,
   },
   navigationBar: {
@@ -230,7 +229,6 @@ const sideStyles = StyleSheet.create({
     height: 150,
     position: "absolute",
     bottom: 0,
-    opacity: 0.5,
   },
   orderBadge: {
     position: "absolute",
