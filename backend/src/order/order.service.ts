@@ -15,6 +15,7 @@ export class OrderService {
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
     // Validate stock items before creating the order
+    
     for (const item of createOrderDto.items) {
       const stock = await this.stockModel.findById(item.stockId).exec();
       if (!stock) {

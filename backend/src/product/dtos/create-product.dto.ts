@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsBoolean, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsBoolean, IsMongoId, Matches } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateProductDto {
@@ -8,7 +8,9 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty()
+  @Matches('^[A-Za-z\\s]+$')
   name: string;
+
 
   @IsString()
   @IsNotEmpty()
