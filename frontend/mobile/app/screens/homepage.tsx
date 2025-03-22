@@ -17,7 +17,7 @@ import * as ImagePicker from "expo-image-picker"
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Ionicons } from '@expo/vector-icons'
-import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage" // Adjust the import path as needed
+import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage"
 
 // Define the navigation stack param list
 type RootStackParamList = {
@@ -507,10 +507,11 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 24, // Increased from 20 to 24
     fontFamily: "Rosario-Bold",
     fontWeight: "800",
     color: "#333",
+    top:50,
     textAlign: "center",
     flex: 1,
   },
@@ -542,7 +543,7 @@ const styles = StyleSheet.create({
   },
   mainImage: {
     marginLeft: -160,
-    top: 140,
+    top: 150,
     left: "50%",
     width: 320,
     height: 295,

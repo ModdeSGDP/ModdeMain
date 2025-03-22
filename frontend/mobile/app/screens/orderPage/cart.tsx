@@ -4,7 +4,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useCartStore } from "../shopPage/cartState";
 import { Ionicons } from "@expo/vector-icons";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import type { RouteProp } from "@react-navigation/native";
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -100,7 +99,6 @@ const Cart = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.cart}>
-        {/* Updated Header with SafeAreaView */}
         <View style={styles.header}>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
             <Ionicons name="chevron-back" size={24} color="#333" />
@@ -117,71 +115,77 @@ const Cart = () => {
           </Pressable>
         </View>
 
-        {items.length > 0 ? (
-          <ScrollView style={styles.carangeCartClothParent}>
-            {items.map(renderCartItem)}
-          </ScrollView>
-        ) : (
-          <View style={styles.oops}>
-            <Image
-              style={styles.empty}
-              resizeMode="cover"
-              source={require("../../assets/empty.png")}
-            />
-            <Text style={[styles.ooops, styles.ooopsLayout]}>Ooops!</Text>
-            <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>
-              Once you add items, your items will appear here.
-            </Text>
-            <Pressable
-              style={styles.shopButton}
-              onPress={() => navigation.navigate("ShopPage")}
-            >
-              <Text style={styles.shopButtonText}>Shop Now</Text>
+        <ScrollView 
+          style={styles.contentContainer}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {items.length > 0 ? (
+            <View style={styles.cartItemsContainer}>
+              {items.map(renderCartItem)}
+            </View>
+          ) : (
+            <View style={styles.oops}>
               <Image
-                style={styles.angleRight}
-                resizeMode="contain"
-                source={require("../../assets/angle-right.png")}
+                style={styles.empty}
+                resizeMode="cover"
+                source={require("../../assets/empty.png")}
               />
-            </Pressable>
-          </View>
-        )}
-
-        {items.length > 0 && (
-          <View style={styles.checkoutBar}>
-            <View style={styles.checkptBar}>
-              <Pressable onPress={selectAll} style={styles.radioButton}>
-                <View
-                  style={[
-                    styles.radio,
-                    selectedItems.size === items.length && styles.radioSelected,
-                  ]}
+              <Text style={[styles.ooops, styles.ooopsLayout]}>Ooops!</Text>
+              <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>
+                Once you add items, your items will appear here.
+              </Text>
+              <Pressable
+                style={styles.shopButton}
+                onPress={() => navigation.navigate("ShopPage")}
+              >
+                <Text style={styles.shopButtonText}>Shop Now</Text>
+                <Image
+                  style={styles.angleRight}
+                  resizeMode="contain"
+                  source={require("../../assets/angle-right.png")}
                 />
               </Pressable>
-              <Text style={styles.allText}>All</Text>
-              <Image
-                style={styles.tag}
-                resizeMode="cover"
-                source={require("../../assets/tag.png")}
-              />
-              <Text style={styles.totalPrice}>{`LKR ${displayTotal.toFixed(2)}`}</Text>
-              <Pressable
-                style={[
-                  styles.checkoutButton,
-                  selectedItems.size === 0 && styles.checkoutButtonDisabled,
-                ]}
-                disabled={selectedItems.size === 0}
-                onPress={() => {
-                  navigation.navigate("CheckoutPage", {
-                    selectedItems: items.filter((item) => selectedItems.has(item.id)),
-                    total: displayTotal,
-                  });
-                }}
-              >
-                <Text style={styles.checkoutText}>Checkout</Text>
-              </Pressable>
             </View>
-          </View>
-        )}
+          )}
+
+          {items.length > 0 && (
+            <View style={styles.checkoutBar}>
+              <View style={styles.checkptBar}>
+                <Pressable onPress={selectAll} style={styles.radioButton}>
+                  <View
+                    style={[
+                      styles.radio,
+                      selectedItems.size === items.length && styles.radioSelected,
+                    ]}
+                  />
+                </Pressable>
+                <Text style={styles.allText}>All</Text>
+                <Image
+                  style={styles.tag}
+                  resizeMode="cover"
+                  source={require("../../assets/tag.png")}
+                />
+                <Text style={styles.totalPrice}>{`LKR ${displayTotal.toFixed(2)}`}</Text>
+                <Pressable
+                  style={[
+                    styles.checkoutButton,
+                    selectedItems.size === 0 && styles.checkoutButtonDisabled,
+                  ]}
+                  disabled={selectedItems.size === 0}
+                  onPress={() => {
+                    navigation.navigate("CheckoutPage", {
+                      selectedItems: items.filter((item) => selectedItems.has(item.id)),
+                      total: displayTotal,
+                    });
+                  }}
+                >
+                  <Text style={styles.checkoutText}>Checkout</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+        </ScrollView>
 
         <View style={styles.navigationBar}>
           <View style={styles.navBarBg} />
@@ -235,69 +239,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  dressCarddetails: {
-    top: 80,
-  },
-  quantityValue: {
-    marginHorizontal: 10,
-    fontSize: 16,
-    minWidth: 20,
-    textAlign: "center",
-  },
-  tag: {
-    width: 24,
-    height: 24,
-    left: 15,
-  },
-  lineView: {
-    borderStyle: "solid",
-    borderColor: "#f97c7c",
-    borderTopWidth: 1,
-    position: "absolute",
-    top: -20,
-    left: 0,
-    right: 0,
-  },
-  shopContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  shopIcon: {
-    width: 16,
-    height: 16,
-    marginRight: 6,
-  },
-  shopName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#555",
-  },
-  activeIndicator: {
-    position: "absolute",
-    left: 217,
-    bottom: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#fba3a3",
-  },
-  empty: {
-    width: 240,
-    height: 240,
-    top: -150,
-  },
-  radio: {
-    width: 20,
-    height: 20,
-    top: 0,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#f97c7c",
-  },
-  radioSelected: {
-    backgroundColor: "#f97c7c",
-  },
   cart: {
     flex: 1,
   },
@@ -307,6 +248,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: "#fff",
   },
   headerTitle: {
     fontSize: 20,
@@ -317,14 +259,19 @@ const styles = StyleSheet.create({
     width: 22,
     height: 24,
   },
-  carangeCartClothParent: {
+  contentContainer: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 100, // Ensures content clears the navigation bar
+  },
+  cartItemsContainer: {
     paddingTop: 10,
   },
   cartItem: {
     flexDirection: "row",
-    padding: 10,
-    top: -20,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
@@ -341,6 +288,21 @@ const styles = StyleSheet.create({
   itemDetails: {
     marginLeft: 10,
     flex: 1,
+  },
+  shopContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  shopIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 6,
+  },
+  shopName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#555",
   },
   itemName: {
     fontSize: 13,
@@ -362,24 +324,39 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     paddingHorizontal: 10,
   },
+  quantityValue: {
+    marginHorizontal: 10,
+    fontSize: 16,
+    minWidth: 20,
+    textAlign: "center",
+  },
   removeButton: {
-    color: "red",
-    marginTop: -20,
     width: 12,
     height: 15,
-    left: 200,
+    position: "absolute",
+    right: 0,
+    top: 0,
   },
   radioButton: {
     marginRight: 10,
+    justifyContent: "center",
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#f97c7c",
+  },
+  radioSelected: {
+    backgroundColor: "#f97c7c",
   },
   checkoutBar: {
     backgroundColor: "#ffccd4",
     padding: 20,
-    width: 400,
-    height: 80,
-    left: 5,
     borderRadius: 15,
-    bottom: 150,
+    marginTop: 20,
+    marginBottom: 20, // Added space below checkout bar
   },
   checkptBar: {
     flexDirection: "row",
@@ -389,6 +366,11 @@ const styles = StyleSheet.create({
   allText: {
     fontSize: 13,
     color: "#321919",
+  },
+  tag: {
+    width: 24,
+    height: 24,
+    marginLeft: 15,
   },
   totalPrice: {
     fontSize: 14,
@@ -448,16 +430,29 @@ const styles = StyleSheet.create({
     width: 23,
     height: 24,
   },
+  activeIndicator: {
+    position: "absolute",
+    left: 217,
+    bottom: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#fba3a3",
+  },
   oops: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+    top:80,
+  },
+  empty: {
+    width: 260,
+    height: 256,
   },
   ooopsLayout: {
     textAlign: "center",
     marginBottom: 20,
-    top: -150,
   },
   ooops: {
     fontSize: 24,
@@ -471,8 +466,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
-    marginTop: 10,
-    top: -150,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -485,6 +478,15 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginLeft: 10,
+  },
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    position: "absolute",
+    top: -20,
+    left: 0,
+    right: 0,
   },
 });
 
