@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, Pressable, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, ScrollView, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useCartStore } from "../shopPage/cartState";
-import { Ionicons } from "@expo/vector-icons"; // Added for back button
+import { Ionicons } from "@expo/vector-icons";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { RouteProp } from "@react-navigation/native";
 
-// Define RootStackParamList for type safety
 type RootStackParamList = {
   HomePage: undefined;
   ShopPage: undefined;
@@ -64,10 +63,7 @@ const Cart = () => {
   };
 
   const renderCartItem = (item: any) => (
-    <Pressable
-      key={item.id}
-      style={styles.cartItem}
-    >
+    <Pressable key={item.id} style={styles.cartItem}>
       <Pressable onPress={() => toggleItemSelection(item.id)} style={styles.radioButton}>
         <View style={[styles.radio, selectedItems.has(item.id) && styles.radioSelected]} />
       </Pressable>
@@ -102,87 +98,143 @@ const Cart = () => {
   );
 
   return (
-    <View style={styles.cart}>
-      <View style={styles.top}></View>
-      {/* Updated Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.navigate("ShopPage")}>
-          <Ionicons name="chevron-back" size={24} color="#333" />
-        </Pressable>
-        <Text style={styles.headerTitle}>Cart {items.length > 0 ? `(${items.length})` : ""}</Text>
-        <Pressable onPress={() => navigation.navigate("NotificationPage")}>
-          <Image style={styles.bellIcon} resizeMode="cover" source={require("../../assets/bell.png")} />
-        </Pressable>
-      </View>
-      {items.length > 0 ? (
-        <ScrollView style={styles.carangeCartClothParent}>{items.map(renderCartItem)}</ScrollView>
-      ) : (
-        <View style={styles.oops}>
-          <Image style={styles.empty} resizeMode="cover" source={require("../../assets/empty.png")} />
-          <Text style={[styles.ooops, styles.ooopsLayout]}>Ooops!</Text>
-          <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>
-            Once you add items, your items will appear here.
+    <SafeAreaView style={styles.container}>
+      <View style={styles.cart}>
+        {/* Updated Header with SafeAreaView */}
+        <View style={styles.header}>
+          <Pressable onPress={() => navigation.navigate("ShopPage")}>
+            <Ionicons name="chevron-back" size={24} color="#333" />
+          </Pressable>
+          <Text style={styles.headerTitle}>
+            Cart {items.length > 0 ? `(${items.length})` : ""}
           </Text>
-          <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
-            <Text style={styles.shopButtonText}>Shop Now</Text>
-            <Image style={styles.angleRight} resizeMode="contain" source={require("../../assets/angle-right.png")} />
+          <Pressable onPress={() => navigation.navigate("NotificationPage")}>
+            <Image
+              style={styles.bellIcon}
+              resizeMode="cover"
+              source={require("../../assets/bell.png")}
+            />
           </Pressable>
         </View>
-      )}
-      {items.length > 0 && (
-        <View style={styles.checkoutBar}>
-          <View style={styles.checkptBar}>
-            <Pressable onPress={selectAll} style={styles.radioButton}>
-              <View style={[styles.radio, selectedItems.size === items.length && styles.radioSelected]} />
-            </Pressable>
-            <Text style={styles.allText}>All</Text>
-            <Image style={styles.tag} resizeMode="cover" source={require("../../assets/tag.png")} />
-            <Text style={styles.totalPrice}>{`LKR ${displayTotal.toFixed(2)}`}</Text>
+
+        {items.length > 0 ? (
+          <ScrollView style={styles.carangeCartClothParent}>
+            {items.map(renderCartItem)}
+          </ScrollView>
+        ) : (
+          <View style={styles.oops}>
+            <Image
+              style={styles.empty}
+              resizeMode="cover"
+              source={require("../../assets/empty.png")}
+            />
+            <Text style={[styles.ooops, styles.ooopsLayout]}>Ooops!</Text>
+            <Text style={[styles.onceYouAdd, styles.ooopsLayout]}>
+              Once you add items, your items will appear here.
+            </Text>
             <Pressable
-              style={[
-                styles.checkoutButton,
-                selectedItems.size === 0 && styles.checkoutButtonDisabled,
-              ]}
-              disabled={selectedItems.size === 0}
-              onPress={() => {
-                navigation.navigate("CheckoutPage", {
-                  selectedItems: items.filter((item) => selectedItems.has(item.id)),
-                  total: displayTotal,
-                });
-              }}
+              style={styles.shopButton}
+              onPress={() => navigation.navigate("ShopPage")}
             >
-              <Text style={styles.checkoutText}>Checkout</Text>
+              <Text style={styles.shopButtonText}>Shop Now</Text>
+              <Image
+                style={styles.angleRight}
+                resizeMode="contain"
+                source={require("../../assets/angle-right.png")}
+              />
             </Pressable>
           </View>
+        )}
+
+        {items.length > 0 && (
+          <View style={styles.checkoutBar}>
+            <View style={styles.checkptBar}>
+              <Pressable onPress={selectAll} style={styles.radioButton}>
+                <View
+                  style={[
+                    styles.radio,
+                    selectedItems.size === items.length && styles.radioSelected,
+                  ]}
+                />
+              </Pressable>
+              <Text style={styles.allText}>All</Text>
+              <Image
+                style={styles.tag}
+                resizeMode="cover"
+                source={require("../../assets/tag.png")}
+              />
+              <Text style={styles.totalPrice}>{`LKR ${displayTotal.toFixed(2)}`}</Text>
+              <Pressable
+                style={[
+                  styles.checkoutButton,
+                  selectedItems.size === 0 && styles.checkoutButtonDisabled,
+                ]}
+                disabled={selectedItems.size === 0}
+                onPress={() => {
+                  navigation.navigate("CheckoutPage", {
+                    selectedItems: items.filter((item) => selectedItems.has(item.id)),
+                    total: displayTotal,
+                  });
+                }}
+              >
+                <Text style={styles.checkoutText}>Checkout</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        <View style={styles.navigationBar}>
+          <View style={styles.navBarBg} />
+          <View style={styles.navIcons}>
+            <Pressable onPress={() => navigation.navigate("HomePage")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/smart_home1.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ShopPage")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/shirt.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("Camera")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/cameraplus.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("CartPage")}>
+              <View style={styles.lineView} />
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/cart2.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ProfilePage")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/user.png")}
+              />
+            </Pressable>
+          </View>
+          <View style={styles.activeIndicator} />
         </View>
-      )}
-      <View style={styles.navigationBar}>
-        <View style={styles.navBarBg} />
-        <View style={styles.navIcons}>
-          <Pressable onPress={() => navigation.navigate("HomePage")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home1.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ShopPage")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("Camera")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("CartPage")}>
-            <View style={styles.lineView} />
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cart2.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
-          </Pressable>
-        </View>
-        <View style={styles.activeIndicator} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   dressCarddetails: {
     top: 80,
   },
@@ -231,8 +283,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fba3a3",
   },
   empty: {
-    width: 250,
-    height: 250,
+    width: 240,
+    height: 240,
     top: -150,
   },
   radio: {
@@ -248,12 +300,6 @@ const styles = StyleSheet.create({
   },
   cart: {
     flex: 1,
-    backgroundColor: "#fff",
-  },
-  top: {
-    height: 69,
-    width: "100%",
-    top: 40,
   },
   header: {
     flexDirection: "row",
@@ -264,8 +310,8 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "bold", // Updated to match PromotionsPage
-    color: "#333", // Updated to match PromotionsPage
+    fontWeight: "bold",
+    color: "#333",
   },
   bellIcon: {
     width: 22,

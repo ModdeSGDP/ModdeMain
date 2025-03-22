@@ -50,6 +50,7 @@ const CameraScreen = () => {
   const [cropScale, setCropScale] = useState(1)
   const [cropTranslateX, setCropTranslateX] = useState(0)
   const [cropTranslateY, setCropTranslateY] = useState(0)
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
 
   useEffect(() => {
     if (capturedImage) {
@@ -59,6 +60,13 @@ const CameraScreen = () => {
         duration: 500,
         useNativeDriver: true,
       }).start()
+
+      // Get image dimensions
+      Image.getSize(capturedImage, (imgWidth, imgHeight) => {
+        setImageDimensions({ width: imgWidth, height: imgHeight })
+      }, (error) => {
+        console.error("Failed to get image size:", error)
+      })
     }
   }, [capturedImage, fadeAnim])
 
@@ -106,6 +114,7 @@ const CameraScreen = () => {
     setCroppedImage(null)
     setUploadProgress(0)
     setIsCropping(false)
+    setImageDimensions(null)
     fadeAnim.setValue(0)
     setCropScale(1)
     setCropTranslateX(0)
@@ -130,21 +139,31 @@ const CameraScreen = () => {
   }
 
   const confirmCrop = async () => {
-    if (!capturedImage) return
+    if (!capturedImage || !imageDimensions) return
 
     try {
-      const cropWidth = width * 0.8 // Fixed crop frame size
-      const cropHeight = width * 0.8
-      const originX = (width - cropWidth) / 2 - (cropTranslateX / cropScale)
-      const originY = (height - cropHeight) / 2 - (cropTranslateY / cropScale)
+      const cropFrameSize = width * 0.8 // Size of the crop frame in screen pixels
+      const { width: imgWidth, height: imgHeight } = imageDimensions
+
+      // Calculate the scale factor from screen size to actual image size
+      const displayWidth = width
+      const displayHeight = height
+      const scaleX = imgWidth / displayWidth
+      const scaleY = imgHeight / displayHeight
+
+      // Calculate crop area in original image coordinates
+      const cropWidth = cropFrameSize * scaleX / cropScale
+      const cropHeight = cropFrameSize * scaleY / cropScale
+      const originX = (imgWidth - cropWidth) / 2 - (cropTranslateX * scaleX / cropScale)
+      const originY = (imgHeight - cropHeight) / 2 - (cropTranslateY * scaleY / cropScale)
 
       const manipResult = await ImageManipulator.manipulateAsync(
         capturedImage,
         [
           {
             crop: {
-              originX: Math.max(0, Math.min(originX, width - cropWidth)),
-              originY: Math.max(0, Math.min(originY, height - cropHeight)),
+              originX: Math.max(0, Math.min(originX, imgWidth - cropWidth)),
+              originY: Math.max(0, Math.min(originY, imgHeight - cropHeight)),
               width: cropWidth,
               height: cropHeight,
             },
@@ -166,7 +185,7 @@ const CameraScreen = () => {
       Alert.alert("No cropped image", "Please crop the image before uploading.")
       return
     }
-
+   3
     const formData = new FormData()
     formData.append("file", {
       uri: croppedImage,
@@ -177,7 +196,6 @@ const CameraScreen = () => {
     try {
       setIsProcessing(true)
       const cleanup = simulateUpload()
-
       const response = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/product/search-similar", {
         method: "POST",
         body: formData,
@@ -214,10 +232,9 @@ const CameraScreen = () => {
     }
   }
 
-  // Remove useNativeDriver to avoid nesting issues
   const onPinchGestureEvent = Animated.event([{ nativeEvent: { scale: pinchScale } }], { useNativeDriver: false })
 
-  const onPinchHandlerStateChange = (event) => {
+  const onPinchHandlerStateChange = (event: { nativeEvent: { oldState: number; scale: number } }) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       const newScale = Math.max(1, Math.min(event.nativeEvent.scale * cropScale, 3)) // Limit scale between 1x and 3x
       setCropScale(newScale)
@@ -237,7 +254,7 @@ const CameraScreen = () => {
     { useNativeDriver: false },
   )
 
-  const onPanHandlerStateChange = (event) => {
+  const onPanHandlerStateChange = (event: { nativeEvent: { oldState: number; translationX: number; translationY: number } }) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       setCropTranslateX(cropTranslateX + event.nativeEvent.translationX)
       setCropTranslateY(cropTranslateY + event.nativeEvent.translationY)
@@ -623,6 +640,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
+    overflow: "hidden",
   },
   cropImage: {
     width: width,

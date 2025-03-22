@@ -1,5 +1,3 @@
-
-// HomePage.tsx
 "use client"
 import { useState, useEffect } from "react"
 import {
@@ -18,6 +16,7 @@ import {
 import * as ImagePicker from "expo-image-picker"
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
+import { Ionicons } from '@expo/vector-icons'
 import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage" // Adjust the import path as needed
 
 // Define the navigation stack param list
@@ -25,7 +24,7 @@ type RootStackParamList = {
   Home: { products?: any[] } | undefined
   Camera: { capturedImage?: string } | undefined
   NotificationPage: undefined
-  ShopPage: { products?: Product[] } | undefined // Updated to pass products
+  ShopPage: { products?: Product[] } | undefined
   CartPage: undefined
   ProfilePage: undefined
   Login: undefined
@@ -38,7 +37,10 @@ interface Product {
   image_url?: string
   [key: string]: any
 }
-
+interface RouteParams {
+  products?: any[];
+  capturedImage?: string;
+}
 interface Order {
   id: string
   date: string
@@ -296,7 +298,6 @@ const HomePage = () => {
         Alert.alert("Permission Required", "Permission to access your photo library is required.", [{ text: "OK" }])
         return
       }
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -348,10 +349,9 @@ const HomePage = () => {
       }
       setUploadProgress(100)
       const productsData = await response.json()
-      // Navigate to ShopPage with the returned products
       navigation.navigate("ShopPage", { products: productsData })
-      setUploadedImage(null) // Reset uploaded image
-      setUploadProgress(0) // Reset progress
+      setUploadedImage(null)
+      setUploadProgress(0)
     } catch (error) {
       const err = error as Error
       console.error("Upload error:", err)
@@ -385,19 +385,21 @@ const HomePage = () => {
       </View>
     )
   }
+
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <View style={styles.homePage}>
-        <View style={[styles.headerParent, styles.headerPosition]}>
-          <Text style={[styles.exploreModdeFashion, styles.exploreTypo]}>Explore Modde Fashion Studio</Text>
-          <Pressable onPress={() => setIsSideMenuOpen(!isSideMenuOpen)} style={styles.menuButton}>
-            <Image style={styles.menuIcon} resizeMode="cover" source={require("../assets/bars-from-left.png")} />
+        <View style={styles.header}>
+          <Pressable onPress={() => setIsSideMenuOpen(!isSideMenuOpen)}>
+            <Ionicons name="menu" size={24} color="#333" />
             {orders.length > 0 && <View style={styles.menuBadge} />}
           </Pressable>
+          <Text style={styles.headerTitle}>Explore Modde Fashion Studio</Text>
           <Pressable onPress={() => navigation.navigate("NotificationPage")}>
             <Image style={styles.bell} source={require("../assets/bell.png")} />
           </Pressable>
         </View>
+
         <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/intro.jpg")} />
         <View style={[styles.mainButtons, styles.buttonPosition]}>
           <Pressable style={styles.uploadButton} onPress={handleUploadImage}>
@@ -457,6 +459,7 @@ const HomePage = () => {
     </View>
   )
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -489,6 +492,41 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    backgroundColor: "#fff",
+    position: "absolute",
+    top: 40,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontFamily: "Rosario-Bold",
+    fontWeight: "800",
+    color: "#333",
+    textAlign: "center",
+    flex: 1,
+  },
+  menuBadge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    width: 10,
+    height: 10,
+    backgroundColor: "#ff4d4d",
+    borderRadius: 5,
+  },
+  bell: {
+    width: 21,
+    height: 23,
+  },
   lineView: {
     borderStyle: "solid",
     borderColor: "#f97c7c",
@@ -498,52 +536,9 @@ const styles = StyleSheet.create({
     height: 1,
     top: -20,
   },
-  headerPosition: {
-    position: "absolute",
-    top: 59,
-    left: 0,
-    right: 0,
-  },
-  exploreTypo: {
-    fontFamily: "Rosario-Bold",
-    fontWeight: "800",
-    textAlign: "center",
-  },
   buttonPosition: {
     position: "absolute",
     left: 30,
-  },
-  headerParent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  exploreModdeFashion: {
-    fontSize: 25,
-    lineHeight: 36,
-    color: "#321919",
-    flex: 1,
-    left: 25,
-    top: 0,
-  },
-  menuButton: {
-    position: "relative",
-  },
-  menuIcon: {
-    width: 30,
-    height: 20,
-    right: 310,
-    bottom: 15,
-  },
-  menuBadge: {
-    position: "absolute",
-    top: -5,
-    right: 305,
-    width: 10,
-    height: 10,
-    backgroundColor: "#ff4d4d",
-    borderRadius: 5,
   },
   mainImage: {
     marginLeft: -160,
@@ -660,12 +655,6 @@ const styles = StyleSheet.create({
     left: 12,
     width: 30,
     height: 30,
-  },
-  bell: {
-    left: -2,
-    width: 21,
-    height: 23,
-    bottom: 20,
   },
   uploadingText: {
     position: "absolute",
