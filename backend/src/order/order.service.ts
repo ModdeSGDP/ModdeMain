@@ -19,6 +19,7 @@ export class OrderService {
       throw new Error('User ID is missing from the token');
     }
     // Validate stock items before creating the order
+    
     for (const item of createOrderDto.items) {
       const stock = await this.stockModel.findById(item.stockId).exec();
       if (!stock) {
