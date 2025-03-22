@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
         source={require("../assets/Ellipse1.png")} 
       />
       <LinearGradient
-        colors={["rgba(255, 248, 248, 0.7)", "rgba(255, 255, 255, 0.9)", "#fff"]}
+        colors={["#fff8f8", "#fff"]}
         style={styles.backgroundGradient}
       />
       <Image 
@@ -97,20 +97,21 @@ const LoginPage: React.FC = () => {
       <Image style={styles.logoIcon} resizeMode="cover" source={require("../assets/logo2.png")} />
 
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>Sign into your account</Text>
         <Text style={styles.subtitle}>
-          Welcome back, <Text style={styles.boldText}>{username || "User"}</Text>.
+          Welcome back, <Text style={styles.boldText}>{username || "User"}</Text>
         </Text>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>E-mail address</Text>
+          <Text style={styles.inputLabel}>Email Address</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter your email here"
-            placeholderTextColor="#898989"
+            placeholder="your.email@example.com"
+            placeholderTextColor="#aaa"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
 
@@ -119,14 +120,15 @@ const LoginPage: React.FC = () => {
           <View style={styles.passwordContainer}>
             <TextInput
               style={styles.passwordInput}
-              placeholder="Enter your password"
-              placeholderTextColor="#898989"
+              placeholder="Minimum 8 characters"
+              placeholderTextColor="#aaa"
               secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
+              autoCapitalize="none"
             />
             <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIconWrapper}>
-              <MaterialCommunityIcons name={showPassword ? "eye" : "eye-off"} size={24} color="#898989" />
+              <MaterialCommunityIcons name={showPassword ? "eye" : "eye-off"} size={24} color="#aaa" />
             </Pressable>
           </View>
         </View>
@@ -141,13 +143,20 @@ const LoginPage: React.FC = () => {
         </View>
 
         <Pressable style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
+          <LinearGradient
+            colors={["#fba3a3", "#ff8a8a"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientButton}
+          >
+            <Text style={styles.loginButtonText}>Sign In</Text>
+          </LinearGradient>
         </Pressable>
 
         <Text style={styles.signUpText}>
-          Don't have an account?{" "}
+          Don’t have an account?{" "}
           <Text style={styles.signUpLink} onPress={() => navigation.navigate("SignUpPage")}>
-            Sign up
+            Create Account
           </Text>
         </Text>
       </View>
@@ -162,24 +171,29 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     position: "absolute",
-    width: "100%",
-    height: "50%",
-    top: 0,
- // Softened for better overlay
+    width: 619,
+    height: 450,
+    top: -20,
+    left: -100,
   },
   backgroundGradient: {
   },
   backgroundBottomImage: {
     position: "absolute",
-    width: "100%",
-    height: "30%",
-    bottom: 0, // Subtle bottom effect
+    width: 450,
+    height: 770,
+    bottom: -100,
+    right: -100,
   },
   logoIcon: {
     alignSelf: "center",
-    width: 174,
-    height: 100,
+    width: 150,
+    height: 86,
     marginTop: 60,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   contentContainer: {
     flex: 1,
@@ -188,49 +202,69 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "600",
-    color: "#321919",
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#333",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 8,
+    fontFamily: "Inter-Bold",
   },
   subtitle: {
-    fontSize: 18,
-    color: "#321919",
+    fontSize: 16,
+    color: "#666",
     textAlign: "center",
     marginBottom: 30,
+    fontFamily: "Inter-Regular",
   },
   boldText: {
-    fontWeight: "bold",
+    fontWeight: "700",
+    color: "#333",
+    fontFamily: "Inter-Bold",
   },
   inputContainer: {
     marginBottom: 20,
   },
   inputLabel: {
     fontSize: 14,
-    color: "#321919",
-    marginBottom: 5,
+    color: "#555",
+    marginBottom: 6,
+    fontWeight: "600",
+    fontFamily: "Rosario-Regular",
   },
   input: {
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#898989",
-    borderRadius: 10,
+    borderColor: "#e0e0e0",
+    borderRadius: 12,
     padding: 12,
-    fontSize: 16,
+    fontSize: 14,
+    color: "#333",
+    fontFamily: "Inter-Regular",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#898989",
-    borderRadius: 10,
+    borderColor: "#e0e0e0",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   passwordInput: {
     flex: 1,
     padding: 12,
-    fontSize: 16,
+    fontSize: 14,
+    color: "#333",
+    fontFamily: "Inter-Regular",
   },
   eyeIconWrapper: {
     padding: 10,
@@ -249,7 +283,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 1,
-    borderColor: "#898989",
+    borderColor: "#e0e0e0",
     borderRadius: 4,
     marginRight: 8,
     justifyContent: "center",
@@ -261,28 +295,40 @@ const styles = StyleSheet.create({
   },
   rememberMeText: {
     fontSize: 14,
-    color: "#321919",
+    color: "#555",
+    fontFamily: "Inter-Medium",
   },
   loginButton: {
-    backgroundColor: "#fba3a3",
-    borderRadius: 10,
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: "#fba3a3",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  gradientButton: {
     padding: 15,
     alignItems: "center",
-    marginBottom: 20,
   },
   loginButtonText: {
     color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "700",
+    fontFamily: "Inter-Bold",
+    letterSpacing: 0.5,
   },
   signUpText: {
     textAlign: "center",
     fontSize: 14,
-    color: "#321919",
+    color: "#666",
+    marginTop: 20,
+    fontFamily: "Inter-Medium",
   },
   signUpLink: {
-    color: "#fba3a3",
-    fontWeight: "600",
+    color: "#ff8a8a",
+    fontWeight: "700",
+    fontFamily: "Inter-Bold",
   },
 })
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, View, Animated, Text } from "react-native";
+import { Image, StyleSheet, View, Animated, Text, Easing } from "react-native";
 import { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -14,66 +14,83 @@ type SplashScreenNavigationProp = StackNavigationProp<RootStackParamList, "Splas
 
 const SplashScreen = () => {
   const titleOpacity = new Animated.Value(0);
-  const titleScale = new Animated.Value(0.5);
+  const titleScale = new Animated.Value(0.8);
   const subtitleOpacity = new Animated.Value(0);
-  const textOpacity = new Animated.Value(0); // New animated value for the text
+  const textOpacity = new Animated.Value(0);
+  const textSlide = new Animated.Value(50); // For sliding the text up
   const navigation = useNavigation<SplashScreenNavigationProp>();
 
   useEffect(() => {
     console.log("SplashScreen: Component mounted");
 
+    // Logo animation (fade in and scale)
     Animated.parallel([
       Animated.timing(titleOpacity, {
         toValue: 1,
-        duration: 2000,
+        duration: 1500,
         useNativeDriver: true,
       }),
       Animated.spring(titleScale, {
         toValue: 1,
-        friction: 3,
+        friction: 5,
+        tension: 40,
         useNativeDriver: true,
       }),
     ]).start(() => {
-      Animated.timing(subtitleOpacity, {
-        toValue: 1,
-        duration: 2000,
-        useNativeDriver: true,
-      }).start();
-
-      // Fade in the "Snap, Style & Slay" text after the logo animation
-      Animated.timing(textOpacity, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }).start();
+      // Text animation (fade in and slide up)
+      Animated.parallel([
+        Animated.timing(textOpacity, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(textSlide, {
+          toValue: 0,
+          duration: 1000,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start();
     });
 
     const timer = setTimeout(() => {
       console.log("SplashScreen: Navigating to OnboardingPage now...");
       navigation.navigate("OnboardingPage");
-    }, 4000);
+    }, 3500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [titleOpacity, titleScale, textOpacity, textSlide, navigation]);
 
   return (
     <View style={styles.splashScreen}>
-      <Image style={styles.splashScreenChild} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
-      <Image style={styles.splashScreenItem} resizeMode="cover" source={require("../assets/Ellipse3.png")} />
+      <Image
+        style={styles.splashScreenChild}
+        resizeMode="cover"
+        source={require("../assets/Ellipse1.png")}
+      />
+      <Image
+        style={styles.splashScreenItem}
+        resizeMode="cover"
+        source={require("../assets/Ellipse2.png")}
+      />
       <Animated.Image
         style={[
           styles.splashScreenInner,
           styles.homeIndicator1Position,
-          { opacity: titleOpacity, transform: [{ scale: titleScale }] },
+          {
+            opacity: titleOpacity,
+            transform: [{ scale: titleScale }],
+          },
         ]}
-        resizeMode="cover"
         source={require("../assets/logo5.png")}
       />
-      {/* Add the "Snap, Style & Slay" text with animation */}
       <Animated.Text
         style={[
           styles.snapStyleSlayText,
-          { opacity: textOpacity }, // Apply the fade-in animation
+          {
+            opacity: textOpacity,
+            transform: [{ translateY: textSlide }],
+          },
         ]}
       >
         Snap, Style & Slay
@@ -88,44 +105,55 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   splashScreenChild: {
-    top: -6,
-    left: -139,
-    width: 449,
-    height: 353,
-    position: "absolute",
+    top: -50,
+    left: -150,
+    width: 500,
+    height: 400,
+    position: "absolute", // Kept subtle opacity for ellipses
   },
   splashScreenItem: {
-    top: 465,
-    left: 10,
-    width: 530,
-    height: 381,
-    position: "absolute",
+    top: 450,
+    left: -50,
+    width: 600,
+    height: 450,
+    position: "absolute", // Kept subtle opacity for ellipses
   },
   splashScreenInner: {
-    marginTop: -80,
-    marginLeft: -112.5,
+    marginTop: -100,
+    marginLeft: -120,
     top: "50%",
-    width: 224,
-    height: 160,
+    width: 240,
+    height: 170,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 10,
   },
   snapStyleSlayText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#000",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#FF6B6B",
     textAlign: "center",
-    marginTop: 20, // Adjust this value to position the text below the logo
     position: "absolute",
-    top: "60%", // Adjust this value to position the text below the logo
-    left: "50%",
-    transform: [{ translateX: -100 }], // Center the text horizontally
+    bottom: 350,
+    left: 85,
+    transform: [{ translateX: -110 }],
+    fontFamily: "Inter-Bold",
+    letterSpacing: 1,
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 4,
   },
   splashScreen: {
     borderRadius: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF", // Changed to solid white
     width: "100%",
     height: 812,
     overflow: "hidden",
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
