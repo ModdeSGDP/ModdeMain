@@ -50,14 +50,11 @@ function Page() {
               {/* Previous Button - Prevent Click if on First Page */}
               <PaginationItem>
                 <PaginationPrevious
-                  // onClick={() => {
-                  //   if (currentPage > 1) {
-                  //     setCurrentPage((prev) => prev - 1);
-                  //   }
-                  // }}
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-
-
+                  onClick={() => {
+                    if (currentPage > 1) {
+                      setCurrentPage((prev) => prev - 1);
+                    }
+                  }}
                   className={currentPage === 1 ? "pointer-events-none opacity-50" : ""} // FIXED: Disable click when on first page
                 />
               </PaginationItem>
@@ -77,13 +74,11 @@ function Page() {
               {/* Next Button - Prevent Click if on Last Page */}
               <PaginationItem>
                 <PaginationNext
-                  // onClick={() => {
-                  //   if (currentPage < totalPages) {
-                  //     setCurrentPage((prev) => prev + 1);
-                  //   }
-                  // }}
-
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() => {
+                    if (currentPage < totalPages) {
+                      setCurrentPage((prev) => prev + 1);
+                    }
+                  }}
                   className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""} // FIXED: Disable click when on last page
                 />
               </PaginationItem>

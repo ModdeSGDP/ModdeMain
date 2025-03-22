@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'; // ✅ Backend on port 3000
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'; // ✅Backend on port 3000
 
 const api = axios.create({
-  baseURL: API_BASE_URL, // ✅ Connects to Swagger API
+  baseURL: API_BASE_URL, //  Connects to Swagger API
   headers: {
     'Content-Type': 'application/json',
   },

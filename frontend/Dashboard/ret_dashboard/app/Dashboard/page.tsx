@@ -19,18 +19,18 @@ function page() {
 
   // Dynamic retailer data
   const retailerOrders = [
-    { id: 25426, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Komal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
-    { id: 25425, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Nikhil", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
-    { id: 25424, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Nimal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
-    { id: 25423, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kushan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
-    { id: 25422, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kidura", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
-    { id: 25421, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Yougesh", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
-    { id: 25420, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Priyantha", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
+    { id: 25426, product: "Bathik Frock", date: "Dec 16th, 2024", customer: { name: "Komal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25425, product: "High Neck Strip Tshirt", date: "Dec 16th, 2024", customer: { name: "Nikhil", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
+    { id: 25424, product: "Saree", date: "Dec 16th, 2024", customer: { name: "Nimal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25423, product: "Female baggy denim", date: "Dec 16th, 2024", customer: { name: "Kushan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
+    { id: 25422, product: "Plane color office trouser", date: "Dec 16th, 2024", customer: { name: "Kidura", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25421, product: "Crop Top Short Sleeve Off Shoulder", date: "Dec 16th, 2024", customer: { name: "Yougesh", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
+    { id: 25420, product: "Crop Top Short Sleeve", date: "Dec 16th, 2024", customer: { name: "Priyantha", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
     { id: 25419, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kishan", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" },
-    { id: 25418, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Kumal", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
-    { id: 25417, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Priyanka", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
-    { id: 25416, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Nuwan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
-    { id: 25415, product: "Lorem Ipsum", date: "Dec 16th, 2024", customer: { name: "Dumal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" }
+    { id: 25418, product: "High Waisted Denim Skirt", date: "Dec 16th, 2024", customer: { name: "Kumal", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
+    { id: 25417, product: "Check Office Trouser", date: "Dec 16th, 2024", customer: { name: "Priyanka", image: "/images/Customer_avatar.svg" }, status: "Canceled", amount: "LKR 4500.00" },
+    { id: 25416, product: "Summer Crop top", date: "Dec 16th, 2024", customer: { name: "Nuwan", image: "/images/Customer_avatar.svg" }, status: "Pending", amount: "LKR 4500.00" },
+    { id: 25415, product: "Collar Crop Top Long Sleeve", date: "Dec 16th, 2024", customer: { name: "Dumal", image: "/images/Customer_avatar.svg" }, status: "Delivered", amount: "LKR 4500.00" }
   ];
 
 

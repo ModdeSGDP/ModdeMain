@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Camera, Pencil } from "lucide-react";
 
 
+
 // **Validation Schema**
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters").max(50, "First name too long"),
@@ -97,7 +98,7 @@ const ProfileForm = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mt-4">
+    <div className="p-6 rounded-lg shadow-md mt-4">
       {/* Profile Picture Upload */}
       <div className="flex items-center space-x-4">
         <label className="flex flex-col items-center cursor-pointer">
