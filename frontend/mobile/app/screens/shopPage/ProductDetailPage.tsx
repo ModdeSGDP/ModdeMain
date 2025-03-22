@@ -20,7 +20,7 @@ import { useCartStore } from "../shopPage/cartState"
 
 const { width } = Dimensions.get("window")
 
-const API_BASE_URL = "http://192.168.8.102:4000"
+const API_BASE_URL = "https://2a1a-124-43-246-34.ngrok-free.app"
 const AUTH_TOKEN = "usertoken" // Replace with secure token retrieval logic
 
 type RootStackParamList = {

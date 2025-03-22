@@ -2,17 +2,19 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { StyleSheet, Text, View, Image, ScrollView, Pressable, SafeAreaView } from "react-native"
+import { StyleSheet, Text, View, Image, ScrollView, Pressable, SafeAreaView, Animated } from "react-native"
 import { useNavigation, useRoute, type RouteProp } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
 import { useAsyncStorage } from "../AsyncStorage/useAsyncStorage" // Adjust the import path as needed
-import { Ionicons } from "@expo/vector-icons" // For chevron-back
+import { Ionicons } from "@expo/vector-icons"
+import { LinearGradient } from "expo-linear-gradient"
 
 type RootStackParamList = {
   HomePage: undefined
   ShopPage: undefined
   CartPage: undefined
   ProfilePage: undefined
+  Camera:undefined
   OrderSettingsPage: undefined
   OrdersPage: { newOrder?: any; deleteAll?: boolean }
 }
@@ -34,6 +36,7 @@ const OrdersPage: React.FC = () => {
   const route = useRoute<OrdersPageRouteProp>()
   const [orders, setOrders] = useState<Order[]>([])
   const { storeData, getData, removeData, isLoading } = useAsyncStorage()
+  const buttonScale = new Animated.Value(1)
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -83,10 +86,16 @@ const OrdersPage: React.FC = () => {
     }
   }, [route.params, removeData])
 
-  const deleteAllOrders = () => {
-    console.log("Deleting all orders via button")
-    setOrders([])
-    removeData("orders")
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
+      Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+    ]).start()
+  }
+
+  const handleShopPress = () => {
+    animateButton()
+    setTimeout(() => navigation.navigate("ShopPage"), 200)
   }
 
   const formatDate = (dateString: string) => {
@@ -121,7 +130,7 @@ const OrdersPage: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.ordersPage}>
-        {/* Updated Header with Cog Icon */}
+        {/* Header */}
         <View style={styles.header}>
           <Pressable onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={24} color="#333" />
@@ -172,29 +181,39 @@ const OrdersPage: React.FC = () => {
           <View style={styles.noOrdersContainer}>
             <Image source={require("../../assets/orderillu.png")} style={styles.noOrdersImage} />
             <Text style={styles.noOrdersText}>Once you place an order, you'll see it listed here</Text>
-            <Pressable style={styles.shopButton} onPress={() => navigation.navigate("ShopPage")}>
-              <Text style={styles.shopButtonText}>Go to Shop</Text>
-            </Pressable>
+            <Animated.View style={[styles.shopButtonContainer, { transform: [{ scale: buttonScale }] }]}>
+              <LinearGradient
+                colors={["#ff9a9e", "#fad0c4"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.shopButton}
+              >
+                <Pressable onPress={handleShopPress} style={styles.shopButtonContent}>
+                  <Text style={styles.shopButtonText}>Go to Shop</Text>
+                  <Ionicons name="arrow-forward" size={20} color="#FFF" style={styles.shopButtonIcon} />
+                </Pressable>
+              </LinearGradient>
+            </Animated.View>
           </View>
         )}
 
         <View style={styles.navigationBar}>
           <View style={styles.navBarBg} />
           <View style={styles.navIcons}>
-            <Pressable onPress={() => navigation.navigate("HomePage")} style={styles.navItem}>
+            <Pressable onPress={() => navigation.navigate("HomePage")}>
               <View style={styles.lineView} />
               <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home.png")} />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("ShopPage")} style={styles.navItem}>
+            <Pressable onPress={() => navigation.navigate("ShopPage")}>
               <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
             </Pressable>
-            <Pressable onPress={() => {}} style={styles.navItem}>
+            <Pressable onPress={() => {navigation.navigate("Camera")}}>
               <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("CartPage")} style={styles.navItem}>
+            <Pressable onPress={() => navigation.navigate("CartPage")}>
               <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
             </Pressable>
-            <Pressable onPress={() => navigation.navigate("ProfilePage")} style={styles.navItem}>
+            <Pressable onPress={() => navigation.navigate("ProfilePage")}>
               <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
             </Pressable>
           </View>
@@ -221,17 +240,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: "#FFFFFF",
   },
-  headerButton: {
-    padding: 8,
-  },
-  navItem: {},
   headerIcon: {
-    width: 24,  // Matches original size
+    width: 24,
     height: 24,
   },
   title: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "bold", // Matches headerTitle from PromotionsPage
     color: "#333",
   },
   orderList: {
@@ -255,25 +270,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   orderTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000000",
+    fontSize: 18, // Matches promotionTitle
+    fontWeight: "bold",
+    color: "#333",
   },
   orderDate: {
-    fontSize: 14,
-    color: "#FF8FA3",
+    fontSize: 14, // Matches promotionDescription
+    color: "#666",
   },
   orderSummary: {
     marginBottom: 12,
   },
   orderInfo: {
-    fontSize: 12,
-    color: "#888888",
+    fontSize: 14, // Matches promotionDescription
+    color: "#666",
     marginBottom: 8,
   },
   orderDescription: {
-    fontSize: 14,
-    color: "#666666",
+    fontSize: 14, // Matches promotionDescription
+    color: "#666",
     marginBottom: 8,
     lineHeight: 20,
   },
@@ -298,27 +313,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   orderProductName: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#321919",
+    fontSize: 14, // Matches promotionDescription
+    fontWeight: "bold", // Adjusted to match promotionTitle for emphasis
+    color: "#333",
     marginBottom: 4,
   },
   orderProductPrice: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#000",
+    fontSize: 14, // Matches promotionDescription
+    fontWeight: "bold", // Adjusted for consistency
+    color: "#333",
     marginBottom: 4,
   },
   orderProductQuantity: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 14, // Matches promotionDescription
+    color: "#666",
   },
   noMoreMessages: {
     textAlign: "center",
-    color: "#FF8FA3",
+    color: "#999", // Matches endMessage
     fontSize: 14,
     marginVertical: 16,
-    fontStyle: "italic",
     bottom: 200,
   },
   noOrdersContainer: {
@@ -328,27 +342,43 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   noOrdersImage: {
-    width: 250,
-    height: 200,
-    marginBottom: 80,
+    width: 300,
+    height: 300,
+    marginBottom: 30,
   },
   noOrdersText: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 18, // Matches noPromotionsText
+    fontWeight: "bold",
     textAlign: "center",
-    color: "#FF4D6D",
-    marginBottom: 24,
+    color: "#333",
+    marginBottom: 20,
+  },
+  shopButtonContainer: {
+    overflow: "hidden",
+    borderRadius: 25,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   shopButton: {
-    backgroundColor: "#FF4D6D",
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 24,
+  },
+  shopButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   shopButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-    fontSize: 16,
+    color: "#FFF",
+    fontSize: 18, // Matches shopButtonText
+    fontWeight: "bold",
+    marginRight: 8,
+  },
+  shopButtonIcon: {
+    marginLeft: 8,
   },
   navigationBar: {
     position: "absolute",
