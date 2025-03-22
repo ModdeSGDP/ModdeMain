@@ -97,7 +97,6 @@ export default function MyStack() {
       <Stack.Screen name="SignUpPage" component={SignupPage} />
       <Stack.Screen name="ProductDetail" component={ProductDetailPage}/>
       <Stack.Screen name="CheckoutPage" component={CheckoutScreen}/>
-      <Stack.Screen name="HomeSideBar" component={SideMenu}/>
       <Stack.Screen name="PromotionPage" component={PromotionsPage}/>
       <Stack.Screen name="NotificationPage" component={NotificationsPage}/>
       <Stack.Screen name="OrdersPage" component={OrdersPage}/>
