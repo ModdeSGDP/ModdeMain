@@ -16,7 +16,7 @@ import {
 import * as ImagePicker from "expo-image-picker"
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons } from "@expo/vector-icons"
 import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage"
 
 // Define the navigation stack param list
@@ -38,8 +38,8 @@ interface Product {
   [key: string]: any
 }
 interface RouteParams {
-  products?: any[];
-  capturedImage?: string;
+  products?: any[]
+  capturedImage?: string
 }
 interface Order {
   id: string
@@ -52,7 +52,7 @@ interface Order {
 
 const { width } = Dimensions.get("window")
 
-// SideMenu Component (unchanged)
+// SideMenu Component (unchanged visuals, added animation)
 interface SideMenuProps {
   orderCount: number
 }
@@ -60,14 +60,36 @@ const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [animation] = useState(new Animated.Value(0))
+  const [floatAnim] = useState(new Animated.Value(0)) // For floating effect
+
   useEffect(() => {
+    // Initial slide-in animation
     Animated.timing(animation, {
       toValue: 1,
       duration: 500,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start()
-  }, [animation])
+
+    // Floating animation loop
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: 5,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start()
+  }, [animation, floatAnim])
+
   const menuItems = [
     { name: "OrdersPage", label: "My Orders", icon: require("../assets/truck.png") },
     { name: "Favorites", label: "Favorites", icon: require("../assets/heart.png") },
@@ -75,6 +97,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
     { name: "PromotionPage", label: "Promotions", icon: require("../assets/fire.png") },
     { name: "Camera", label: "Camera", icon: require("../assets/camera-photo.png") },
   ]
+
   const NavigationItem: React.FC<{ name: string; label: string; icon: any; index: number }> = ({
     name,
     label,
@@ -117,42 +140,61 @@ const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
       </Animated.View>
     )
   }
+
   return (
-    <LinearGradient colors={["#fff8f8", "#fff"]} style={sideStyles.sideMenu}>
-      <Image style={sideStyles.background} source={require("../assets/Ellipse1.png")} />
-      <Animated.Image
-        style={[
-          sideStyles.logoIcon,
-          {
-            opacity: animation,
-            transform: [
-              {
-                scale: animation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.5, 1],
-                }),
-              },
-            ],
-          },
-        ]}
-        source={require("../assets/logo.png")}
-      />
-      <View style={sideStyles.navigationBar}>
-        {menuItems.map((item, index) => (
-          <NavigationItem key={item.name} {...item} index={index} />
-        ))}
-      </View>
-      <Image style={sideStyles.background2} source={require("../assets/Ellipse2.png")} />
-    </LinearGradient>
+    <Animated.View
+      style={[
+        sideStyles.sideMenuContainer,
+        {
+          transform: [{ translateY: floatAnim }],
+        },
+      ]}
+    >
+      <LinearGradient colors={["#fff8f8", "#fff"]} style={sideStyles.sideMenu}>
+        <Image style={sideStyles.background} source={require("../assets/Ellipse1.png")} />
+        <Animated.Image
+          style={[
+            sideStyles.logoIcon,
+            {
+              opacity: animation,
+              transform: [
+                {
+                  scale: animation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.5, 1],
+                  }),
+                },
+              ],
+            },
+          ]}
+          source={require("../assets/logo.png")}
+        />
+        <View style={sideStyles.navigationBar}>
+          {menuItems.map((item, index) => (
+            <NavigationItem key={item.name} {...item} index={index} />
+          ))}
+        </View>
+        <Image style={sideStyles.background2} source={require("../assets/Ellipse2.png")} />
+      </LinearGradient>
+    </Animated.View>
   )
 }
 
 const sideStyles = StyleSheet.create({
+  sideMenuContainer: {
+    flex: 1,
+    width: 280,
+    shadowColor: "#000",
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 10,
+  },
   sideMenu: {
     flex: 1,
     alignItems: "center",
     paddingTop: 40,
-    width: 280,
+    borderRadius: 15,
   },
   background: {
     width: "100%",
@@ -258,6 +300,8 @@ const HomePage = () => {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<Order[]>([])
+  const [slideAnim] = useState(new Animated.Value(-width * 0.67))
+  const [overlayOpacity] = useState(new Animated.Value(0))
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -279,11 +323,28 @@ const HomePage = () => {
     }
   }, [route.params?.capturedImage])
 
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: isSideMenuOpen ? 0 : -width * 0.67,
+        duration: 300,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }),
+      Animated.timing(overlayOpacity, {
+        toValue: isSideMenuOpen ? 0.7 : 0,
+        duration: 300,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }, [isSideMenuOpen, slideAnim, overlayOpacity])
+
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (evt, gestureState) => {
-      if (gestureState.dx < -50) {
+      if (gestureState.dx < -50 && isSideMenuOpen) {
         setIsSideMenuOpen(false)
       }
     },
@@ -449,11 +510,28 @@ const HomePage = () => {
         </View>
       </View>
       {isSideMenuOpen && (
-        <View style={styles.sideMenuContainer}>
+        <Animated.View
+          style={[
+            styles.sideMenuWrapper,
+            {
+              transform: [{ translateX: slideAnim }],
+            },
+          ]}
+        >
           <SideMenu orderCount={orders.length} />
-          <Pressable style={styles.overlay} onPress={() => setIsSideMenuOpen(false)} />
-        </View>
+        </Animated.View>
       )}
+      <Animated.View
+        style={[
+          styles.overlay,
+          {
+            opacity: overlayOpacity,
+          },
+        ]}
+        pointerEvents={isSideMenuOpen ? "auto" : "none"}
+      >
+        <Pressable style={styles.overlayPressable} onPress={() => setIsSideMenuOpen(false)} />
+      </Animated.View>
     </View>
   )
 }
@@ -468,27 +546,25 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     overflow: "hidden",
   },
-  sideMenuContainer: {
+  sideMenuWrapper: {
     position: "absolute",
     top: 0,
     left: 0,
     bottom: 0,
     width: width * 0.67,
     zIndex: 1000,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: -2, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
   },
   overlay: {
     position: "absolute",
     top: 0,
-    left: width * 0.67,
+    left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker overlay for shadow effect
+    zIndex: 999,
+  },
+  overlayPressable: {
+    flex: 1,
   },
   header: {
     flexDirection: "row",
@@ -505,11 +581,11 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   headerTitle: {
-    fontSize: 24, // Increased from 20 to 24
+    fontSize: 24,
     fontFamily: "Rosario-Bold",
     fontWeight: "800",
     color: "#333",
-    top:50,
+    top: 50,
     textAlign: "center",
     flex: 1,
   },
