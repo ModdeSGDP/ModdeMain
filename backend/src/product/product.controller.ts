@@ -40,8 +40,8 @@ export class ProductController {
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
   ) {}
 
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('add')
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
