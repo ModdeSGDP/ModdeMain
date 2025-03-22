@@ -23,10 +23,10 @@ const AnalyticsGraphs = () => {
               curve: 'catmullRom', // Smooth curve effect
             },
           ]}
-          tooltip={{ trigger: 'item' }} // Enhanced tooltip on hover
-          grid={{ vertical: true, horizontal: true }} // Added grid for better readability
-          width={320} // Adjusted width to shift left slightly
-          height={130} // Slightly increased height for better visualization
+          tooltip={{ trigger: 'item' }}
+          grid={{ vertical: true, horizontal: true }}
+          width={320}
+          height={130}
         />
       </div>
 
@@ -46,10 +46,10 @@ const AnalyticsGraphs = () => {
               curve: 'catmullRom', // Smooth curve effect
             },
           ]}
-          tooltip={{ trigger: 'item' }} // Enhanced tooltip on hover
-          grid={{ vertical: true, horizontal: true }} // Added grid for better readability
-          width={320} // Adjusted width to shift left slightly
-          height={130} // Slightly increased height for better visualization
+          tooltip={{ trigger: 'item' }}
+          grid={{ vertical: true, horizontal: true }}
+          width={320}
+          height={130}
         />
       </div>
 
@@ -77,7 +77,7 @@ const AnalyticsGraphs = () => {
           tooltip={{ trigger: 'item' }} // Interactive tooltip
           grid={{ vertical: true, horizontal: true }} // Grid for readability
           width={1000} // Wider chart
-          height={200} // Taller chart for better visibility
+          height={200}
           legend={{ position: { horizontal: 'right', vertical: 'top' } }} // Positioned legend at top-right
         />
       </div>
@@ -105,7 +105,7 @@ const AnalyticsGraphs = () => {
             width={300}
             height={250}
             slotProps={{
-              sector: { className: 'hover:scale-105 hover:drop-shadow-lg transition-transform duration-300' }, // Fix applied here
+
               legend: { hidden: true },
             }}
           />

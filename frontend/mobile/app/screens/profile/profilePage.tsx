@@ -11,12 +11,11 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
-  Modal,
   TouchableOpacity,
   Platform,
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { useAsyncStorage } from "../AsyncStorage/useAsyncStorage"
+import { useAsyncStorage } from "../AsyncStorage/useAsyncStorage" // Adjust path as needed
 import { LinearGradient } from "expo-linear-gradient"
 import type { StackNavigationProp } from "@react-navigation/stack"
 
@@ -27,7 +26,7 @@ type RootStackParamList = {
   CartPage: undefined
   ProfilePage: undefined
   NotificationPage: undefined
-  Camera:undefined
+  Camera: undefined
 }
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, "ProfilePage">
@@ -46,13 +45,11 @@ const deleteAccount = async (): Promise<void> => {
   })
 }
 
-
 const Profile: React.FC = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>()
-  const { storeData, getData } = useAsyncStorage()
+  const { storeData, getData, isLoading } = useAsyncStorage()
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [showConfirmation, setShowConfirmation] = useState(false)
 
   const [profileData, setProfileData] = useState({
     firstName: "",
@@ -64,6 +61,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const loadUserData = async () => {
       const userData = await getData("userData")
+      console.log("Loaded userData:", userData) // Debug log
       if (userData) {
         setProfileData({
           firstName: userData.firstName || "",
@@ -73,13 +71,15 @@ const Profile: React.FC = () => {
         })
       }
     }
-    loadUserData()
-  }, [getData])
+    if (!isLoading) {
+      loadUserData()
+    }
+  }, [getData, isLoading])
 
   const handleEdit = async () => {
     if (isEditing) {
       // Save changes to AsyncStorage
-      await storeData("userData", JSON.stringify(profileData))
+      await storeData("userData", profileData) // No need to stringify here, useAsyncStorage does it
       console.log("Saving changes:", profileData)
     }
     setIsEditing(!isEditing)
@@ -100,6 +100,14 @@ const Profile: React.FC = () => {
       setIsDeleting(false)
       alert("Error deleting account. Please try again.")
     }
+  }
+
+  if (isLoading) {
+    return (
+      <View style={styles.profile}>
+        <Text>Loading profile...</Text>
+      </View>
+    )
   }
 
   return (
@@ -251,7 +259,6 @@ const Profile: React.FC = () => {
         </View>
         <View style={styles.activeIndicator} />
       </View>
-
 
       {isDeleting && (
         <View style={styles.loadingOverlay}>
@@ -405,35 +412,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     marginVertical: 4,
   },
-  deleteAccount: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFE2E2",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-    shadowColor: "#ff0000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  trashIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
-    tintColor: "#FF0000",
-  },
-  deleteAccountText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FF0000",
-    fontFamily: "Inter-SemiBold",
-  },
   logoutButton: {
     borderRadius: 16,
     marginBottom: 130,
@@ -511,78 +489,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fba3a3",
   },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalView: {
-    width: "80%",
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 24,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 10,
-  },
-  modalIcon: {
-    width: 40,
-    height: 40,
-    tintColor: "#FF0000",
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#321919",
-    marginBottom: 12,
-    fontFamily: "Inter-Bold",
-  },
-  modalText: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 20,
-    lineHeight: 20,
-    fontFamily: "Inter-Regular",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  button: {
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    elevation: 2,
-    width: "48%",
-  },
-  buttonCancel: {
-    backgroundColor: "#f0f0f0",
-  },
-  buttonConfirm: {
-    backgroundColor: "#FF0000",
-  },
-  cancelButtonText: {
-    color: "#666",
-    fontWeight: "600",
-    textAlign: "center",
-    fontFamily: "Inter-SemiBold",
-  },
-  confirmButtonText: {
-    color: "white",
-    fontWeight: "600",
-    textAlign: "center",
-    fontFamily: "Inter-SemiBold",
-  },
   loadingOverlay: {
     position: "absolute",
     left: 0,
@@ -596,4 +502,3 @@ const styles = StyleSheet.create({
 })
 
 export default Profile
-

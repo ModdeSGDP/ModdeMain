@@ -10,9 +10,9 @@ class OrderItemDto {
 }
 
 export class CreateOrderDto {
-  @IsMongoId()
-  @IsNotEmpty()
-  customerId: string;
+  // @IsMongoId()
+  // @IsNotEmpty()
+  // customerId: string;
 
   @IsArray()
   @ValidateNested({ each: true })

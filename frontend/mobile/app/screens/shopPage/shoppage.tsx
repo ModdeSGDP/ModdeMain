@@ -1,6 +1,5 @@
 "use client"
-
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect, useMemo } from "react"
 import {
   StyleSheet,
   View,
@@ -11,202 +10,204 @@ import {
   FlatList,
   Dimensions,
   ActivityIndicator,
+  SafeAreaView,
 } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import type { StackNavigationProp } from "@react-navigation/stack"
+import { useNavigation, useRoute } from "@react-navigation/native"
+import type { StackNavigationProp, RouteProp } from "@react-navigation/stack"
 import { useCartStore } from "./cartState"
+import { Ionicons } from "@expo/vector-icons"
 
 const { width } = Dimensions.get("window")
 
-// API endpoint - consider moving to environment config
-const API_BASE_URL = "http://192.168.8.100:4000"
-
-// Authentication token - should be stored securely and fetched from secure storage
-const AUTH_TOKEN = "usertoken" // Replace with your actual auth token or token retrieval logic
+const API_BASE_URL = "https://2a1a-124-43-246-34.ngrok-free.app"
+const AUTH_TOKEN = "usertoken" // Replace with secure token retrieval logic
 
 type RootStackParamList = {
   HomePage: undefined
-  ShopPage: undefined
+  ShopPage: { products?: Product[] } | undefined
   ProductDetail: { product: Product }
   CartPage: undefined
   ProfilePage: undefined
   Camera: undefined
+  NotificationPage: undefined
 }
+
 type ShopsPageNavigationProp = StackNavigationProp<RootStackParamList, "ShopPage">
-// Extend Product type to include retailer details
+
 type Retailer = {
   id: string
   name: string
   logo?: string | null
   location?: string | null
 }
+
 type Product = {
   id: string
+  productId: string
   name: string
   description: string
   category: string
   color: string
-  sizes: string[]
   image: string | null
-  price: number
-  brand: string
-  tag: string
-  gender: string
-  material: string
   retailerId: string
   retailer?: Retailer | null
+  createdAt: string
+  updatedAt: string
+  price?: number
+  sizes?: string[]
+  brand?: string
+  tag?: string
+  gender?: string
+  material?: string
 }
-// Function to fix S3 image URLs
-const fixS3ImageUrl = (url: string | null): string | null => {
-  if (!url) return null;
-  // Check if it's an S3 URL with issues
-  if (url.includes('modde.s3.undefined.amazonaws.com')) {
-    // Replace undefined region with a valid one (us-east-1 in this case)
-    return url.replace('modde.s3.undefined.amazonaws.com', 'modde.s3.us-east-1.amazonaws.com');
-  }
 
-  return url;
+const fixS3ImageUrl = (url: string | null): string | null => {
+  if (!url) return null
+  if (url.includes("modde.s3.undefined.amazonaws.com")) {
+    return url.replace("modde.s3.undefined.amazonaws.com", "modde.s3.us-east-1.amazonaws.com")
+  }
+  return url
 }
 
 const ShopsPageInfinityScroll = () => {
   const navigation = useNavigation<ShopsPageNavigationProp>()
+  const route = useRoute<RouteProp<RootStackParamList, "ShopPage">>()
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [authToken, setAuthToken] = useState<string | null>(AUTH_TOKEN)
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({})
+  const [initialProductsLoaded, setInitialProductsLoaded] = useState(false)
 
   const { items, addItem } = useCartStore()
   const totalQuantity = items.reduce((total, item) => total + item.quantity, 0)
 
-  // Fetch retailer details with authentication
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return products
+    
+    return products.filter(product => 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.brand && product.brand.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.retailer?.name && product.retailer.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+  }, [products, searchQuery])
+
+  useEffect(() => {
+    if (route.params?.products && !initialProductsLoaded) {
+      const mappedProducts = route.params.products.map((item: any) => ({
+        id: item._id || item.id,
+        productId: item.productId || "N/A",
+        name: item.name || "Unnamed Product",
+        description: item.description || "",
+        category: item.category || "Uncategorized",
+        color: item.color || "",
+        image: fixS3ImageUrl(item.image_url || item.image),
+        retailerId: item.retailerId || "",
+        retailer: item.retailer || null,
+        createdAt: item.createdAt || "",
+        updatedAt: item.updatedAt || "",
+        price: item.price || 0,
+        sizes: item.sizes || [],
+        brand: item.brand || "Unknown Brand",
+        tag: item.tag || "none",
+        gender: item.gender || "unisex",
+        material: item.material || "unknown",
+      }))
+      setProducts(mappedProducts)
+      setInitialProductsLoaded(true)
+      setIsLoading(false)
+    }
+  }, [route.params?.products, initialProductsLoaded])
+
+  useEffect(() => {
+    if (!route.params?.products && !initialProductsLoaded && products.length === 0) {
+      fetchProducts(1)
+    }
+  }, [route.params?.products, initialProductsLoaded, products.length])
+
   const fetchRetailerDetails = async (retailerId: string): Promise<Retailer | null> => {
+    if (!retailerId || retailerId.trim() === "") return null
     try {
-      // Skip fetch if retailerId is empty or invalid
-      if (!retailerId || retailerId.trim() === "") {
-        return {
-          id: "unknown",
-          name: "Unknown Retailer",
-        }
-      }
-
-      // Check if we have an auth token
-      if (!authToken) {
-        console.log("No auth token available for retailer fetch")
-        return {
-          id: retailerId,
-          name: "Unknown Retailer",
-        }
-      }
-
-      const response = await fetch(`${API_BASE_URL}/retailer/${retailerId}`, {
+      if (!authToken) return null
+      const response = await fetch(`${API_BASE_URL}/retailers/${retailerId}`, {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${authToken}`, // Add auth token
+          "Authorization": `Bearer ${authToken}`,
         },
       })
-
       if (!response.ok) {
-        // Handle different error codes
-        if (response.status === 401) {
-          console.log(`Authentication failed for retailer ${retailerId}`)
-          // You might want to trigger a re-authentication here
-          setAuthToken(null) // Clear invalid token
-          return {
-            id: retailerId,
-            name: "Unknown Retailer",
-          }
-        } else if (response.status === 404) {
-          console.log(`Retailer ${retailerId} not found`)
-          return {
-            id: retailerId,
-            name: "Unknown Retailer",
-          }
-        }
-        throw new Error(`Failed to fetch retailer details: ${response.status}`)
+        if (response.status === 401) setAuthToken(null)
+        return null
       }
-
       const retailerData = await response.json()
       return {
         id: retailerData._id || retailerId,
-        name: retailerData.name || "Unknown Retailer",
+        name: retailerData.name || "Retailer Not Specified",
         logo: retailerData.logo || null,
         location: retailerData.location || null,
       }
     } catch (error) {
       console.error(`Error fetching retailer ${retailerId}:`, error)
-      return {
-        id: retailerId,
-        name: "Unknown Retailer",
-      }
+      return null
     }
   }
 
-  // Function to fetch products with retry logic and authentication
-  const fetchProducts = async (pageNum: number, retryCount = 0) => {
-    if (retryCount === 0) {
-      setIsLoading(true)
-    }
+  const fetchProducts = async (pageNum: number, retryCount = 0): Promise<boolean> => {
+    if (retryCount === 0) setIsLoading(true)
     setError(null)
     try {
       const API_ENDPOINT = `${API_BASE_URL}/product?page=${pageNum}&limit=10`
-      console.log("Fetching products from:", API_ENDPOINT)
-      // Prepare headers with authentication if available
       const headers: Record<string, string> = {
         "Accept": "application/json",
         "Content-Type": "application/json",
       }
-      
-      if (authToken) {
-        headers["Authorization"] = `Bearer ${authToken}`
-      }
+      if (authToken) headers["Authorization"] = `Bearer ${authToken}`
 
       const response = await fetch(API_ENDPOINT, { headers })
-      
       if (!response.ok) {
-        // Handle authentication errors
         if (response.status === 401) {
-          console.log("Authentication failed for product fetch")
-          setAuthToken(null) // Clear invalid token
+          setAuthToken(null)
           throw new Error("Authentication failed. Please log in again.")
         }
         throw new Error(`HTTP error! Status: ${response.status}`)
       }
-      
-      const result = await response.json()
-      console.log("API Response received")
 
-      const productsArray = result.products || []
+      const result = await response.json()
+      console.log("API Response:", result)
+      
+      const productsArray = Array.isArray(result) ? result : result.products || []
       setTotalPages(result.totalPages || 1)
 
-      // Map products and fetch retailer details
       const mappedProducts = await Promise.all(
         productsArray.map(async (item: any) => {
           const retailer = item.retailerId ? await fetchRetailerDetails(item.retailerId) : null
-          
-          // Fix S3 image URL if needed
           const fixedImageUrl = fixS3ImageUrl(item.image)
-          
+
           return {
-            id: item._id,
+            id: item._id || item.id,
+            productId: item.productId || "N/A",
             name: item.name || "Unnamed Product",
             description: item.description || "",
             category: item.category || "Uncategorized",
             color: item.color || "",
-            sizes: item.sizes || [],
             image: fixedImageUrl,
+            retailerId: item.retailerId || "",
+            retailer,
+            createdAt: item.createdAt || "",
+            updatedAt: item.updatedAt || "",
             price: item.price || 0,
+            sizes: item.sizes || [],
             brand: item.brand || "Unknown Brand",
             tag: item.tag || "none",
             gender: item.gender || "unisex",
             material: item.material || "unknown",
-            retailerId: item.retailerId || "",
-            retailer,
           }
         })
       )
@@ -216,20 +217,13 @@ const ShopsPageInfinityScroll = () => {
       } else {
         setProducts((prevProducts) => [...prevProducts, ...mappedProducts])
       }
-      
       return true
     } catch (error) {
       console.error("Fetch error:", error)
-      
-      // Retry logic (max 3 attempts)
       if (retryCount < 3) {
-        console.log(`Retrying fetch (attempt ${retryCount + 1})...`)
-        setTimeout(() => {
-          fetchProducts(pageNum, retryCount + 1)
-        }, 1000 * (retryCount + 1)) // Exponential backoff
-        return false
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)))
+        return fetchProducts(pageNum, retryCount + 1)
       }
-      
       setError(error instanceof Error ? error.message : "Failed to fetch products")
       return false
     } finally {
@@ -240,60 +234,39 @@ const ShopsPageInfinityScroll = () => {
     }
   }
 
-  // Initial load and pagination
-  useEffect(() => {
-    fetchProducts(page)
-  }, [page])
-
-  // Handle refresh
   const handleRefresh = () => {
     setIsRefreshing(true)
     setPage(1)
+    setSearchQuery("")
+    setInitialProductsLoaded(false)
     fetchProducts(1)
   }
 
   const loadMoreProducts = () => {
-    if (page < totalPages && !isLoading) {
+    if (page < totalPages && !isLoading && !initialProductsLoaded && searchQuery.trim() === "") {
       setPage((prevPage) => prevPage + 1)
+      fetchProducts(page + 1)
     }
   }
 
-  // Handle image loading errors
   const handleImageError = (imageUrl: string | null) => {
     if (imageUrl) {
-      setImageLoadErrors(prev => ({
-        ...prev,
-        [imageUrl]: true
-      }))
+      setImageLoadErrors((prev) => ({ ...prev, [imageUrl]: true }))
     }
   }
 
-  // Improved ProductCard with better image handling
   const ProductCard = useCallback(
     ({ item }: { item: Product }) => {
-      // Check if this image previously had an error
       const hasError = item.image ? imageLoadErrors[item.image] : true
-      
-      // Determine image source with fallback
-      const imageSource = (() => {
-        // If we already know this image has an error, use fallback
-        if (hasError) {
-          return require("../../assets/user.png")
-        }
-        
-        // Check if image is a valid URL
-        if (item.image && typeof item.image === "string" && 
-            (item.image.startsWith("http://") || item.image.startsWith("https://"))) {
-          return { uri: item.image }
-        }
-        
-        // Return default image if no valid image URL
-        return require("../../assets/user.png")
-      })()
-      
+      const imageSource = hasError || !item.image || !item.image.startsWith("http")
+        ? require("../../assets/user.png")
+        : { uri: item.image }
+
+      const retailerName = item.retailer?.name || "Retailer Not Specified"
+
       return (
-        <Pressable 
-          style={styles.card} 
+        <Pressable
+          style={styles.card}
           onPress={() => navigation.navigate("ProductDetail", { product: item })}
         >
           <Image
@@ -301,19 +274,13 @@ const ShopsPageInfinityScroll = () => {
             resizeMode="cover"
             source={imageSource}
             defaultSource={require("../../assets/user.png")}
-            onError={(e) => {
-              console.log("Image load error:", e.nativeEvent.error, "URL:", item.image)
-              handleImageError(item.image)
-            }}
+            onError={() => handleImageError(item.image)}
           />
           <View style={styles.inStockLabel}>
             <Text style={styles.inStockText}>In stock</Text>
           </View>
           {item.tag && item.tag !== "none" && (
-            <View style={[
-              styles.tagLabel, 
-              item.tag === "popular" ? styles.popularTag : styles.recommendedTag
-            ]}>
+            <View style={[styles.tagLabel, item.tag === "popular" ? styles.popularTag : styles.recommendedTag]}>
               <Text style={styles.tagText}>
                 {item.tag === "popular" ? "Most Popular" : "Recommended"}
               </Text>
@@ -324,9 +291,9 @@ const ShopsPageInfinityScroll = () => {
               {item.name}
             </Text>
             <Text style={styles.brandName} numberOfLines={1} ellipsizeMode="tail">
-              {item.retailer?.name || item.brand}
+              {retailerName}
             </Text>
-            <Text style={styles.price}>LKR {item.price.toFixed(2)}</Text>
+            <Text style={styles.price}>LKR {item.price?.toFixed(2) || "N/A"}</Text>
           </View>
           <Pressable
             style={styles.addToCartButton}
@@ -334,20 +301,20 @@ const ShopsPageInfinityScroll = () => {
               addItem({
                 id: item.id,
                 name: item.name,
-                price: item.price.toString(),
+                price: item.price?.toString() || "0",
                 image: item.image,
                 quantity: 1,
                 color: item.color,
-                size: item.sizes[0] || "",
-                brand: item.brand,
-                shop: item.retailer?.name || item.brand,
+                size: item.sizes?.[0] || "",
+                brand: item.brand || retailerName,
+                shop: retailerName,
               })
             }}
           >
-            <Image 
-              style={styles.addToCartIcon} 
-              resizeMode="cover" 
-              source={require("../../assets/addcart.png")} 
+            <Image
+              style={styles.addToCartIcon}
+              resizeMode="cover"
+              source={require("../../assets/addcart.png")}
             />
           </Pressable>
         </Pressable>
@@ -356,13 +323,9 @@ const ShopsPageInfinityScroll = () => {
     [navigation, addItem, imageLoadErrors]
   )
 
-  const renderItem = useCallback(
-    ({ item }: { item: Product }) => <ProductCard item={item} />, 
-    [ProductCard]
-  )
+  const renderItem = useCallback(({ item }: { item: Product }) => <ProductCard item={item} />, [ProductCard])
 
-  // Loading state for initial load
-  if (isLoading && page === 1) {
+  if (isLoading && page === 1 && !initialProductsLoaded && searchQuery.trim() === "") {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#F97C7C" />
@@ -371,153 +334,158 @@ const ShopsPageInfinityScroll = () => {
     )
   }
 
-  // Error state
-  if (error && products.length === 0) {
+  if (error && products.length === 0 && searchQuery.trim() === "") {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error}</Text>
-        <Pressable 
-          style={styles.retryButton} 
-          onPress={() => fetchProducts(1)}
-        >
+        <Pressable style={styles.retryButton} onPress={() => fetchProducts(1)}>
           <Text style={styles.retryButtonText}>Retry</Text>
         </Pressable>
       </View>
     )
   }
 
-  // Empty state
-  if (products.length === 0 && !isLoading) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text>No products found.</Text>
-        <Pressable 
-          style={styles.retryButton} 
-          onPress={() => fetchProducts(1)}
-        >
-          <Text style={styles.retryButtonText}>Refresh</Text>
-        </Pressable>
-      </View>
-    )
-  }
-
   return (
-    <View style={styles.shopsPageInfinityScroll}>
-      <Pressable 
-        style={styles.backButton} 
-        onPress={() => navigation.navigate("HomePage")}
-      >
-        <Image 
-          style={styles.backButtonIcon} 
-          resizeMode="cover" 
-          source={require("../../assets/chevron_left.png")} 
-        />
-      </Pressable>
-      
-      <View style={styles.searchBar}>
-        <Pressable onPress={() => navigation.navigate("Camera")}>
-          <Image 
-            style={styles.searchCamera} 
-            resizeMode="cover" 
-            source={require("../../assets/Vector1.png")} 
-          />
-        </Pressable>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search products"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <Pressable onPress={() => { /* Handle search */ }}>
-          <Image 
-            style={styles.searchIcon} 
-            resizeMode="cover" 
-            source={require("../../assets/vector.png")} 
-          />
-        </Pressable>
-      </View>
-      
-      <Image 
-        style={styles.bannerImage} 
-        resizeMode="cover" 
-        source={require("../../assets/Rectangle41.png")} 
-      />
-      
-      <FlatList
-        data={products}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
-        numColumns={2}
-        contentContainerStyle={styles.productGrid}
-        columnWrapperStyle={styles.columnWrapper}
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.5}
-        refreshing={isRefreshing}
-        onRefresh={handleRefresh}
-        ListFooterComponent={
-          isLoading && page > 1 ? (
-            <ActivityIndicator size="small" color="#F97C7C" style={styles.footerLoader} />
-          ) : null
-        }
-      />
-      
-      <View style={styles.navigationBar}>
-        <View style={styles.navBarBg} />
-        <View style={styles.navIcons}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.shopsPageInfinityScroll}>
+        <View style={styles.header}>
           <Pressable onPress={() => navigation.navigate("HomePage")}>
-            <Image 
-              style={styles.navIcon} 
-              resizeMode="cover" 
-              source={require("../../assets/smart_home1.png")} 
-            />
+            <Ionicons name="chevron-back" size={24} color="#333" />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate("ShopPage")}>
-            <View style={styles.lineView} />
-            <Image 
-              style={styles.navIcon} 
-              resizeMode="cover" 
-              source={require("../../assets/shirt1.png")} 
-            />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("Camera")}>
-            <Image 
-              style={styles.navIcon} 
-              resizeMode="cover" 
-              source={require("../../assets/cameraplus.png")} 
-            />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("CartPage")}>
-            <View style={styles.cartBadgeContainer}>
-              <Image 
-                style={styles.navIcon} 
-                resizeMode="cover" 
-                source={require("../../assets/shopping_cart.png")} 
-              />
-              {totalQuantity > 0 && (
-                <View style={styles.cartBadge}>
-                  <Text style={styles.cartBadgeText}>{totalQuantity}</Text>
-                </View>
-              )}
-            </View>
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
-            <Image 
-              style={styles.navIcon} 
-              resizeMode="cover" 
-              source={require("../../assets/user.png")} 
+          <Text style={styles.headerTitle}>Shop</Text>
+          <Pressable onPress={() => navigation.navigate("NotificationPage")}>
+            <Image
+              style={styles.bellIcon}
+              resizeMode="cover"
+              source={require("../../assets/bell.png")}
             />
           </Pressable>
         </View>
-        <View style={styles.activeIndicator} />
+
+        <View style={styles.searchBar}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search products"
+            placeholderTextColor="#999"  // Added for better visibility of placeholder
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        {searchQuery.trim() === "" && (
+          <Image
+            style={styles.bannerImage}
+            resizeMode="cover"
+            source={require("../../assets/Rectangle41.png")}
+          />
+        )}
+        <FlatList
+          data={filteredProducts}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          numColumns={2}
+          contentContainerStyle={[
+            styles.productGrid,
+            searchQuery.trim() !== "" && styles.searchResultsGrid,
+          ]}
+          columnWrapperStyle={styles.columnWrapper}
+          onEndReached={loadMoreProducts}
+          onEndReachedThreshold={0.5}
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          ListFooterComponent={
+            isLoading && page > 1 && !initialProductsLoaded && searchQuery.trim() === "" ? (
+              <ActivityIndicator size="small" color="#F97C7C" style={styles.footerLoader} />
+            ) : null
+          }
+          ListEmptyComponent={
+            searchQuery.trim() !== "" ? (
+              <View style={styles.emptyResultsContainer}>
+                <Text style={styles.emptyResultsText}>No products found matching "{searchQuery}"</Text>
+              </View>
+            ) : products.length === 0 && !isLoading ? (
+              <View style={styles.emptyResultsContainer}>
+                <Text style={styles.emptyResultsText}>No products available</Text>
+              </View>
+            ) : null
+          }
+        />
+        <View style={styles.navigationBar}>
+          <View style={styles.navBarBg} />
+          <View style={styles.navIcons}>
+            <Pressable onPress={() => navigation.navigate("HomePage")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/smart_home1.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ShopPage")}>
+              <View style={styles.lineView} />
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/shirt1.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("Camera")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/cameraplus.png")}
+              />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("CartPage")}>
+              <View style={styles.cartBadgeContainer}>
+                <Image
+                  style={styles.navIcon}
+                  resizeMode="cover"
+                  source={require("../../assets/shopping_cart.png")}
+                />
+                {totalQuantity > 0 && (
+                  <View style={styles.cartBadge}>
+                    <Text style={styles.cartBadgeText}>{totalQuantity}</Text>
+                  </View>
+                )}
+              </View>
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ProfilePage")}>
+              <Image
+                style={styles.navIcon}
+                resizeMode="cover"
+                source={require("../../assets/user.png")}
+              />
+            </Pressable>
+          </View>
+          <View style={styles.activeIndicator} />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  shopsPageInfinityScroll: {
+  container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  shopsPageInfinityScroll: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  bellIcon: {
+    width: 22,
+    height: 24,
   },
   loadingContainer: {
     flex: 1,
@@ -536,11 +504,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   retryButton: {
     backgroundColor: "#F97C7C",
     paddingHorizontal: 20,
@@ -552,17 +515,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  backButton: {
-    position: "absolute",
-    top: 15,
-    left: 10,
-    zIndex: 1,
-  },
-  backButtonIcon: {
-    width: 37,
-    height: 27,
-    top: 12,
-  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -572,8 +524,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFE2E6",
     borderRadius: 10,
     margin: 10,
-    marginTop: 5,
-    top: 10,
     padding: 6,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -581,32 +531,26 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  searchCamera: {
-    width: 20,
-    height: 18,
-    marginRight: 10,
-  },
-  searchIcon: {
-    width: 16,
-    height: 18,
-    marginLeft: 10,
-  },
   searchInput: {
     flex: 1,
     fontFamily: "Inter-SemiBold",
     fontSize: 14,
     color: "#321919",
+    fontStyle: "italic", // Added to make input text italic
   },
   bannerImage: {
-    width: "90%",
-    height: 165,
+    width: "80%",
+    height: 155,
     borderRadius: 10,
-    left: 20,
+    left: 35,
     marginVertical: 10,
   },
   productGrid: {
     paddingHorizontal: 10,
     paddingBottom: 120,
+  },
+  searchResultsGrid: {
+    paddingTop: 20,
   },
   columnWrapper: {
     justifyContent: "space-between",
@@ -762,6 +706,18 @@ const styles = StyleSheet.create({
   },
   footerLoader: {
     marginVertical: 20,
+  },
+  emptyResultsContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 50,
+  },
+  emptyResultsText: {
+    fontFamily: "Inter-Medium",
+    fontSize: 16,
+    color: "#321919",
+    textAlign: "center",
   },
 })
 

@@ -1,45 +1,350 @@
 "use client"
-
 import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, Image, Pressable, Dimensions, PanResponder, Alert } from "react-native"
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  Dimensions,
+  PanResponder,
+  Alert,
+  Animated,
+  Easing,
+  Platform,
+} from "react-native"
 import * as ImagePicker from "expo-image-picker"
-import { useNavigation, useRoute, type NavigationProp } from "@react-navigation/native"
-import SideMenu from "./sideBars/homeSideBar"
-import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage" // Import useAsyncStorage
+import { useNavigation, useRoute, type NavigationProp, type RouteProp } from "@react-navigation/native"
+import { LinearGradient } from "expo-linear-gradient"
+import { Ionicons } from "@expo/vector-icons"
+import { useAsyncStorage } from "./AsyncStorage/useAsyncStorage"
 
+// Define the navigation stack param list
 type RootStackParamList = {
-  Home: undefined
-  Camera: undefined
+  Home: { products?: any[] } | undefined
+  Camera: { capturedImage?: string } | undefined
   NotificationPage: undefined
-  ShopPage: undefined
+  ShopPage: { products?: Product[] } | undefined
   CartPage: undefined
   ProfilePage: undefined
-  Login: undefined // Add Login route
+  Login: undefined
+  OrdersPage: { newOrder?: any; deleteAll?: boolean } | undefined
+}
+
+interface Product {
+  _id?: string
+  name?: string
+  image_url?: string
+  [key: string]: any
+}
+interface RouteParams {
+  products?: any[]
+  capturedImage?: string
+}
+interface Order {
+  id: string
+  date: string
+  items: any[]
+  total: number
+  status: string
+  paymentMethod: string
 }
 
 const { width } = Dimensions.get("window")
 
+// SideMenu Component (unchanged visuals, added animation)
+interface SideMenuProps {
+  orderCount: number
+}
+const SideMenu: React.FC<SideMenuProps> = ({ orderCount }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const [selectedItem, setSelectedItem] = useState<string | null>(null)
+  const [animation] = useState(new Animated.Value(0))
+  const [floatAnim] = useState(new Animated.Value(0)) // For floating effect
+
+  useEffect(() => {
+    // Initial slide-in animation
+    Animated.timing(animation, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start()
+
+    // Floating animation loop
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: 5,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start()
+  }, [animation, floatAnim])
+
+  const menuItems = [
+    { name: "OrdersPage", label: "My Orders", icon: require("../assets/truck.png") },
+    { name: "Favorites", label: "Favorites", icon: require("../assets/heart.png") },
+    { name: "History", label: "History", icon: require("../assets/shopping-bag.png") },
+    { name: "PromotionPage", label: "Promotions", icon: require("../assets/fire.png") },
+    { name: "Camera", label: "Camera", icon: require("../assets/camera-photo.png") },
+  ]
+
+  const NavigationItem: React.FC<{ name: string; label: string; icon: any; index: number }> = ({
+    name,
+    label,
+    icon,
+    index,
+  }) => {
+    const itemAnimation = animation.interpolate({
+      inputRange: [0, 1],
+      outputRange: [50, 0],
+    })
+    return (
+      <Animated.View
+        style={{
+          transform: [{ translateX: itemAnimation }],
+          opacity: animation,
+        }}
+      >
+        <Pressable
+          style={[sideStyles.navigationItem, selectedItem === name && sideStyles.selectedItem]}
+          onPress={() => {
+            setSelectedItem(name)
+            navigation.navigate(name as keyof RootStackParamList)
+          }}
+        >
+          <LinearGradient
+            colors={selectedItem === name ? ["#ffccd4", "#ffd5d5"] : ["#f8f8f8", "#ffffff"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={sideStyles.navigationItemGradient}
+          >
+            <Image style={[sideStyles.icon, selectedItem === name && sideStyles.selectedIcon]} source={icon} />
+            <Text style={[sideStyles.navText, selectedItem === name && sideStyles.selectedNavText]}>{label}</Text>
+            {name === "OrdersPage" && orderCount > 0 && (
+              <View style={sideStyles.orderBadge}>
+                <Text style={sideStyles.orderBadgeText}>{orderCount}</Text>
+              </View>
+            )}
+          </LinearGradient>
+        </Pressable>
+      </Animated.View>
+    )
+  }
+
+  return (
+    <Animated.View
+      style={[
+        sideStyles.sideMenuContainer,
+        {
+          transform: [{ translateY: floatAnim }],
+        },
+      ]}
+    >
+      <LinearGradient colors={["#fff8f8", "#fff"]} style={sideStyles.sideMenu}>
+        <Image style={sideStyles.background} source={require("../assets/Ellipse1.png")} />
+        <Animated.Image
+          style={[
+            sideStyles.logoIcon,
+            {
+              opacity: animation,
+              transform: [
+                {
+                  scale: animation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.5, 1],
+                  }),
+                },
+              ],
+            },
+          ]}
+          source={require("../assets/logo.png")}
+        />
+        <View style={sideStyles.navigationBar}>
+          {menuItems.map((item, index) => (
+            <NavigationItem key={item.name} {...item} index={index} />
+          ))}
+        </View>
+        <Image style={sideStyles.background2} source={require("../assets/Ellipse2.png")} />
+      </LinearGradient>
+    </Animated.View>
+  )
+}
+
+const sideStyles = StyleSheet.create({
+  sideMenuContainer: {
+    flex: 1,
+    width: 280,
+    shadowColor: "#000",
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  sideMenu: {
+    flex: 1,
+    alignItems: "center",
+    paddingTop: 40,
+    borderRadius: 15,
+  },
+  background: {
+    width: "100%",
+    height: 250,
+    position: "absolute",
+    top: 0,
+    left: 0,
+  },
+  logoIcon: {
+    width: 100,
+    height: 60,
+    marginTop: 5,
+    marginBottom: 100,
+  },
+  navigationBar: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  navigationItem: {
+    width: 220,
+    marginBottom: 20,
+    borderRadius: 15,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  navigationItemGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    position: "relative",
+  },
+  selectedItem: {
+    ...Platform.select({
+      ios: {
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
+  },
+  icon: {
+    width: 24,
+    height: 24,
+    marginRight: 15,
+    tintColor: "#321919",
+  },
+  selectedIcon: {
+    tintColor: "#ff8a8a",
+  },
+  navText: {
+    fontSize: 16,
+    color: "#321919",
+    fontFamily: "Inter-SemiBold",
+  },
+  selectedNavText: {
+    color: "#ff8a8a",
+  },
+  background2: {
+    width: "100%",
+    height: 150,
+    position: "absolute",
+    bottom: 0,
+  },
+  orderBadge: {
+    position: "absolute",
+    right: 10,
+    top: 18,
+    backgroundColor: "#ff4d4d",
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 5,
+  },
+  orderBadgeText: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+})
+
 const HomePage = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
-  const route = useRoute()
+  const route = useRoute<RouteProp<RootStackParamList, "Home" | "Camera">>()
+  const { storeData, getData, isLoading } = useAsyncStorage()
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const { getData } = useAsyncStorage() // Use hook for token retrieval
+  const [products, setProducts] = useState<Product[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
+  const [slideAnim] = useState(new Animated.Value(-width * 0.67))
+  const [overlayOpacity] = useState(new Animated.Value(0))
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      const storedOrders = await getData("orders")
+      if (storedOrders) {
+        setOrders(storedOrders)
+      }
+    }
+    if (!isLoading) {
+      loadOrders()
+    }
+  }, [isLoading, getData])
 
   useEffect(() => {
     if (route.params?.capturedImage) {
       setUploadedImage(route.params.capturedImage)
       simulateUpload()
-      uploadImage(route.params.capturedImage) // Upload captured image
+      uploadImage(route.params.capturedImage)
     }
   }, [route.params?.capturedImage])
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: isSideMenuOpen ? 0 : -width * 0.67,
+        duration: 300,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }),
+      Animated.timing(overlayOpacity, {
+        toValue: isSideMenuOpen ? 0.7 : 0,
+        duration: 300,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }, [isSideMenuOpen, slideAnim, overlayOpacity])
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (evt, gestureState) => {
-      if (gestureState.dx < -50) {
+      if (gestureState.dx < -50 && isSideMenuOpen) {
         setIsSideMenuOpen(false)
       }
     },
@@ -48,97 +353,69 @@ const HomePage = () => {
   const handleUploadImage = async () => {
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      console.log("Permission result:", permissionResult)
-
       if (!permissionResult.granted) {
         Alert.alert("Permission Required", "Permission to access your photo library is required.", [{ text: "OK" }])
-        console.error("Permission to access media library denied")
         return
       }
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
       })
-      console.log("Image picker result:", result)
 
-      if (result.canceled) {
-        console.log("Image selection canceled by user")
-        return
-      }
-
-      if (!result.assets || result.assets.length === 0) {
-        throw new Error("No image selected")
-      }
+      if (result.canceled) return
+      if (!result.assets || result.assets.length === 0) throw new Error("No image selected")
 
       const selectedImage = result.assets[0].uri
       setUploadedImage(selectedImage)
       simulateUpload()
       await uploadImage(selectedImage)
     } catch (error) {
-      console.error("Image picker error:", error)
-      Alert.alert("Error", "Failed to select image. Please try again.")
+      const err = error as Error
+      console.error("Image picker error:", err)
+      Alert.alert("Error", err.message || "Failed to select image. Please try again.")
     }
   }
 
   const uploadImage = async (imageUri: string) => {
-    // Retrieve token
-    const token = await getData("userToken")
-    console.log("Retrieved token for uploadImage:", token)
-    if (!token) {
-      Alert.alert("Authentication Error", "Please log in to upload images.")
-      navigation.navigate("Login")
+    if (!imageUri) {
+      Alert.alert("No image", "Please select an image first.")
       return
     }
-
     const formData = new FormData()
     formData.append("file", {
       uri: imageUri,
       name: "image.jpg",
       type: "image/jpeg",
     } as any)
-
-    console.log("FormData prepared with image URI:", imageUri)
-
     try {
       setUploadProgress(10)
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      }
-      console.log("Request headers:", headers)
-
-      const response = await fetch("http://192.168.8.100:4000/product/search-similar", {
+      const response = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/product/search-similar", {
         method: "POST",
         body: formData,
-        headers,
       })
-
-      console.log("Server response status:", response.status)
-      const responseText = await response.text()
-      console.log("Server response text:", responseText)
-
       if (!response.ok) {
-        let errorMessage
+        const responseText = await response.text()
+        let errorMessage = "Upload failed"
         try {
           const errorData = JSON.parse(responseText)
-          errorMessage = errorData.message || "Upload failed"
+          errorMessage = errorData.message || `Upload failed with status: ${response.status}`
         } catch {
-          errorMessage = `Upload failed with status: ${response.status}`
+          errorMessage = `Server error: ${response.status}`
         }
         throw new Error(errorMessage)
       }
-
       setUploadProgress(100)
-      const data = JSON.parse(responseText)
-      console.log("Upload successful, server response:", data)
-      navigation.navigate("Home", { products: data })
-    } catch (error) {
-      console.error("Upload error:", error)
+      const productsData = await response.json()
+      navigation.navigate("ShopPage", { products: productsData })
+      setUploadedImage(null)
       setUploadProgress(0)
-      Alert.alert("Upload Failed", error.message || "Failed to upload image. Please try again.", [{ text: "OK" }])
+    } catch (error) {
+      const err = error as Error
+      console.error("Upload error:", err)
+      setUploadProgress(0)
+      Alert.alert("Upload Failed", err.message || "Failed to upload image. Please check your network and try again.")
     }
   }
 
@@ -160,21 +437,29 @@ const HomePage = () => {
     navigation.navigate("Camera")
   }
 
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <View style={styles.homePage}>
-        <View style={[styles.headerParent, styles.headerPosition]}>
-          <Text style={[styles.exploreModdeFashion, styles.exploreTypo]}>Explore Modde Fashion Studio</Text>
+        <View style={styles.header}>
           <Pressable onPress={() => setIsSideMenuOpen(!isSideMenuOpen)}>
-            <Image style={styles.menuIcon} resizeMode="cover" source={require("../assets/bars-from-left.png")} />
+            <Ionicons name="menu" size={24} color="#333" />
+            {orders.length > 0 && <View style={styles.menuBadge} />}
           </Pressable>
+          <Text style={styles.headerTitle}>Explore Modde Fashion Studio</Text>
           <Pressable onPress={() => navigation.navigate("NotificationPage")}>
             <Image style={styles.bell} source={require("../assets/bell.png")} />
           </Pressable>
         </View>
 
-        <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/Rectangle23.png")} />
-
+        <Image style={styles.mainImage} resizeMode="cover" source={require("../assets/intro.jpg")} />
         <View style={[styles.mainButtons, styles.buttonPosition]}>
           <Pressable style={styles.uploadButton} onPress={handleUploadImage}>
             <Image style={styles.buttonBg} resizeMode="cover" source={require("../assets/ellipse16.png")} />
@@ -192,7 +477,6 @@ const HomePage = () => {
             <Image style={styles.arrowIcon} resizeMode="cover" source={require("../assets/chevron-left1.png")} />
           </Pressable>
         </View>
-
         {uploadedImage && (
           <View style={styles.uploadingBar}>
             <View style={styles.uploadingBarBg} />
@@ -202,7 +486,6 @@ const HomePage = () => {
             <Text style={styles.percentageText}>{`${uploadProgress}%`}</Text>
           </View>
         )}
-
         <View style={styles.navigationBar}>
           <View style={styles.navBarBg} />
           <View style={styles.navIcons}>
@@ -227,11 +510,28 @@ const HomePage = () => {
         </View>
       </View>
       {isSideMenuOpen && (
-        <View style={styles.sideMenuContainer}>
-          <SideMenu />
-          <Pressable style={styles.overlay} onPress={() => setIsSideMenuOpen(false)} />
-        </View>
+        <Animated.View
+          style={[
+            styles.sideMenuWrapper,
+            {
+              transform: [{ translateX: slideAnim }],
+            },
+          ]}
+        >
+          <SideMenu orderCount={orders.length} />
+        </Animated.View>
       )}
+      <Animated.View
+        style={[
+          styles.overlay,
+          {
+            opacity: overlayOpacity,
+          },
+        ]}
+        pointerEvents={isSideMenuOpen ? "auto" : "none"}
+      >
+        <Pressable style={styles.overlayPressable} onPress={() => setIsSideMenuOpen(false)} />
+      </Animated.View>
     </View>
   )
 }
@@ -246,27 +546,61 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     overflow: "hidden",
   },
-  sideMenuContainer: {
+  sideMenuWrapper: {
     position: "absolute",
     top: 0,
     left: 0,
     bottom: 0,
     width: width * 0.67,
     zIndex: 1000,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: -2, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
   },
   overlay: {
     position: "absolute",
     top: 0,
-    left: width * 0.67,
+    left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker overlay for shadow effect
+    zIndex: 999,
+  },
+  overlayPressable: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    backgroundColor: "#fff",
+    position: "absolute",
+    top: 40,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontFamily: "Rosario-Bold",
+    fontWeight: "800",
+    color: "#333",
+    top: 50,
+    textAlign: "center",
+    flex: 1,
+  },
+  menuBadge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    width: 10,
+    height: 10,
+    backgroundColor: "#ff4d4d",
+    borderRadius: 5,
+  },
+  bell: {
+    width: 21,
+    height: 23,
   },
   lineView: {
     borderStyle: "solid",
@@ -277,44 +611,13 @@ const styles = StyleSheet.create({
     height: 1,
     top: -20,
   },
-  headerPosition: {
-    position: "absolute",
-    top: 59,
-    left: 0,
-    right: 0,
-  },
-  exploreTypo: {
-    fontFamily: "Rosario-Bold",
-    fontWeight: "800",
-    textAlign: "center",
-  },
   buttonPosition: {
     position: "absolute",
     left: 30,
   },
-  headerParent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  exploreModdeFashion: {
-    fontSize: 25,
-    lineHeight: 36,
-    color: "#321919",
-    flex: 1,
-    left: 25,
-    top: -30,
-  },
-  menuIcon: {
-    width: 30,
-    height: 20,
-    left: -290,
-    top: -45,
-  },
   mainImage: {
     marginLeft: -160,
-    top: 140,
+    top: 150,
     left: "50%",
     width: 320,
     height: 295,
@@ -424,15 +727,9 @@ const styles = StyleSheet.create({
   fileIcon: {
     position: "absolute",
     top: 11,
-    left: 11,
+    left: 12,
     width: 30,
     height: 30,
-  },
-  bell: {
-    left: -2,
-    width: 21,
-    height: 23,
-    top: -50,
   },
   uploadingText: {
     position: "absolute",
@@ -502,4 +799,3 @@ const styles = StyleSheet.create({
 })
 
 export default HomePage
-

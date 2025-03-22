@@ -13,7 +13,11 @@ export class OrderService {
     @InjectModel(Stocks.name) private stockModel: Model<StocksDocument>,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+  async createOrder(createOrderDto: CreateOrderDto, user: any): Promise<Order> {
+    const userId = new Types.ObjectId(user.id);
+    if (!userId) {
+      throw new Error('User ID is missing from the token');
+    }
     // Validate stock items before creating the order
     
     for (const item of createOrderDto.items) {
@@ -21,12 +25,15 @@ export class OrderService {
       if (!stock) {
         throw new NotFoundException(`Stock item with ID ${item.stockId} not found`);
       }
-      if (stock.quantity < item.quantity) {
+      if (stock.get('quantity') < item.quantity) {
         throw new BadRequestException(`Insufficient stock for item with ID ${item.stockId}`);
       }
     }
 
-    const newOrder = new this.orderModel(createOrderDto);
+    const newOrder = new this.orderModel({
+      ...createOrderDto,
+      userId,
+    });
     return newOrder.save();
   }
 

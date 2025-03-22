@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
@@ -61,20 +61,7 @@ export default function DateStatusFilter() {
         </Popover>
       </div>
 
-      {/* Status Dropdown */}
-      <div className="relative">
-        <select
-          className="bg-gray-200 px-4 py-2 rounded-md border text-gray-800 cursor-pointer shadow-sm"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          {statuses.map((stat) => (
-            <option key={stat} value={stat}>
-              {stat}
-            </option>
-          ))}
-        </select>
-      </div>
+
     </div>
   );
 }

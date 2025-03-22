@@ -2,7 +2,6 @@ import * as React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Image } from 'react-native';
-
 // Importing screens
 import SplashScreen from './screens/splashScreen';
 import OrderComplete from './screens/orderComplete';
@@ -98,7 +97,6 @@ export default function MyStack() {
       <Stack.Screen name="SignUpPage" component={SignupPage} />
       <Stack.Screen name="ProductDetail" component={ProductDetailPage}/>
       <Stack.Screen name="CheckoutPage" component={CheckoutScreen}/>
-      <Stack.Screen name="HomeSideBar" component={SideMenu}/>
       <Stack.Screen name="PromotionPage" component={PromotionsPage}/>
       <Stack.Screen name="NotificationPage" component={NotificationsPage}/>
       <Stack.Screen name="OrdersPage" component={OrdersPage}/>

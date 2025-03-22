@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native"
+import { StyleSheet, View, Text, Image, Pressable, ScrollView, SafeAreaView } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
+import { Ionicons } from "@expo/vector-icons" // Added for chevron-back
 
 type Address = {
   name: string
@@ -20,7 +21,6 @@ type CartItem = {
   quantity: number
 }
 
-// Updated RootStackParamList to include OrderComplete screen
 type RootStackParamList = {
   HomePage: undefined
   ShopPage: undefined
@@ -62,12 +62,8 @@ const CheckoutScreen = ({
 
   const handlePayment = () => {
     setIsProcessing(true)
-
-    // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false)
-
-      // Create order object with necessary details
       const newOrder = {
         id: `ORD-${Date.now()}`,
         date: new Date().toLocaleDateString(),
@@ -77,15 +73,17 @@ const CheckoutScreen = ({
         shippingAddress: address,
         status: "Processing",
       }
-
-      // Navigate to OrderComplete page instead of showing Alert
       navigation.navigate("orderComplete", { order: newOrder })
     }, 1500)
   }
 
   const renderCartItem = (item: CartItem) => (
     <View key={item.id} style={styles.cartItem}>
-      <Image style={styles.itemImage} resizeMode="cover" source={item.image} />
+      <Image 
+        style={styles.itemImage} 
+        resizeMode="cover" 
+        source={item.image}
+      />
       <View style={styles.itemDetails}>
         <View style={styles.shopContainer}>
           <Image style={styles.shopIcon} source={require("../../assets/home.png")} />
@@ -99,152 +97,134 @@ const CheckoutScreen = ({
   )
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <Image style={styles.backButton} source={require("../../assets/chevron_left.png")} />
-        </Pressable>
-        <Text style={styles.pageTitle}>Checkout</Text>
-        <Pressable onPress={() => navigation.navigate("NotificationPage")}>
-          <Image style={styles.bell} source={require("../../assets/bell.png")} />
-        </Pressable>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            {/* <Text style={styles.sectionTitle}>Address</Text> */}
-            <Pressable
-              onPress={() => {
-                /* Handle edit address */
-              }}
-            ></Pressable>
-          </View>
-          {/* <View style={styles.addressInfo}>
-            <Text style={styles.addressName}>{address.name}</Text>
-            <Text style={styles.addressDetails}>{address.phone}</Text>
-            <Text style={styles.addressDetails}>{address.fullAddress}</Text>
-          </View> */}
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons name="chevron-back" size={24} color="#321919" />
+          </Pressable>
+          <Text style={styles.pageTitle}>Checkout</Text>
+          <Pressable onPress={() => navigation.navigate("NotificationPage")}>
+            <Image style={styles.bell} source={require("../../assets/bell.png")} />
+          </Pressable>
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Payment method</Text>
-            <Pressable
-              onPress={() => {
-                /* Handle edit payment */
-              }}
-            >
-              <Text style={styles.editButton}>Edit</Text>
-            </Pressable>
-          </View>
-          <View style={styles.paymentOptions}>
-            <Pressable style={styles.paymentOption} onPress={() => setPaymentMethod("card")}>
-              <Image style={styles.paymentIcon} source={require("../../assets/credit-card.png")} />
-              <Text style={styles.paymentText}>Credit/Debit card</Text>
-              <View style={[styles.radioButton, paymentMethod === "card" && styles.radioButtonSelected]} />
-            </Pressable>
-            <Pressable style={styles.paymentOption} onPress={() => setPaymentMethod("cash")}>
-              <Image style={styles.paymentIcon} source={require("../../assets/cash.png")} />
-              <Text style={styles.paymentText}>Cash</Text>
-              <View style={[styles.radioButton, paymentMethod === "cash" && styles.radioButtonSelected]} />
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Order Items Section */}
-        {selectedItems.length > 0 && (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Order Items</Text>
+              {/* Address section can be uncommented and styled if needed */}
+              {/* <Text style={styles.sectionTitle}>Address</Text> */}
             </View>
-            <View style={styles.orderItemsContainer}>{selectedItems.map(renderCartItem)}</View>
           </View>
-        )}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Payment method</Text>
+            </View>
+            <View style={styles.paymentOptions}>
+              <Pressable style={styles.paymentOption} onPress={() => setPaymentMethod("card")}>
+                <Image style={styles.paymentIcon} source={require("../../assets/credit-card.png")} />
+                <Text style={styles.paymentText}>Credit/Debit card</Text>
+                <View style={[styles.radioButton, paymentMethod === "card" && styles.radioButtonSelected]} />
+              </Pressable>
+              <Pressable style={styles.paymentOption} onPress={() => setPaymentMethod("cash")}>
+                <Image style={styles.paymentIcon} source={require("../../assets/cash.png")} />
+                <Text style={styles.paymentText}>Cash</Text>
+                <View style={[styles.radioButton, paymentMethod === "cash" && styles.radioButtonSelected]} />
+              </Pressable>
+            </View>
+          </View>
+          {selectedItems.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Order Items</Text>
+              </View>
+              <View style={styles.orderItemsContainer}>{selectedItems.map(renderCartItem)}</View>
+            </View>
+          )}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Promotions</Text>
+              <Pressable onPress={() => {}}>
+                <Text style={styles.viewButton}>View</Text>
+              </Pressable>
+            </View>
+          </View>
+          <View style={styles.totalSection}>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Delivery</Text>
+              <Text style={styles.totalValue}>Free</Text>
+            </View>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalValue}>LKR {total.toFixed(2)}</Text>
+            </View>
+          </View>
+          <Pressable
+            style={[styles.payNowButton, isProcessing && styles.payNowButtonDisabled]}
+            onPress={handlePayment}
+            disabled={isProcessing}
+          >
+            <Text style={styles.payNowText}>{isProcessing ? "Processing..." : "Pay now"}</Text>
+          </Pressable>
+        </ScrollView>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Promotions</Text>
-            <Pressable
-              onPress={() => {
-                /* Handle view promotions */
-              }}
-            >
-              <Text style={styles.viewButton}>View</Text>
+        <View style={styles.navigationBar}>
+          <View style={styles.navBarBg} />
+          <View style={styles.navIcons}>
+            <Pressable onPress={() => navigation.navigate("HomePage")}>
+              <Image style={styles.navIcon} source={require("../../assets/smart_home1.png")} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ShopPage")}>
+              <Image style={styles.navIcon} source={require("../../assets/shirt.png")} />
+            </Pressable>
+            <Pressable onPress={() => {}}>
+              <Image style={styles.navIcon} source={require("../../assets/cameraplus.png")} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("CartPage")}>
+              <Image style={styles.navIcon} source={require("../../assets/shopping_cart.png")} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("ProfilePage")}>
+              <Image style={styles.navIcon} source={require("../../assets/user.png")} />
             </Pressable>
           </View>
         </View>
-        <View style={styles.totalSection}>
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Delivery</Text>
-            <Text style={styles.totalValue}>Free</Text>
-          </View>
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>LKR {total.toFixed(2)}</Text>
-          </View>
-        </View>
-        <Pressable
-          style={[styles.payNowButton, isProcessing && styles.payNowButtonDisabled]}
-          onPress={handlePayment}
-          disabled={isProcessing}
-        >
-          <Text style={styles.payNowText}>{isProcessing ? "Processing..." : "Pay now"}</Text>
-        </Pressable>
-      </ScrollView>
-
-      <View style={styles.navigationBar}>
-        <View style={styles.navBarBg} />
-        <View style={styles.navIcons}>
-          <Pressable onPress={() => navigation.navigate("HomePage")}>
-            <Image style={styles.navIcon} source={require("../../assets/smart_home1.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ShopPage")}>
-            <Image style={styles.navIcon} source={require("../../assets/shirt1.png")} />
-          </Pressable>
-          <Pressable onPress={() => {}}>
-            <Image style={styles.navIcon} source={require("../../assets/cameraplus.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("CartPage")}>
-            <Image style={styles.navIcon} source={require("../../assets/shopping_cart.png")} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("ProfilePage")}>
-            <Image style={styles.navIcon} source={require("../../assets/user.png")} />
-          </Pressable>
-        </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: "#FFFFFF",
+  },
   bell: {
-    left: 340,
     width: 21,
     height: 23,
-    top: -100,
   },
   scrollContent: {
     padding: 20,
-  },
-  backButton: {
-    width: 27,
-    height: 27,
-    marginBottom: 20,
+    paddingBottom: 100, // Increased paddingBottom to ensure content isn't obscured by navigation bar
   },
   pageTitle: {
     fontFamily: "Inter-SemiBold",
     fontSize: 24,
-    left: 130,
-    top: -50,
     color: "#321919",
-    marginBottom: 20,
   },
   section: {
     marginBottom: 24,
-    bottom: 80,
   },
   sectionHeader: {
     flexDirection: "row",
@@ -257,31 +237,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#321919",
   },
-  editButton: {
-    fontFamily: "Inter-Regular",
-    fontSize: 13,
-    color: "#321919",
-  },
   viewButton: {
     fontFamily: "Inter-Regular",
     fontSize: 13,
     color: "#321919",
-  },
-  addressInfo: {
-    backgroundColor: "#FFE2E6",
-    borderRadius: 10,
-    padding: 15,
-  },
-  addressName: {
-    fontFamily: "Inter-SemiBold",
-    fontSize: 16,
-    color: "#321919",
-    marginBottom: 5,
-  },
-  addressDetails: {
-    fontFamily: "Inter-Regular",
-    fontSize: 13,
-    color: "#898989",
   },
   paymentOptions: {
     backgroundColor: "#FFE2E6",
@@ -321,7 +280,6 @@ const styles = StyleSheet.create({
   },
   totalSection: {
     marginTop: 20,
-    top: -90,
   },
   totalRow: {
     flexDirection: "row",
@@ -343,7 +301,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     alignItems: "center",
-    marginTop: -50,
+    marginTop: 20,
   },
   payNowButtonDisabled: {
     backgroundColor: "#d3d3d3",
@@ -440,4 +398,3 @@ const styles = StyleSheet.create({
 })
 
 export default CheckoutScreen
-

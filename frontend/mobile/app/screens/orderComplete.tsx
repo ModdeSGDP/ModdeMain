@@ -20,6 +20,7 @@ export type RootStackParamList = {
   RegistrationComplete: undefined
   OrderComplete: { order: any }
   OrdersPage: { newOrder?: any }
+  OrderSettingsPage: undefined
 }
 
 const OrderComplete = ({ route }: { route: { params: { order: any } } }) => {
@@ -203,4 +204,3 @@ const styles = StyleSheet.create({
 })
 
 export default OrderComplete
-

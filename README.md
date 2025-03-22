@@ -80,8 +80,36 @@ We follow the Git Flow model:
 git clone https://github.com/your-organization/modde.git  
 cd modde  
 ```  
+### **2.Configure Environment Variables**
 
-### **2. Install Dependencies**  
+# Database Configuration
+MONGO_URI=mongodb://your-mongodb-uri
+
+# Authentication
+JWT_SECRET=your_jwt_secret
+
+# Redis Configuration
+CORE_REDIS_HOST=your_redis_host
+CORE_REDIS_PORT=your_redis_port
+CORE_REDIS_PASSWORD=your_redis_password
+
+# AWS Configuration
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_REGION=us-east-1
+AWS_S3_BUCKET_NAME=your_s3_bucket_name
+
+# Email Configuration
+EMAIL_USER=your_email_user
+EMAIL_PASS=your_email_password
+EMAIL_HOST=your_email_host
+EMAIL_PORT=your_email_port
+ADMIN_EMAIL=your_admin_email
+
+# .gitignore
+.env
+
+### **3. Install Dependencies**  
 Navigate to the respective directories to install dependencies:  
 
 #### Web Frontend:  

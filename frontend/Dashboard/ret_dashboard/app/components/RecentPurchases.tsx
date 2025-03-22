@@ -1,10 +1,7 @@
-
-
-
 "use client";
 
 import React from "react";
-import Image from "next/image";
+// import Image from "next/image";
 
 interface Order {
   id: number;
@@ -31,14 +28,14 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
           <thead>
             <tr className="bg-gray-200 text-gray-700">
               {/* Checkbox before Product header */}
-              <th className="p-3">
+              {/* <th className="p-3">
                 <input type="checkbox" className="w-4 h-4" />
-              </th>
+              </th> */}
               <th className="text-left p-3">Product</th>
               <th className="text-left p-3">Order ID</th>
               <th className="text-left p-3">Date</th>
               <th className="text-left p-3">Customer</th>
-              <th className="text-left p-3">Status</th>
+              {/* <th className="text-left p-3">Status</th> */}
               <th className="text-left p-3">Amount</th>
             </tr>
           </thead>
@@ -46,9 +43,9 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
             {orders.map((order) => (
               <tr key={order.id} className="border-b">
                 {/* Checkbox for each product row */}
-                <td className="p-3">
+                {/* <td className="p-3">
                   <input type="checkbox" className="w-4 h-4" />
-                </td>
+                </td> */}
                 <td className="p-3">{order.product}</td>
                 <td className="p-3 font-medium">#{order.id}</td>
                 <td className="p-3">{order.date}</td>
@@ -67,20 +64,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
                   </div>
                 </td>
 
-                {/* Status with colored dot */}
-                <td className="p-3">
-                  <div className="flex items-center space-x-2">
-                    <span
-                      className={`w-3 h-3 rounded-full ${order.status === "Delivered"
-                        ? "bg-green-500"
-                        : order.status === "Pending"
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
-                        }`}
-                    ></span>
-                    <span>{order.status}</span>
-                  </div>
-                </td>
+
 
                 <td className="p-3">{order.amount}</td>
               </tr>

@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
 import { LinearGradient } from "expo-linear-gradient"
 
+// Define the navigation stack param list
 type RootStackParamList = {
   HomePage: undefined
   OrdersPage: undefined
@@ -14,20 +15,29 @@ type RootStackParamList = {
   History: undefined
   PromotionPage: undefined
   Camera: undefined
+  HomeSideBar: undefined // Add this if not already present
 }
 
-type SideMenuNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
+type SideMenuNavigationProp = StackNavigationProp<RootStackParamList, "HomeSideBar">
 
-const SideMenu: React.FC = () => {
-  const navigation = useNavigation<SideMenuNavigationProp>()
+// Props interface for the SideMenu component
+interface SideMenuProps {
+  orderCount: number
+  navigation?: SideMenuNavigationProp // Optional navigation prop for screen compatibility
+}
+
+// Make SideMenu compatible with React Navigation's ScreenComponentType
+const SideMenu: React.FC<SideMenuProps> = ({ orderCount, navigation: navigationProp }) => {
+  // Use navigation prop if provided, otherwise fallback to useNavigation
+  const navigation = navigationProp || useNavigation<SideMenuNavigationProp>()
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [animation] = useState(new Animated.Value(0))
 
   useEffect(() => {
     Animated.timing(animation, {
       toValue: 1,
-      duration: 500,
-      easing: Easing.out(Easing.cubic),
+      duration: 600,
+      easing: Easing.ease,
       useNativeDriver: true,
     }).start()
   }, [animation])
@@ -48,13 +58,15 @@ const SideMenu: React.FC = () => {
   }) => {
     const itemAnimation = animation.interpolate({
       inputRange: [0, 1],
-      outputRange: [50, 0],
+      outputRange: [50 * (index + 1), 0],
     })
+
+    const scaleAnimation = selectedItem === name ? 1.05 : 1
 
     return (
       <Animated.View
         style={{
-          transform: [{ translateX: itemAnimation }],
+          transform: [{ translateX: itemAnimation }, { scale: scaleAnimation }],
           opacity: animation,
         }}
       >
@@ -66,13 +78,18 @@ const SideMenu: React.FC = () => {
           }}
         >
           <LinearGradient
-            colors={selectedItem === name ? ["#ffccd4", "#ffd5d5"] : ["#f8f8f8", "#ffffff"]}
+            colors={selectedItem === name ? ["#FBA3A3", "#FFD5D5"] : ["#F8F8F8", "#FFFFFF"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.navigationItemGradient}
           >
             <Image style={[styles.icon, selectedItem === name && styles.selectedIcon]} source={icon} />
             <Text style={[styles.navText, selectedItem === name && styles.selectedNavText]}>{label}</Text>
+            {name === "OrdersPage" && orderCount > 0 && (
+              <View style={styles.orderBadge}>
+                <Text style={styles.orderBadgeText}>{orderCount}</Text>
+              </View>
+            )}
           </LinearGradient>
         </Pressable>
       </Animated.View>
@@ -80,36 +97,40 @@ const SideMenu: React.FC = () => {
   }
 
   return (
-    <LinearGradient colors={["#fff8f8", "#fff"]} style={styles.sideMenu}>
-      <Image style={styles.background} source={require("../../assets/Ellipse1.png")} />
-      {/* <Pressable style={styles.closeButton} onPress={() => navigation.navigate("HomePage")}>
-        <Image style={styles.closeIcon} source={require("../../assets/close.png")} />
-      </Pressable> */}
-
-      <Animated.Image
+    <LinearGradient colors={["#FFF5F5", "#FFFFFF"]} style={styles.sideMenu}>
+      <Image style={styles.background} source={require("../../assets/Ellipse1.png")} resizeMode="cover" />
+      <Animated.View
         style={[
-          styles.logoIcon,
+          styles.logoContainer,
           {
             opacity: animation,
             transform: [
               {
                 scale: animation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [0.5, 1],
+                  outputRange: [0.8, 1],
                 }),
               },
             ],
           },
         ]}
-        source={require("../../assets/logo.png")}
-      />
+      >
+        <LinearGradient
+          colors={["#FBA3A3", "#FFE6E6"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.logoGradient}
+        >
+          <Image style={styles.logoIcon} source={require("../../assets/logo.png")} resizeMode="contain" />
+        </LinearGradient>
+      </Animated.View>
 
       <View style={styles.navigationBar}>
         {menuItems.map((item, index) => (
           <NavigationItem key={item.name} {...item} index={index} />
         ))}
       </View>
-      <Image style={styles.background2} source={require("../../assets/Ellipse2.png")} />
+      <Image style={styles.background2} source={require("../../assets/Ellipse2.png")} resizeMode="cover" />
     </LinearGradient>
   )
 }
@@ -118,98 +139,132 @@ const styles = StyleSheet.create({
   sideMenu: {
     flex: 1,
     alignItems: "center",
-    paddingTop: 40,
+    paddingTop: 50,
     width: 280,
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
   },
   background: {
-    width: "100%",
-    height: 250,
+    width: "120%",
+    height: 300,
     position: "absolute",
-    top: 0,
-    left: 0,
-    opacity: 0.5,
+    top: -50,
+    left: -20,
+    opacity: 0.3,
   },
-  closeButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    zIndex: 10,
-    padding: 10,
+  logoContainer: {
+    marginBottom: 60,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  logoGradient: {
+    padding: 15,
+    borderRadius: 20,
   },
   logoIcon: {
-    width: 150,
-    height: 80,
-    marginTop: -10,
-    marginBottom: 100,
+    width: 160,
+    height: 90,
   },
   navigationBar: {
     width: "100%",
     alignItems: "center",
-    marginTop: 20,
+    paddingHorizontal: 20,
   },
   navigationItem: {
-    width: 220,
-    marginBottom: 20,
-    borderRadius: 15,
+    width: "100%",
+    marginBottom: 15,
+    borderRadius: 12,
     overflow: "hidden",
     ...Platform.select({
       ios: {
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowOpacity: 0.15,
+        shadowRadius: 5,
       },
       android: {
-        elevation: 3,
+        elevation: 4,
       },
     }),
   },
   navigationItemGradient: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
+    paddingVertical: 18,
     paddingHorizontal: 20,
+    borderRadius: 12,
   },
   selectedItem: {
     ...Platform.select({
       ios: {
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 5,
+        elevation: 6,
       },
     }),
   },
   icon: {
-    width: 24,
-    height: 24,
+    width: 26,
+    height: 26,
     marginRight: 15,
     tintColor: "#321919",
   },
   selectedIcon: {
-    tintColor: "#ff8a8a",
+    tintColor: "#FF6B6B",
   },
   navText: {
-    fontSize: 16,
+    fontSize: 17,
     color: "#321919",
     fontFamily: "Inter-SemiBold",
+    letterSpacing: 0.5,
   },
   selectedNavText: {
-    color: "#ff8a8a",
+    color: "#FF6B6B",
+    fontWeight: "700",
   },
   background2: {
-    width: "100%",
-    height: 150,
+    width: "120%",
+    height: 200,
     position: "absolute",
-    bottom: 0,
-    opacity: 0.5,
+    bottom: -50,
+    opacity: 0.3,
   },
-  closeIcon: {
-    width: 24,
+  orderBadge: {
+    position: "absolute",
+    right: 15,
+    top: 10,
+    backgroundColor: "#FF4D4D",
+    borderRadius: 12,
+    minWidth: 24,
     height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 6,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  orderBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 })
 
 export default SideMenu
-

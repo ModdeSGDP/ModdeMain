@@ -7,15 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+}
+
+
 interface EditProductModalProps {
-  product: any;
+  product: Product;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updatedProduct: any) => void;
+  onSave: (updatedProduct: Product) => void;
 }
 
 export default function EditProductModal({ product, isOpen, onClose, onSave }: EditProductModalProps) {
-  const [formData, setFormData] = useState(product);
+  const [formData, setFormData] = useState<Product>(product);
 
   useEffect(() => {
     if (isOpen) {
@@ -23,10 +31,16 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }: E
     }
   }, [isOpen, product]);
 
-  const handleChange = (e: { target: { name: any; value: any } }) => {
+  // const handleChange = (e: { target: { name: any; value: any } }) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev: any) => ({ ...prev, [name]: value }));
+  // };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
 
   const handleSubmit = () => {
     onSave(formData); // Save the specific product
@@ -41,14 +55,22 @@ export default function EditProductModal({ product, isOpen, onClose, onSave }: E
           <DialogTitle className="text-lg font-semibold">Edit Product</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input name="title" value={formData.title} onChange={handleChange} placeholder="Product Name" />
-          <Textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" />
+
+          <label className="font-medium text-gray-700">Product Name</label>
+          <Input name="title" value={formData.title} onChange={handleChange} placeholder="Enter Product Name" />
+
+          <label className="font-medium text-gray-700">Description</label>
+          <Textarea name="description" value={formData.description} onChange={handleChange} placeholder="Enter Description Of the Product" />
+
+          <label className="font-medium text-gray-700">Select Category</label>
           <Select name="category" value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-            <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Category" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="Men">Men</SelectItem>
               <SelectItem value="Women">Women</SelectItem>
-              <SelectItem value="Women">Unisex</SelectItem>
+              <SelectItem value="Unisex">Unisex</SelectItem>
             </SelectContent>
           </Select>
           {/* <Input name="price" type="text" value={formData.price} onChange={handleChange} placeholder="Price" />

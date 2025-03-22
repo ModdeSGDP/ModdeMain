@@ -38,7 +38,7 @@ export default function RootLayout({
     if (authStatus && isBasePath) {
       router.push("/Dashboard")
     }
-  }, [pathname]);
+  }, [pathname, isAuthPage, isBasePath, router]);
 
   // Load the sample data into localStorage if not already loaded
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function RootLayout({
 
               {/* Main Content */}
               <div className="overflow-y-scroll h-screen flex-grow">
-                <div className="flex flex-col w-full">
+                <div className="flex flex-col min-h-screen">
                   {/* Header */}
                   <div className="flex flex-column">
                     <div className="p-4">

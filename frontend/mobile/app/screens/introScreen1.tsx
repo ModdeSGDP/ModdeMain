@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   introScreen1Child: {
-    top: -6,
+    top: 0,
     left: -139,
     width: 449,
     height: 353,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     width: 218,
     height: 299,
     top: "50%",
-    left: "50%",
+    left: 20,
   },
   exploreFashion: {
     marginLeft: -93.5,
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
   introScreen1Inner: {
     top: 559,
-    left: 180,
+    left: 190,
     width: 24,
     height: 4,
     position: "absolute"
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   exploreThe2025s: {
     top: 620,
     left: 55,
-    lineHeight: 24,
+    lineHeight: 20,
     fontWeight: "500",
     fontFamily: "Rosario-Medium",
     width: 294,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     height: "80%",
     width: "80%",
     top: 20,
-    left: 17,
+    left: 27,
   },
   wrapper: {
     left: 24,

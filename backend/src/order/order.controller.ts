@@ -1,15 +1,21 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Request } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.createOrder(createOrderDto);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new order' })
+  @ApiResponse({ status: 201, description: 'Order created successfully' })
+  @Post('create')
+  async createOrder(@Body() createOrderDto: CreateOrderDto, @Request() req) {
+    return this.orderService.createOrder(createOrderDto, req.user);
   }
 
   @Get(':id')

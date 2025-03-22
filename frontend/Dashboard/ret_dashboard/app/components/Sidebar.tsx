@@ -20,9 +20,9 @@ export default function Sidebar() {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("authenticated"); // ✅ Clear authentication status
+    localStorage.removeItem("authenticated"); // Clear authentication status
     setShowLogoutPopup(false);
-    router.push("/auth/login"); // ✅ Redirect to Login page
+    router.push("/auth/login"); // Redirect to Login page
   };
 
   return (
@@ -61,7 +61,7 @@ export default function Sidebar() {
         </Link>
       </div>
 
-      {/* Logout Confirmation Popup */}
+
       {/* Logout Confirmation Popup */}
       {showLogoutPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[99999]">

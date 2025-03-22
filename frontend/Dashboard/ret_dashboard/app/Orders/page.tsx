@@ -1,25 +1,22 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import OrderList from "../components/OrderList";
 import { orders as retailerOrders } from "../data/orders";
 
 function Page() {
-  // Dynamic order data including profit
-  // const retailerOrders = [
-  //   { id: 25426, customer: "Komal", total: "LKR 4500.00", profit: "LKR 150.00", status: "Delivered" },
-  //   { id: 25425, customer: "Nikhil", total: "LKR 4500.00", profit: "LKR 160.00", status: "Canceled" },
-  //   { id: 25424, customer: "Nimal", total: "LKR 4500.00", profit: "LKR 120.00", status: "Delivered" },
-  //   { id: 25423, customer: "Kushan", total: "LKR 4500.00", profit: "LKR 140.00", status: "Pending" },
-  //   { id: 25422, customer: "Kidura", total: "LKR 4500.00", profit: "LKR 110.00", status: "Delivered" },
-  //   { id: 25421, customer: "Yougesh", total: "LKR 4500.00", profit: "LKR 180.00", status: "Processing" },
-  //   { id: 25420, customer: "Priyantha", total: "LKR 4500.00", profit: "LKR 130.00", status: "Canceled" },
-  //   { id: 25419, customer: "Kishan", total: "LKR 4500.00", profit: "LKR 145.00", status: "Shipped" },
-  //   { id: 25417, customer: "Kumal", total: "LKR 4500.00", profit: "LKR 135.00", status: "Pending" },
-  //   { id: 25412, customer: "Priyanka", total: "LKR 4500.00", profit: "LKR 125.00", status: "Picked" },
-  //   { id: 25413, customer: "Nuwan", total: "LKR 4500.00", profit: "LKR 175.00", status: "Confirmed" },
-  //   { id: 254, customer: "Dumal", total: "LKR 4500.00", profit: "LKR 190.00", status: "Delivered" }
-  // ];
+
+  const [currentPage, setCurrentPage] = useState(1); // CHANGED: Added pagination state
+  const itemsPerPage = 5; // CHANGED: Define items per page
+  const totalPages = Math.max(1, Math.ceil(retailerOrders.length / itemsPerPage)); // CHANGED: Calculate total pages
+
+  // CHANGED: Get only the orders for the current page
+  const paginatedOrders = retailerOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="pt-0 pl-4">
@@ -41,29 +38,57 @@ function Page() {
       <hr className="my-4 border-gray-300" />
 
       {/* Order List Component with Filtering */}
-      <OrderList orders={retailerOrders} />
+      <OrderList orders={paginatedOrders} />
 
-      {/* Pagination (Move to Left Side) */}
+
+      {/* CHANGED: Dynamic Pagination */}
       <div className="mt-6 w-full flex">
+
         <div className="w-fit">
           <Pagination>
             <PaginationContent>
+              {/* Previous Button - Prevent Click if on First Page */}
               <PaginationItem>
-                <PaginationPrevious href="#" />
+                <PaginationPrevious
+                  onClick={() => {
+                    if (currentPage > 1) {
+                      setCurrentPage((prev) => prev - 1);
+                    }
+                  }}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""} // FIXED: Disable click when on first page
+                />
               </PaginationItem>
+
+              {/* Page Numbers */}
+              {[...Array(totalPages)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    isActive={currentPage === index + 1}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              {/* Next Button - Prevent Click if on Last Page */}
               <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
+                <PaginationNext
+                  onClick={() => {
+                    if (currentPage < totalPages) {
+                      setCurrentPage((prev) => prev + 1);
+                    }
+                  }}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""} // FIXED: Disable click when on last page
+                />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
         </div>
+
+
       </div>
+
     </div>
   );
 }

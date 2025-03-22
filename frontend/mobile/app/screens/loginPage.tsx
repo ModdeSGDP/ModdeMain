@@ -16,6 +16,7 @@ import {
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { LinearGradient } from "expo-linear-gradient"
 
 type RootStackParamList = {
   HomePage: undefined
@@ -53,7 +54,7 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      const loginResponse = await fetch("http://192.168.8.100:4000/auth/login", {
+      const loginResponse = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -77,10 +78,25 @@ const LoginPage: React.FC = () => {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-      <Image style={styles.backgroundImage} resizeMode="cover" source={require("../assets/Ellipse1.png")} />
+      {/* Enhanced Background */}
+      <Image 
+        style={styles.backgroundImage} 
+        resizeMode="cover" 
+        source={require("../assets/Ellipse1.png")} 
+      />
+      <LinearGradient
+        colors={["rgba(255, 248, 248, 0.7)", "rgba(255, 255, 255, 0.9)", "#fff"]}
+        style={styles.backgroundGradient}
+      />
+      <Image 
+        style={styles.backgroundBottomImage} 
+        resizeMode="cover" 
+        source={require("../assets/Ellipse2.png")} 
+      />
+
       <Image style={styles.logoIcon} resizeMode="cover" source={require("../assets/logo2.png")} />
 
-      <View style={styles.formContainer}>
+      <View style={styles.contentContainer}>
         <Text style={styles.title}>Login</Text>
         <Text style={styles.subtitle}>
           Welcome back, <Text style={styles.boldText}>{username || "User"}</Text>.
@@ -122,13 +138,6 @@ const LoginPage: React.FC = () => {
             </View>
             <Text style={styles.rememberMeText}>Remember me</Text>
           </Pressable>
-          <Pressable
-            onPress={() => {
-              /* Handle forgot password */
-            }}
-          >
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          </Pressable>
         </View>
 
         <Pressable style={styles.loginButton} onPress={handleLogin}>
@@ -156,6 +165,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "50%",
     top: 0,
+ // Softened for better overlay
+  },
+  backgroundGradient: {
+  },
+  backgroundBottomImage: {
+    position: "absolute",
+    width: "100%",
+    height: "30%",
+    bottom: 0, // Subtle bottom effect
   },
   logoIcon: {
     alignSelf: "center",
@@ -163,7 +181,7 @@ const styles = StyleSheet.create({
     height: 100,
     marginTop: 60,
   },
-  formContainer: {
+  contentContainer: {
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 30,
@@ -245,11 +263,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#321919",
   },
-  forgotPassword: {
-    fontSize: 14,
-    color: "#fba3a3",
-    fontWeight: "600",
-  },
   loginButton: {
     backgroundColor: "#fba3a3",
     borderRadius: 10,
@@ -274,4 +287,3 @@ const styles = StyleSheet.create({
 })
 
 export default LoginPage
-

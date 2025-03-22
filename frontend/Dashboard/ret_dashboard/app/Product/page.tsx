@@ -1,185 +1,318 @@
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+// import { Button } from "@/components/ui/button";
+// import { ProductCard } from "../components/Productcard";
+// import { Plus } from "lucide-react";
+// import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+// import Link from "next/link";
+// import { API_GET_PRODUCT } from "../constant/apiConstant";
+// import { isTokenExpired } from "../utils/checkToken";
+// import SessionExpiredModal from "@/components/ui/SessionExpiredModal";
+
+// interface Product {
+//     id: string;
+//     image: string;
+//     title: string;
+//     category: string;
+//     //price: string;
+//     description: string;
+//     //salesCount?: number;
+//     //remainingCount?: number;
+// }
+
+// export default function Products() {
+
+
+//     const [products, setProducts] = useState<Product[]>([]);
+//     const [currentPage, setCurrentPage] = useState(1); // Added pagination state
+//     const [totalPages, setTotalPages] = useState(1); //  Store total pages
+//     const itemsPerPage = 8; // CHANGED: Define items per page
+//     const [sessionExpired, setSessionExpired] = useState(false);
+
+//     // Load product data from localStorage on mount
+//     useEffect(() => {
+
+
+//         const fetchProducts = async () => {
+//             try {
+//                 const token = localStorage.getItem("token");
+//                 // const response = await fetch("/api/product"); // Update this endpoint as needed
+//                 const response = await fetch(`${API_GET_PRODUCT}?page=${currentPage}&limit=${itemsPerPage}`, {
+//                     method: "GET",
+//                     headers: {
+//                         "Content-Type": "application/json",
+//                         Authorization: `Bearer ${token}`,
+//                     },
+//                 });
+//                 if (!response.ok) {
+//                     throw new Error("Failed to fetch products");
+//                 }
+//                 const data = await response.json();
+//                 if (!data.products) {
+//                     throw new Error("Invalid product data format from API");
+//                 }
+//                 // setProducts(data);
+
+
+
+
+//                 const formattedProducts: Product[] = data.products.map(
+//                     (product: { _id: string; image?: string; name: string; category: string; price?: number; description: string }) => ({
+//                         id: product._id,
+//                         image: product.image || "/images/default-product.png",
+//                         title: product.name,
+//                         category: product.category,
+//                         description: product.description,
+//                     })
+//                 );
+
+
+
+
+
+//                 setProducts(formattedProducts);
+//                 setTotalPages(data.totalPages); // CHANGED: Set total pages from API
+//             } catch (error) {
+//                 console.error("Error fetching products:", error);
+//             }
+//         };
+
+//         fetchProducts();
+
+
+//     }, [currentPage]);
+
+//     // Function to update a single product
+//     const updateProduct = (updatedProduct: Partial<Product> & { id: string }) => {
+//         // const updatedProducts = products.map((product) =>
+//         //     product.id === updatedProduct.id ? updatedProduct : product
+//         // );   //before the below code
+
+//         // setProducts((prevProducts) =>
+//         //     prevProducts.map((product) =>
+//         //         (product.id === updatedProduct.id ? updatedProduct : product))
+//         // ); //  FIXED: Removed unused `updatedProducts` variable
+
+//         setProducts((prevProducts) =>
+//             prevProducts.map((product) =>
+//                 product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
+//             )
+//         );
+
+//     };
+
+//     // Function to delete a product
+//     const deleteProduct = (productId: string) => {
+
+//         setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
+//     };
+
+//     return (
+//         <div className="pt-0 pl-4">
+//             <div className="pt-0 pl-64">
+//                 <div className="flex justify-end">
+//                     <Link href="/AddProducts">
+//                         <Button className="bg-black text-white hover:bg-gray-800 px-4 py-2 flex items-center space-x-2">
+//                             <Plus className="h-5 w-5" />
+//                             <span>Add Products</span>
+//                         </Button>
+//                     </Link>
+//                 </div>
+//             </div>
+
+//             <h1 className="text-xl font-bold mb-0">Products</h1>
+//             <div className="flex">
+//                 <div>
+//                     <Breadcrumb>
+//                         <BreadcrumbList>
+//                             <BreadcrumbItem>
+//                                 <BreadcrumbLink href="/Dashboard">Dashboard</BreadcrumbLink>
+//                             </BreadcrumbItem>
+//                             <BreadcrumbSeparator />
+//                             <BreadcrumbItem>
+//                                 <BreadcrumbPage>Product</BreadcrumbPage>
+//                             </BreadcrumbItem>
+//                         </BreadcrumbList>
+//                     </Breadcrumb>
+
+//                     {/* Horizontal Line */}
+//                     <hr className="my-4 border-gray-300" />
+
+//                     <div className="flex flex-row flex-wrap gap-5">
+//                         {products.map((product) => (
+//                             // <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
+//                             <ProductCard key={product.id} {...product} onUpdate={(updatedProduct) => updateProduct(updatedProduct)} onDelete={deleteProduct} />
+//                         ))}
+//                     </div>
+//                 </div>
+//             </div>
+
+//             {/* CHANGED: Dynamic Pagination */}
+//             <div className="mt-6 w-full flex">
+//                 <div className="w-fit">
+//                     <Pagination>
+//                         <PaginationContent>
+//                             <PaginationItem>
+//                                 <PaginationPrevious
+//                                     onClick={() => {
+//                                         if (currentPage > 1) {
+//                                             setCurrentPage((prev) => prev - 1);
+//                                         }
+//                                     }}
+//                                     className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+//                                 />
+//                             </PaginationItem>
+//                             {/* Fix: Ensure at least 1 page before mapping */}
+//                             {totalPages > 0 &&
+//                                 [...Array(Math.max(1, totalPages))].map((_, index) => (
+//                                     <PaginationItem key={index}>
+//                                         <PaginationLink
+//                                             isActive={currentPage === index + 1}
+//                                             onClick={() => setCurrentPage(index + 1)}
+//                                         >
+//                                             {index + 1}
+//                                         </PaginationLink>
+//                                     </PaginationItem>
+//                                 ))}
+
+
+
+
+//                             <PaginationItem>
+//                                 <PaginationNext
+//                                     onClick={() => {
+//                                         if (currentPage < totalPages) {
+//                                             setCurrentPage((prev) => prev + 1);
+//                                         }
+//                                     }}
+//                                     className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+//                                 />
+//                             </PaginationItem>
+//                         </PaginationContent>
+//                     </Pagination>
+//                 </div>
+//             </div>
+
+
+//         </div>
+//     );
+// }  //before the below code- session expire handle in new (below) code
+
+
 "use client";
 
 import { useState, useEffect } from "react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "../components/Productcard";
 import { Plus } from "lucide-react";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 import Link from "next/link";
 import { API_GET_PRODUCT } from "../constant/apiConstant";
+import { isTokenExpired } from "../utils/checkToken"; // ✅ Correct path based on your structure
+import SessionExpiredModal from "@/components/ui/SessionExpiredModal"; // ✅ You already use this in components/ui
 
 interface Product {
     id: string;
     image: string;
     title: string;
     category: string;
-    //price: string;
     description: string;
-    //salesCount?: number;
-    //remainingCount?: number;
 }
 
 export default function Products() {
-    // const initialProducts: Product[] = [
-    //     {
-    //         id: "1",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Women",
-    //         price: "LKR 4850",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1269,
-    //         remainingCount: 1269,
-    //     },
-    //     {
-    //         id: "2",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Men",
-    //         price: "LKR 5750",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 854,
-    //         remainingCount: 450,
-    //     },
-    //     {
-    //         id: "3",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Women",
-    //         price: "LKR 7200",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 940,
-    //         remainingCount: 220,
-    //     },
-    //     {
-    //         id: "4",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 6300",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 2034,
-    //         remainingCount: 530,
-    //     },
-    //     {
-    //         id: "5",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 9100",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1100,
-    //         remainingCount: 320,
-    //     },
-    //     {
-    //         id: "6",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Men",
-    //         price: "LKR 10200",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 765,
-    //         remainingCount: 120,
-    //     },
-    //     {
-    //         id: "7",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 4700",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1560,
-    //         remainingCount: 360,
-    //     },
-    //     {
-    //         id: "8",
-    //         image: "/images/Productcard.svg",
-    //         title: "Hooded Long Sleeve - New York",
-    //         category: "Unisex",
-    //         price: "LKR 3200",
-    //         description: "Lorem ipsum is placeholder text commonly used in the graphic.",
-    //         salesCount: 1320,
-    //         remainingCount: 480,
-    //     },
-    // ];
-
     const [products, setProducts] = useState<Product[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 8;
+    const [sessionExpired, setSessionExpired] = useState(false);
 
-    // Load product data from localStorage on mount
     useEffect(() => {
-        // const storedProducts = localStorage.getItem("products");
-
-        // if (storedProducts) {
-        //     setProducts(JSON.parse(storedProducts)); // Load stored products
-        // } else {
-        //     setProducts(initialProducts); // Set initial data if no stored data
-        //     localStorage.setItem("products", JSON.stringify(initialProducts));
-        // }
-
         const fetchProducts = async () => {
+            const token = localStorage.getItem("token");
+
+            if (isTokenExpired(token)) {
+                setSessionExpired(true); //  Show modal if token expired
+                return;
+            }
+
             try {
-                const token = localStorage.getItem("token");
-                // const response = await fetch("/api/product"); // Update this endpoint as needed
-                const response = await fetch(API_GET_PRODUCT, {
+                const response = await fetch(`${API_GET_PRODUCT}?page=${currentPage}&limit=${itemsPerPage}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
                 if (!response.ok) {
                     throw new Error("Failed to fetch products");
                 }
+
                 const data = await response.json();
                 if (!data.products) {
                     throw new Error("Invalid product data format from API");
                 }
-                // setProducts(data);
 
-
-                // Map API response to match the frontend component structure
-                const formattedProducts: Product[] = data.products.map((product: any) => ({
-                    id: product._id, // Use _id from backend
-                    image: product.image || "/images/default-product.png", // Handle missing images
-                    title: product.name,
-                    category: product.category,
-                    price: product.price ? `LKR ${product.price}` : "Price Not Available",
-                    description: product.description,
-                    salesCount: 0, // Default to 0 if not provided
-                    remainingCount: 0, // Default to 0 if not provided
-                }));
+                const formattedProducts: Product[] = data.products.map(
+                    (product: {
+                        _id: string;
+                        image?: string;
+                        name: string;
+                        category: string;
+                        description: string;
+                    }) => ({
+                        id: product._id,
+                        image: product.image || "/images/default-product.png",
+                        title: product.name,
+                        category: product.category,
+                        description: product.description,
+                    })
+                );
 
                 setProducts(formattedProducts);
+                setTotalPages(data.totalPages);
             } catch (error) {
                 console.error("Error fetching products:", error);
             }
         };
 
         fetchProducts();
+    }, [currentPage]);
 
-
-    }, []);
-
-    // Function to update a single product
-    const updateProduct = (updatedProduct: Product) => {
-        const updatedProducts = products.map((product) =>
-            product.id === updatedProduct.id ? updatedProduct : product
+    const updateProduct = (updatedProduct: Partial<Product> & { id: string }) => {
+        setProducts((prevProducts) =>
+            prevProducts.map((product) =>
+                product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
+            )
         );
-        // setProducts(updatedProducts);
-        // localStorage.setItem("products", JSON.stringify(updatedProducts)); // Store updated product list in localStorage
     };
 
-    // Function to delete a product
     const deleteProduct = (productId: string) => {
-        // const updatedProducts = products.filter((product) => product.id !== productId);
-        // setProducts(updatedProducts);
-        // localStorage.setItem("products", JSON.stringify(updatedProducts)); // Update storage
         setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
     };
 
     return (
         <div className="pt-0 pl-4">
+            {/*  Session Expired Modal */}
+            <SessionExpiredModal show={sessionExpired} />
+
             <div className="pt-0 pl-64">
                 <div className="flex justify-end">
                     <Link href="/AddProducts">
@@ -206,13 +339,16 @@ export default function Products() {
                         </BreadcrumbList>
                     </Breadcrumb>
 
-                    {/* Horizontal Line */}
                     <hr className="my-4 border-gray-300" />
 
                     <div className="flex flex-row flex-wrap gap-5">
                         {products.map((product) => (
-                            // <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
-                            <ProductCard key={product.id} {...product} onUpdate={updateProduct} onDelete={deleteProduct} />
+                            <ProductCard
+                                key={product.id}
+                                {...product}
+                                onUpdate={(updatedProduct) => updateProduct(updatedProduct)}
+                                onDelete={deleteProduct}
+                            />
                         ))}
                     </div>
                 </div>
@@ -223,16 +359,35 @@ export default function Products() {
                     <Pagination>
                         <PaginationContent>
                             <PaginationItem>
-                                <PaginationPrevious href="#" />
+                                <PaginationPrevious
+                                    onClick={() => {
+                                        if (currentPage > 1) {
+                                            setCurrentPage((prev) => prev - 1);
+                                        }
+                                    }}
+                                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                                />
                             </PaginationItem>
+                            {totalPages > 0 &&
+                                [...Array(Math.max(1, totalPages))].map((_, index) => (
+                                    <PaginationItem key={index}>
+                                        <PaginationLink
+                                            isActive={currentPage === index + 1}
+                                            onClick={() => setCurrentPage(index + 1)}
+                                        >
+                                            {index + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
                             <PaginationItem>
-                                <PaginationLink href="#">1</PaginationLink>
-                            </PaginationItem>
-                            <PaginationItem>
-                                <PaginationEllipsis />
-                            </PaginationItem>
-                            <PaginationItem>
-                                <PaginationNext href="#" />
+                                <PaginationNext
+                                    onClick={() => {
+                                        if (currentPage < totalPages) {
+                                            setCurrentPage((prev) => prev + 1);
+                                        }
+                                    }}
+                                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                                />
                             </PaginationItem>
                         </PaginationContent>
                     </Pagination>
@@ -241,3 +396,4 @@ export default function Products() {
         </div>
     );
 }
+

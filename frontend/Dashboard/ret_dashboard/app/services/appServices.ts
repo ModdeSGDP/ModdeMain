@@ -6,7 +6,7 @@ export interface AppStatus {
 }
 export const fetchAppStatus = async (): Promise<AppStatus> => {
   try {
-    const response = await api.get<AppStatus>('/'); // ✅ Use the correct endpoint
+    const response = await api.get<AppStatus>('/');
     return response.data;
   } catch (error) {
     console.error("Failed to fetch app status:", error);
