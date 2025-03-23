@@ -19,6 +19,7 @@ export class RetailerService {
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
+  //Create retailer
   async create(createRetailerDto: CreateRetailerDto): Promise<Retailer> {
     const { email } = createRetailerDto;
     const existingRetailer = await this.retailerModel.findOne({ email }).exec();
@@ -29,6 +30,7 @@ export class RetailerService {
     return newRetailer.save();
   }
 
+  //Read all retailers with pagination
   async findAll(paginationDto: PaginationDto): Promise<{ data: Retailer[]; meta: any }> {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
@@ -51,6 +53,7 @@ export class RetailerService {
     }, };
   }
 
+  //Read one retailer
   async findOne(id: string): Promise<Retailer> {
     const retailer = await this.retailerModel.findById(id).exec();
     if (!retailer) {
@@ -59,6 +62,7 @@ export class RetailerService {
     return retailer;
   }
 
+  //Update retailer
   async update(
     id: string,
     updateRetailerDto: UpdateRetailerDto,
@@ -72,6 +76,7 @@ export class RetailerService {
     return updatedRetailer;
   }
 
+  //Create a retailer with an admin user
   async createRetailerWithAdmin(signupRetailerDto: SignupRetailerDto) {
     const { retailer, admin } = signupRetailerDto;
     const session = await this.connection.startSession();

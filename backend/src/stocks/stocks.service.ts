@@ -14,6 +14,7 @@ export class StocksService {
     @InjectModel(Product.name) private ProductModel: Model<ProductDocument>
   ) {}
 
+  //Create a new stock entry for a product
   async create(createStocksDto: CreateStocksDto): Promise<Stocks> {
 
     const { productId, stock, regularPrice, salePrice } = createStocksDto;
@@ -40,27 +41,23 @@ export class StocksService {
         }
       });
       // Update price fields if provided
-    if (regularPrice !== undefined) existingStock.regularPrice = regularPrice;
-    if (salePrice !== undefined) existingStock.salePrice = salePrice;
+      if (regularPrice !== undefined) existingStock.regularPrice = regularPrice;
+      if (salePrice !== undefined) existingStock.salePrice = salePrice;
 
-    // Ensure Mongoose detects changes
-    existingStock.markModified('stock');
+      // Ensure Mongoose detects changes
+      existingStock.markModified('stock');
 
-    // Save and return the updated stock
-    return await existingStock.save();
+      // Save and return the updated stock
+      return await existingStock.save();
+    }
+    // If no existing stock, create a new one
+    const newStock = new this.stocksModel(createStocksDto);
+    return newStock.save();
   }
 
-  // If no existing stock, create a new one
-  const newStock = new this.stocksModel(createStocksDto);
-  return newStock.save();
-
-
-    // const newStock = new this.stocksModel(createStocksDto);
-    // return newStock.save();
-  }
-
+  //Read all stock entries with pagination
   async findAll(paginationDto: PaginationDto) {
-    const { page = 1, limit = 10 } = paginationDto;
+    const { page, limit } = paginationDto;
   
     const stocks = await this.stocksModel
       .find()
@@ -79,21 +76,19 @@ export class StocksService {
     };
   }
 
+  //Read all stock entries for a product
   async findByProduct(productId: string): Promise<Stocks[]> {
     return this.stocksModel.find({ productId }).populate('productId').exec();
   }
 
+  //Read one stock entry
   async findOne(id: string): Promise<Stocks> {
     const stock = await this.stocksModel.findById(id).populate('productId').exec();
     if (!stock) throw new NotFoundException('Stock not found');
     return stock;
   }
 
-  // async update(id: string, updateStocksDto: UpdateStocksDto): Promise<Stocks> {
-  //   const updatedStock = await this.stocksModel.findByIdAndUpdate(id, updateStocksDto, { new: true });
-  //   if (!updatedStock) throw new NotFoundException('Stock not found');
-  //   return updatedStock;
-  // }
+  //Update a stock entry
   async update(id: string, updateStocksDto: UpdateStocksDto): Promise<Stocks> {
     const stockEntry = await this.stocksModel.findById(id);
     
@@ -127,6 +122,7 @@ export class StocksService {
     return stockEntry.save();
   }
 
+  //Delete a stock entry
   async remove(id: string): Promise<void> {
     const deletedStock = await this.stocksModel.findByIdAndDelete(id);
     if (!deletedStock) throw new NotFoundException('Stock not found');

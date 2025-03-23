@@ -28,11 +28,4 @@ export class CreateProductDto {
   @IsString()
   image?: string; // Optional field for the product image URL
 
-  // @IsString()
-  // @IsNotEmpty()
-  // image_id: string;
-
-  // @IsMongoId()
-  // retailerId: Types.ObjectId;
-
 }
