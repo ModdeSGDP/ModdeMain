@@ -44,9 +44,9 @@ async def search_similar_images(file: UploadFile = File(...)):
 
         # Query Pinecone using keyword arguments
         results = index.query(
-            vector=query_features,  # Use keyword argument for the vector
-            top_k=5,               # Use keyword argument for top_k
-            include_metadata=True  # Use keyword argument for include_metadata
+            vector=query_features, 
+            top_k=5,               
+            include_metadata=True  
         )
         print("Pinecone query successful.")
 
