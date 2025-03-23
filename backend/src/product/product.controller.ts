@@ -31,8 +31,6 @@ import { RetailerGuard } from 'src/auth/guards/retailer.guard';
 import { ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @Controller('product')
-// @UseGuards(JwtAuthGuard)
-// @ApiBearerAuth()
 export class ProductController {
   constructor(
     private readonly productService: ProductService,

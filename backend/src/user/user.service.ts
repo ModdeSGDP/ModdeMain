@@ -23,7 +23,6 @@ export class UserService {
   async createUser(registerUserDto: RegisterUserDto): Promise<User> {
     const { email, password, firstName, lastName, role, address, gender, retailerId } = registerUserDto;
 
-  
     // Check if the username already exists
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {

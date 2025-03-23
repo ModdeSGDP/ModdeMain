@@ -18,6 +18,7 @@ export class User {
   @Prop({ required: true })
   role: string; // ADMIN, RETAILER, CONSUMER
 
+  //Saves reailerId of the user if they are an admin
   @Prop({ type: Types.ObjectId, ref: 'Retailer', required: false })
   retailerId?: Types.ObjectId;
 
