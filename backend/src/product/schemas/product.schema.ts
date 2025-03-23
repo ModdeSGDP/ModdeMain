@@ -20,11 +20,12 @@ export class Product {
   color: string;
 
   @Prop()
-  image?: string; // field for storing the image URL
+  image?: string; // field for storing the image URL from AWS S3
 
   @Prop({type: Types.ObjectId, ref: 'Retailer', required:true })
   retailerId: Types.ObjectId;
 
+  //Field for storing feature extraction image id generated from Pinecone db
   @Prop({ required: true })
   image_id: string;
 }

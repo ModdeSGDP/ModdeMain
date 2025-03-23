@@ -31,18 +31,7 @@ export class ProductService {
     @InjectQueue('emailQueue') private readonly emailQueue: Queue,
     private readonly s3Service: S3Service, // Using isolated AWS functionality
     private readonly httpService: HttpService,  // Injecting HttpService
-  ) {
-    // Although S3 functionality is now handled by AwsService, we still initialize s3 here if needed.
-    // Alternatively, we can remove these lines if we want to solely rely on s3Service.uploadFile().
-    this.s3 = new S3Client({
-      region: this.configService.get('AWS_REGION'),
-      credentials: {
-        accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
-        secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
-      },
-    });
-    this.bucketName = this.configService.get('AWS_S3_BUCKET_NAME');
-  }
+  ) {}
 
   // Use AwsService's uploadFile() for file uploads
   private async uploadToS3(file: Express.Multer.File): Promise<string> {
@@ -54,16 +43,16 @@ export class ProductService {
     let imageId = null;
 
     if (file) {
-      // Step 1: Upload Image to S3
+      // Upload Image to S3
       imageUrl = await this.uploadToS3(file);
       
       console.log('Image uploaded to S3:', imageUrl);
 
-      // Step 2: Save Image Temporarily to Send to FastAPI
+      // Save Image Temporarily to Send to FastAPI
       const tempFilePath = `../fastapi/${Date.now()}_${file.originalname}`;
       writeFileSync(tempFilePath, file.buffer);
 
-      // Step 3: Prepare Multipart/Form-Data Request
+      // Prepare Multipart/Form-Data Request
       const formData = new FormData();
       formData.append('file', createReadStream(tempFilePath), {
         filename: file.originalname,
@@ -72,7 +61,7 @@ export class ProductService {
 
       console.log('Sending image to FastAPI for feature extraction...');
 
-      // Step 4: Send Image to FastAPI for Feature Extraction
+      // Send Image to FastAPI for Feature Extraction
       try {
         const response = await axios.post('http://127.0.0.1:8000/upload', formData, {
           headers: {
@@ -86,7 +75,7 @@ export class ProductService {
         console.error('Error sending image to FastAPI:', error.response?.data || error.message);
         throw new Error('Failed to extract image features');
       } finally {
-        // Step 5: Delete the temporary file
+        // Delete the temporary file
         try {
           unlinkSync(tempFilePath);
           console.log('Temporary file deleted:', tempFilePath);
