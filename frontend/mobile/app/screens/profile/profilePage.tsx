@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native"
 import { useAsyncStorage } from "../AsyncStorage/useAsyncStorage" // Adjust path as needed
 import { LinearGradient } from "expo-linear-gradient"
 import type { StackNavigationProp } from "@react-navigation/stack"
-import { Ionicons } from "@expo/vector-icons" // Added Ionicons import
+import { Ionicons } from "@expo/vector-icons"
 
 type RootStackParamList = {
   Login: undefined
@@ -106,7 +106,7 @@ const Profile: React.FC = () => {
   if (isLoading) {
     return (
       <View style={styles.profile}>
-        <Text>Loading profile...</Text> {/* Wrapped in Text component */}
+        <Text>Loading profile...</Text>
       </View>
     )
   }

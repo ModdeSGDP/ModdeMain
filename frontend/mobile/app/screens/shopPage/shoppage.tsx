@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useCallback, useEffect, useMemo } from "react"
+import React, { useState, useCallback, useEffect, useMemo  } from "react"
 import {
   StyleSheet,
   View,
@@ -20,7 +20,7 @@ import { Ionicons } from "@expo/vector-icons"
 const { width } = Dimensions.get("window")
 
 const API_BASE_URL = "https://2a1a-124-43-246-34.ngrok-free.app"
-const AUTH_TOKEN = "usertoken" // Replace with secure token retrieval logic
+const AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2M3ZmJiOWYxMTg3ZmVkMDZmY2Q4YjQiLCJlbWFpbCI6ImFkbWluN0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJyZXRhaWxlcklkIjoiNjdjN2ZiYjhmMTE4N2ZlZDA2ZmNkOGIyIiwiaWF0IjoxNzQyNDg3MzM2LCJleHAiOjE3NDI5MTkzMzZ9.2AXnmkQIpTXRRuyQE9Q_d7VQEwBGgPU0HKgD3H2PVFk" // Replace with secure token retrieval logic
 
 type RootStackParamList = {
   HomePage: undefined
@@ -97,7 +97,6 @@ const ShopsPageInfinityScroll = () => {
       (product.retailer?.name && product.retailer.name.toLowerCase().includes(searchQuery.toLowerCase()))
     )
   }, [products, searchQuery])
-
   useEffect(() => {
     if (route.params?.products && !initialProductsLoaded) {
       const mappedProducts = route.params.products.map((item: any) => ({
@@ -181,7 +180,6 @@ const ShopsPageInfinityScroll = () => {
 
       const result = await response.json()
       console.log("API Response:", result)
-      
       const productsArray = Array.isArray(result) ? result : result.products || []
       setTotalPages(result.totalPages || 1)
 
@@ -211,7 +209,6 @@ const ShopsPageInfinityScroll = () => {
           }
         })
       )
-
       if (pageNum === 1) {
         setProducts(mappedProducts)
       } else {
@@ -261,9 +258,7 @@ const ShopsPageInfinityScroll = () => {
       const imageSource = hasError || !item.image || !item.image.startsWith("http")
         ? require("../../assets/user.png")
         : { uri: item.image }
-
       const retailerName = item.retailer?.name || "Retailer Not Specified"
-
       return (
         <Pressable
           style={styles.card}
@@ -333,7 +328,6 @@ const ShopsPageInfinityScroll = () => {
       </View>
     )
   }
-
   if (error && products.length === 0 && searchQuery.trim() === "") {
     return (
       <View style={styles.errorContainer}>
@@ -344,7 +338,6 @@ const ShopsPageInfinityScroll = () => {
       </View>
     )
   }
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.shopsPageInfinityScroll}>
@@ -362,7 +355,7 @@ const ShopsPageInfinityScroll = () => {
           </Pressable>
         </View>
 
-        <View style={styles.searchBar}>
+        {/* <View style={styles.searchBar}>
           <TextInput
             style={styles.searchInput}
             placeholder="Search products"
@@ -370,7 +363,7 @@ const ShopsPageInfinityScroll = () => {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-        </View>
+        </View> */}
         {searchQuery.trim() === "" && (
           <Image
             style={styles.bannerImage}

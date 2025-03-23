@@ -10,6 +10,8 @@ type RootStackParamList = {
   ShopPage: undefined
   CartPage: undefined
   ProfilePage: undefined
+  NotificationPage: undefined // Added NotificationPage
+  Camera: undefined // Added Camera
 }
 
 type PromotionsPageNavigationProp = StackNavigationProp<RootStackParamList, "HomePage">
@@ -52,6 +54,10 @@ const PromotionsPage: React.FC = () => {
     setTimeout(() => navigation.navigate("ShopPage"), 200)
   }
 
+  const handleCameraPress = () => {
+    navigation.navigate("Camera")
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -60,11 +66,7 @@ const PromotionsPage: React.FC = () => {
           <Ionicons name="chevron-back" size={24} color="#333" />
         </Pressable>
         <Text style={styles.headerTitle}>Promotions</Text>
-        <Pressable
-          onPress={() => {
-            /* Handle notifications */
-          }}
-        >
+        <Pressable onPress={() => navigation.navigate("NotificationPage")}>
           <Image source={require("../../assets/bell.png")} style={styles.bellIcon} />
         </Pressable>
       </View>
@@ -103,18 +105,18 @@ const PromotionsPage: React.FC = () => {
         <View style={styles.navBarBg} />
         <View style={styles.navIcons}>
           <Pressable onPress={() => navigation.navigate("HomePage")}>
+            <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/smart_home.png")} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("ShopPage")}>
-            <View style={styles.lineView} />
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shirt.png")} />
           </Pressable>
-          <Pressable
-            onPress={() => {
-              /* Camera Feature */
-            }}
-          >
-            <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/cameraplus.png")} />
+          <Pressable onPress={handleCameraPress}>
+            <Image
+              style={styles.navIcon}
+              resizeMode="cover"
+              source={require("../../assets/cameraplus.png")}
+            />
           </Pressable>
           <Pressable onPress={() => navigation.navigate("CartPage")}>
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/shopping_cart.png")} />
@@ -123,6 +125,7 @@ const PromotionsPage: React.FC = () => {
             <Image style={styles.navIcon} resizeMode="cover" source={require("../../assets/user.png")} />
           </Pressable>
         </View>
+        <View style={styles.activeIndicator} />
       </View>
     </SafeAreaView>
   )
@@ -139,7 +142,6 @@ const styles = StyleSheet.create({
     left: 80,
     bottom: 6,
   },
-  lineView: {},
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -159,6 +161,24 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     flexGrow: 1,
+  },
+  activeIndicator: {
+    position: "absolute",
+    left: 26,
+    bottom: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#fba3a3",
+  },
+  lineView: {
+    borderStyle: "solid",
+    borderColor: "#f97c7c",
+    borderTopWidth: 1,
+    flex: 1,
+    width: "100%",
+    height: 1,
+    top: -20,
   },
   promotionCard: {
     flexDirection: "row",
@@ -280,4 +300,3 @@ const styles = StyleSheet.create({
 })
 
 export default PromotionsPage
-
