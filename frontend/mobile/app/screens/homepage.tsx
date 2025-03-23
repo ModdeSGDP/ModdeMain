@@ -322,7 +322,6 @@ const HomePage = () => {
       uploadImage(route.params.capturedImage)
     }
   }, [route.params?.capturedImage])
-
   useEffect(() => {
     Animated.parallel([
       Animated.timing(slideAnim, {
@@ -453,7 +452,7 @@ const HomePage = () => {
             <Ionicons name="menu" size={24} color="#333" />
             {orders.length > 0 && <View style={styles.menuBadge} />}
           </Pressable>
-          <Text style={styles.headerTitle}>Explore Modde Fashion Studio</Text>
+          <Text style={styles.headerTitle}>Modde Fashion Studio</Text>
           <Pressable onPress={() => navigation.navigate("NotificationPage")}>
             <Image style={styles.bell} source={require("../assets/bell.png")} />
           </Pressable>
@@ -585,7 +584,7 @@ const styles = StyleSheet.create({
     fontFamily: "Rosario-Bold",
     fontWeight: "800",
     color: "#333",
-    top: 50,
+    top: 0,
     textAlign: "center",
     flex: 1,
   },

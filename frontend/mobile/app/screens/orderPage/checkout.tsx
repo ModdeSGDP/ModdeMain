@@ -1,10 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Text, Image, Pressable, ScrollView, SafeAreaView } from "react-native"
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  Pressable,
+  ScrollView,
+  SafeAreaView,
+} from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import type { StackNavigationProp } from "@react-navigation/stack"
-import { Ionicons } from "@expo/vector-icons" // Added for chevron-back
+import { Ionicons } from "@expo/vector-icons"
 
 type Address = {
   name: string
@@ -17,7 +25,7 @@ type CartItem = {
   name: string
   shop: string
   price: string
-  image: any
+  image: string | null // Updated to explicitly allow string or null
   quantity: number
 }
 
@@ -31,6 +39,7 @@ type RootStackParamList = {
   ItemDetails: { item: any }
   OrdersPage: { newOrder?: any }
   OrderSettingsPage: undefined
+  Camera:undefined
   orderComplete: { order: any }
 }
 
@@ -38,7 +47,9 @@ type CheckoutNavigationProp = StackNavigationProp<RootStackParamList, "CheckoutP
 
 const CheckoutScreen = ({
   route,
-}: { route: { params?: { address?: Address; selectedItems?: CartItem[]; total?: number } } }) => {
+}: {
+  route: { params?: { address?: Address; selectedItems?: CartItem[]; total?: number } }
+}) => {
   const navigation = useNavigation<CheckoutNavigationProp>()
   const address = route.params?.address || {
     name: "Default Name",
@@ -47,7 +58,9 @@ const CheckoutScreen = ({
   }
 
   const [paymentMethod, setPaymentMethod] = useState("card")
-  const [selectedItems, setSelectedItems] = useState<CartItem[]>(route.params?.selectedItems || [])
+  const [selectedItems, setSelectedItems] = useState<CartItem[]>(
+    route.params?.selectedItems || []
+  )
   const [total, setTotal] = useState(route.params?.total || 0)
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -77,24 +90,34 @@ const CheckoutScreen = ({
     }, 1500)
   }
 
-  const renderCartItem = (item: CartItem) => (
-    <View key={item.id} style={styles.cartItem}>
-      <Image 
-        style={styles.itemImage} 
-        resizeMode="cover" 
-        source={item.image}
-      />
-      <View style={styles.itemDetails}>
-        <View style={styles.shopContainer}>
-          <Image style={styles.shopIcon} source={require("../../assets/home.png")} />
-          <Text style={styles.shopName}>{item.shop}</Text>
+  const renderCartItem = (item: CartItem) => {
+    // Determine the image source with proper handling
+    const imageSource =
+      item.image && typeof item.image === "string" && item.image.startsWith("http")
+        ? { uri: item.image }
+        : require("../../assets/user.png") // Fallback image
+
+    return (
+      <View key={item.id} style={styles.cartItem}>
+        <Image
+          style={styles.itemImage}
+          resizeMode="cover"
+          source={imageSource}
+          defaultSource={require("../../assets/user.png")} // Fallback for loading
+          onError={(e) => console.log(`Image load error for ${item.name}:`, e.nativeEvent.error)}
+        />
+        <View style={styles.itemDetails}>
+          <View style={styles.shopContainer}>
+            <Image style={styles.shopIcon} source={require("../../assets/home.png")} />
+            <Text style={styles.shopName}>{item.shop}</Text>
+          </View>
+          <Text style={styles.itemName}>{item.name}</Text>
+          <Text style={styles.itemPrice}>LKR {item.price}</Text>
+          <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
         </View>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>LKR {item.price}</Text>
-        <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
       </View>
-    </View>
-  )
+    )
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -122,15 +145,34 @@ const CheckoutScreen = ({
               <Text style={styles.sectionTitle}>Payment method</Text>
             </View>
             <View style={styles.paymentOptions}>
-              <Pressable style={styles.paymentOption} onPress={() => setPaymentMethod("card")}>
-                <Image style={styles.paymentIcon} source={require("../../assets/credit-card.png")} />
+              <Pressable
+                style={styles.paymentOption}
+                onPress={() => setPaymentMethod("card")}
+              >
+                <Image
+                  style={styles.paymentIcon}
+                  source={require("../../assets/credit-card.png")}
+                />
                 <Text style={styles.paymentText}>Credit/Debit card</Text>
-                <View style={[styles.radioButton, paymentMethod === "card" && styles.radioButtonSelected]} />
+                <View
+                  style={[
+                    styles.radioButton,
+                    paymentMethod === "card" && styles.radioButtonSelected,
+                  ]}
+                />
               </Pressable>
-              <Pressable style={styles.paymentOption} onPress={() => setPaymentMethod("cash")}>
+              <Pressable
+                style={styles.paymentOption}
+                onPress={() => setPaymentMethod("cash")}
+              >
                 <Image style={styles.paymentIcon} source={require("../../assets/cash.png")} />
                 <Text style={styles.paymentText}>Cash</Text>
-                <View style={[styles.radioButton, paymentMethod === "cash" && styles.radioButtonSelected]} />
+                <View
+                  style={[
+                    styles.radioButton,
+                    paymentMethod === "cash" && styles.radioButtonSelected,
+                  ]}
+                />
               </Pressable>
             </View>
           </View>
@@ -139,7 +181,9 @@ const CheckoutScreen = ({
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Order Items</Text>
               </View>
-              <View style={styles.orderItemsContainer}>{selectedItems.map(renderCartItem)}</View>
+              <View style={styles.orderItemsContainer}>
+                {selectedItems.map(renderCartItem)}
+              </View>
             </View>
           )}
           <View style={styles.section}>
@@ -165,30 +209,41 @@ const CheckoutScreen = ({
             onPress={handlePayment}
             disabled={isProcessing}
           >
-            <Text style={styles.payNowText}>{isProcessing ? "Processing..." : "Pay now"}</Text>
+            <Text style={styles.payNowText}>
+              {isProcessing ? "Processing..." : "Pay now"}
+            </Text>
           </Pressable>
         </ScrollView>
 
-        <View style={styles.navigationBar}>
+        {/* <View style={styles.navigationBar}>
           <View style={styles.navBarBg} />
           <View style={styles.navIcons}>
             <Pressable onPress={() => navigation.navigate("HomePage")}>
-              <Image style={styles.navIcon} source={require("../../assets/smart_home1.png")} />
+              <Image
+                style={styles.navIcon}
+                source={require("../../assets/smart_home1.png")}
+              />
             </Pressable>
             <Pressable onPress={() => navigation.navigate("ShopPage")}>
               <Image style={styles.navIcon} source={require("../../assets/shirt.png")} />
             </Pressable>
-            <Pressable onPress={() => {}}>
-              <Image style={styles.navIcon} source={require("../../assets/cameraplus.png")} />
+            <Pressable onPress={() => navigation.navigate("Camera")}>
+              <Image
+                style={styles.navIcon}
+                source={require("../../assets/cameraplus.png")}
+              />
             </Pressable>
             <Pressable onPress={() => navigation.navigate("CartPage")}>
-              <Image style={styles.navIcon} source={require("../../assets/shopping_cart.png")} />
+              <Image
+                style={styles.navIcon}
+                source={require("../../assets/shopping_cart.png")}
+              />
             </Pressable>
             <Pressable onPress={() => navigation.navigate("ProfilePage")}>
               <Image style={styles.navIcon} source={require("../../assets/user.png")} />
             </Pressable>
           </View>
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   )
@@ -216,7 +271,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Increased paddingBottom to ensure content isn't obscured by navigation bar
+    paddingBottom: 100,
   },
   pageTitle: {
     fontFamily: "Inter-SemiBold",

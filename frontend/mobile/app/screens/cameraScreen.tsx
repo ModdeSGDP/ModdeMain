@@ -7,9 +7,8 @@ import * as ImageManipulator from "expo-image-manipulator"
 import { useNavigation, type NavigationProp } from "@react-navigation/native"
 import { MaterialIcons, Ionicons, FontAwesome5 } from "@expo/vector-icons"
 import { LinearGradient } from "expo-linear-gradient"
-import { PanGestureHandler, PinchGestureHandler, State, GestureHandlerRootView } from "react-native-gesture-handler"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
-// Define the navigation stack param list
 type RootStackParamList = {
   Home: { products?: any[] } | undefined
   Camera: { capturedImage?: string } | undefined
@@ -21,7 +20,6 @@ type RootStackParamList = {
   OrdersPage: { newOrder?: any; deleteAll?: boolean } | undefined
 }
 
-// Define Product interface
 interface Product {
   _id?: string
   name?: string
@@ -35,57 +33,91 @@ const CameraScreen = () => {
   const [facing, setFacing] = useState<CameraType>("back")
   const [permission, requestPermission] = useCameraPermissions()
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
-  const [croppedImage, setCroppedImage] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [isCropping, setIsCropping] = useState(false)
   const cameraRef = useRef<CameraView | null>(null)
   const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const fadeAnim = useRef(new Animated.Value(0)).current
 
-  // Crop state
-  const pinchScale = useRef(new Animated.Value(1)).current
-  const translateX = useRef(new Animated.Value(0)).current
-  const translateY = useRef(new Animated.Value(0)).current
-  const [cropScale, setCropScale] = useState(1)
-  const [cropTranslateX, setCropTranslateX] = useState(0)
-  const [cropTranslateY, setCropTranslateY] = useState(0)
-  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null)
+  // Animation values for loader
+  const spinValue = useRef(new Animated.Value(0)).current
+  const pulseValue = useRef(new Animated.Value(1)).current
+
+  // Frame size - allow user to adjust
+  const [frameSize, setFrameSize] = useState(width * 0.7)
 
   useEffect(() => {
     if (capturedImage) {
-      setIsCropping(true) // Automatically enter cropping mode after capture
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 500,
         useNativeDriver: true,
       }).start()
-
-      // Get image dimensions
-      Image.getSize(capturedImage, (imgWidth, imgHeight) => {
-        setImageDimensions({ width: imgWidth, height: imgHeight })
-      }, (error) => {
-        console.error("Failed to get image size:", error)
-      })
     }
   }, [capturedImage, fadeAnim])
 
+  // Start loader animations when processing
+  useEffect(() => {
+    if (isProcessing) {
+      // Rotation animation
+      Animated.loop(
+        Animated.timing(spinValue, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ).start()
+
+      // Pulse animation
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseValue, {
+            toValue: 1.2,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseValue, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start()
+    } else {
+      // Stop animations
+      spinValue.setValue(0)
+      pulseValue.setValue(1)
+    }
+  }, [isProcessing, spinValue, pulseValue])
+
+  // Create the spin interpolation for rotation
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  })
+
   if (!permission) {
-    return <View style={styles.container} />
+    return (
+      <GestureHandlerRootView style={styles.container}>
+        <View style={styles.container} />
+      </GestureHandlerRootView>
+    )
   }
 
   if (!permission.granted) {
     return (
-      <LinearGradient colors={["#FFB6C1", "#FF69B4"]} style={styles.permissionContainer}>
-        <View style={styles.permissionContent}>
-          <FontAwesome5 name="camera" size={60} color="white" style={styles.permissionIcon} />
-          <Text style={styles.permissionTitle}>Camera Access</Text>
-          <Text style={styles.message}>We need your permission to use the camera for taking product photos</Text>
-          <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-            <Text style={styles.permissionButtonText}>Grant Permission</Text>
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
+      <GestureHandlerRootView style={styles.container}>
+        <LinearGradient colors={["#FFB6C1", "#FF69B4"]} style={styles.permissionContainer}>
+          <View style={styles.permissionContent}>
+            <FontAwesome5 name="camera" size={60} color="white" style={styles.permissionIcon} />
+            <Text style={styles.permissionTitle}>Camera Access</Text>
+            <Text style={styles.message}>We need your permission to use the camera for taking product photos</Text>
+            <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+              <Text style={styles.permissionButtonText}>Grant Permission</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </GestureHandlerRootView>
     )
   }
 
@@ -95,14 +127,95 @@ const CameraScreen = () => {
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo: CameraCapturedPicture | undefined = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-        skipProcessing: false,
-      })
-      if (photo) {
-        setCapturedImage(photo.uri)
-      } else {
-        Alert.alert("Error", "Failed to capture photo. Please try again.")
+      try {
+        setIsProcessing(true)
+
+        // Take the full photo first
+        const photo: CameraCapturedPicture | undefined = await cameraRef.current.takePictureAsync({
+          quality: 0.8,
+          skipProcessing: false,
+        })
+
+        if (!photo) {
+          Alert.alert("Error", "Failed to capture photo. Please try again.")
+          setIsProcessing(false)
+          return
+        }
+
+        // Calculate the crop area based on the frame size
+        const screenCenterX = width / 2
+        const screenCenterY = height / 2
+
+        // Get the image dimensions
+        const { width: imgWidth, height: imgHeight } = await new Promise<{ width: number; height: number }>(
+          (resolve, reject) => {
+            Image.getSize(
+              photo.uri,
+              (width, height) => resolve({ width, height }),
+              (error) => {
+                console.error("Failed to get image size:", error)
+                reject(error)
+              },
+            )
+          },
+        )
+
+        // Calculate the scale factor from screen to image
+        const screenAspect = width / height
+        const imageAspect = imgWidth / imgHeight
+
+        let displayWidth, displayHeight
+
+        if (screenAspect > imageAspect) {
+          // Image is taller than screen
+          displayHeight = height
+          displayWidth = imgWidth * (height / imgHeight)
+        } else {
+          // Image is wider than screen
+          displayWidth = width
+          displayHeight = imgHeight * (width / imgWidth)
+        }
+
+        // Calculate the scale factor from display size to actual image size
+        const scaleX = imgWidth / displayWidth
+        const scaleY = imgHeight / displayHeight
+
+        // Calculate the crop dimensions in image coordinates
+        const cropWidth = frameSize * scaleX
+        const cropHeight = frameSize * scaleY
+
+        // Calculate the top-left corner of the crop area
+        const originX = (screenCenterX - frameSize / 2) * scaleX
+        const originY = (screenCenterY - frameSize / 2) * scaleY
+
+        // Ensure crop area is within image bounds
+        const safeOriginX = Math.max(0, Math.min(originX, imgWidth - cropWidth))
+        const safeOriginY = Math.max(0, Math.min(originY, imgHeight - cropHeight))
+        const safeCropWidth = Math.min(cropWidth, imgWidth - safeOriginX)
+        const safeCropHeight = Math.min(cropHeight, imgHeight - safeOriginY)
+
+        // Crop the image to the frame area
+        const croppedResult = await ImageManipulator.manipulateAsync(
+          photo.uri,
+          [
+            {
+              crop: {
+                originX: safeOriginX,
+                originY: safeOriginY,
+                width: safeCropWidth,
+                height: safeCropHeight,
+              },
+            },
+          ],
+          { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG },
+        )
+
+        setCapturedImage(croppedResult.uri)
+        setIsProcessing(false)
+      } catch (error) {
+        console.error("Error capturing and cropping image:", error)
+        Alert.alert("Error", "Failed to process image. Please try again.")
+        setIsProcessing(false)
       }
     } else {
       Alert.alert("Error", "Camera is not available.")
@@ -111,17 +224,8 @@ const CameraScreen = () => {
 
   const retakePicture = () => {
     setCapturedImage(null)
-    setCroppedImage(null)
     setUploadProgress(0)
-    setIsCropping(false)
-    setImageDimensions(null)
     fadeAnim.setValue(0)
-    setCropScale(1)
-    setCropTranslateX(0)
-    setCropTranslateY(0)
-    pinchScale.setValue(1)
-    translateX.setValue(0)
-    translateY.setValue(0)
   }
 
   const simulateUpload = () => {
@@ -138,57 +242,21 @@ const CameraScreen = () => {
     return () => clearInterval(interval)
   }
 
-  const confirmCrop = async () => {
-    if (!capturedImage || !imageDimensions) return
-
-    try {
-      const cropFrameSize = width * 0.8 // Size of the crop frame in screen pixels
-      const { width: imgWidth, height: imgHeight } = imageDimensions
-
-      // Calculate the scale factor from screen size to actual image size
-      const displayWidth = width
-      const displayHeight = height
-      const scaleX = imgWidth / displayWidth
-      const scaleY = imgHeight / displayHeight
-
-      // Calculate crop area in original image coordinates
-      const cropWidth = cropFrameSize * scaleX / cropScale
-      const cropHeight = cropFrameSize * scaleY / cropScale
-      const originX = (imgWidth - cropWidth) / 2 - (cropTranslateX * scaleX / cropScale)
-      const originY = (imgHeight - cropHeight) / 2 - (cropTranslateY * scaleY / cropScale)
-
-      const manipResult = await ImageManipulator.manipulateAsync(
-        capturedImage,
-        [
-          {
-            crop: {
-              originX: Math.max(0, Math.min(originX, imgWidth - cropWidth)),
-              originY: Math.max(0, Math.min(originY, imgHeight - cropHeight)),
-              width: cropWidth,
-              height: cropHeight,
-            },
-          },
-        ],
-        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG },
-      )
-
-      setCroppedImage(manipResult.uri)
-      setIsCropping(false)
-    } catch (error) {
-      console.error("Error cropping image:", error)
-      Alert.alert("Error", "Failed to crop image. Please try again.")
-    }
+  // Adjust frame size
+  const adjustFrameSize = (increase: boolean) => {
+    const newSize = increase ? Math.min(frameSize + 20, width * 0.95) : Math.max(frameSize - 20, width * 0.3)
+    setFrameSize(newSize)
   }
 
   const uploadImage = async () => {
-    if (!croppedImage) {
-      Alert.alert("No cropped image", "Please crop the image before uploading.")
+    if (!capturedImage) {
+      Alert.alert("No image", "Please capture an image before uploading.")
       return
     }
-   3
+
     const formData = new FormData()
     formData.append("file", {
-      uri: croppedImage,
+      uri: capturedImage,
       name: "image.jpg",
       type: "image/jpeg",
     } as any)
@@ -218,7 +286,7 @@ const CameraScreen = () => {
       setIsProcessing(false)
 
       navigation.navigate("ShopPage", { products: productsData })
-      retakePicture() // Reset after successful upload
+      retakePicture()
       cleanup()
     } catch (error) {
       console.error("Upload error:", error)
@@ -232,165 +300,156 @@ const CameraScreen = () => {
     }
   }
 
-  const onPinchGestureEvent = Animated.event([{ nativeEvent: { scale: pinchScale } }], { useNativeDriver: false })
-
-  const onPinchHandlerStateChange = (event: { nativeEvent: { oldState: number; scale: number } }) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      const newScale = Math.max(1, Math.min(event.nativeEvent.scale * cropScale, 3)) // Limit scale between 1x and 3x
-      setCropScale(newScale)
-      pinchScale.setValue(1)
-    }
-  }
-
-  const onPanGestureEvent = Animated.event(
-    [
-      {
-        nativeEvent: {
-          translationX: translateX,
-          translationY: translateY,
-        },
-      },
-    ],
-    { useNativeDriver: false },
-  )
-
-  const onPanHandlerStateChange = (event: { nativeEvent: { oldState: number; translationX: number; translationY: number } }) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      setCropTranslateX(cropTranslateX + event.nativeEvent.translationX)
-      setCropTranslateY(cropTranslateY + event.nativeEvent.translationY)
-      translateX.setValue(0)
-      translateY.setValue(0)
-    }
-  }
-
   const goBack = () => {
     navigation.goBack()
   }
 
-  // Cropping UI
-  if (isCropping && capturedImage) {
+  if (capturedImage) {
     return (
       <GestureHandlerRootView style={styles.container}>
-        <View style={styles.cropContainer}>
-          <Text style={styles.cropTitle}>Crop your image</Text>
+        <View style={styles.container}>
+          <Animated.View style={[styles.previewContainer, { opacity: fadeAnim }]}>
+            <Image source={{ uri: capturedImage }} style={styles.preview} />
+            <LinearGradient
+              colors={["rgba(0,0,0,0.7)", "transparent", "transparent", "rgba(0,0,0,0.7)"]}
+              style={styles.previewGradient}
+            />
 
-          <View style={styles.cropImageContainer}>
-            <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
-              <Animated.View>
-                <PanGestureHandler onGestureEvent={onPanGestureEvent} onHandlerStateChange={onPanHandlerStateChange}>
-                  <Animated.Image
-                    source={{ uri: capturedImage }}
+            {/* Beautiful animated loader */}
+            {isProcessing && (
+              <View style={styles.loaderContainer}>
+                <LinearGradient colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.85)"]} style={styles.loaderBackground} />
+                <View style={styles.loaderContent}>
+                  <Animated.View
                     style={[
-                      styles.cropImage,
+                      styles.loaderImageContainer,
                       {
-                        transform: [
-                          { scale: Animated.multiply(pinchScale, cropScale) },
-                          { translateX: Animated.add(translateX, cropTranslateX) },
-                          { translateY: Animated.add(translateY, cropTranslateY) },
-                        ],
+                        transform: [{ scale: pulseValue }],
                       },
                     ]}
-                  />
-                </PanGestureHandler>
-              </Animated.View>
-            </PinchGestureHandler>
+                  >
+                    <Image source={{ uri: capturedImage }} style={styles.loaderImage} />
+                    <Animated.View
+                      style={[
+                        styles.loaderSpinner,
+                        {
+                          transform: [{ rotate: spin }],
+                        },
+                      ]}
+                    >
+                      <LinearGradient
+                        colors={["#ff8a8a", "#ff5e5e"]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.loaderSpinnerGradient}
+                      />
+                    </Animated.View>
+                  </Animated.View>
+                  <Text style={styles.loaderTitle}>Finding similar products</Text>
+                  <Text style={styles.loaderSubtitle}>
+                    {uploadProgress < 30
+                      ? "Analyzing image..."
+                      : uploadProgress < 60
+                        ? "Searching catalog..."
+                        : uploadProgress < 90
+                          ? "Matching products..."
+                          : "Almost done..."}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </Animated.View>
 
-            <View style={styles.cropOverlay}>
-              <View style={styles.cropFrame} />
+          {!isProcessing && (
+            <View style={styles.previewButtonContainer}>
+              <TouchableOpacity style={styles.previewButton} onPress={retakePicture}>
+                <MaterialIcons name="replay" size={24} color="white" />
+                <Text style={styles.buttonText}>Retake</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.previewButton, styles.uploadButton]} onPress={uploadImage}>
+                <MaterialIcons name="file-upload" size={24} color="white" />
+                <Text style={styles.buttonText}>Upload</Text>
+              </TouchableOpacity>
             </View>
-          </View>
+          )}
 
-          <View style={styles.cropInstructions}>
-            <Text style={styles.cropInstructionsText}>Pinch to zoom • Drag to position</Text>
-          </View>
-
-          <View style={styles.cropButtonsContainer}>
-            <TouchableOpacity style={styles.cropButton} onPress={retakePicture}>
-              <Text style={styles.cropButtonText}>Retake</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.cropButton, styles.confirmCropButton]} onPress={confirmCrop}>
-              <Text style={styles.confirmCropButtonText}>Confirm Crop</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.closeButton} onPress={goBack}>
+            <Ionicons name="close" size={28} color="white" />
+          </TouchableOpacity>
         </View>
       </GestureHandlerRootView>
     )
   }
 
-  // Preview UI (after cropping)
-  if (croppedImage && !isCropping) {
-    return (
-      <View style={styles.container}>
-        <Animated.View style={[styles.previewContainer, { opacity: fadeAnim }]}>
-          <Image source={{ uri: croppedImage }} style={styles.preview} />
-          <LinearGradient
-            colors={["rgba(0,0,0,0.7)", "transparent", "transparent", "rgba(0,0,0,0.7)"]}
-            style={styles.previewGradient}
-          />
-
-          {isProcessing && (
-            <View style={styles.uploadingBar}>
-              <View style={styles.uploadingBarBg} />
-              <View style={[styles.uploadingBarFill, { width: `${uploadProgress}%` }]} />
-              <Image style={styles.fileIcon} source={{ uri: croppedImage }} />
-              <Text style={styles.uploadingText}>Uploading</Text>
-              <Text style={styles.percentageText}>{`${uploadProgress}%`}</Text>
-            </View>
-          )}
-        </Animated.View>
-
-        {!isProcessing && (
-          <View style={styles.previewButtonContainer}>
-            <TouchableOpacity style={styles.previewButton} onPress={retakePicture}>
-              <MaterialIcons name="replay" size={24} color="white" />
-              <Text style={styles.buttonText}>Retake</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.previewButton, styles.uploadButton]} onPress={uploadImage}>
-              <MaterialIcons name="file-upload" size={24} color="white" />
-              <Text style={styles.buttonText}>Upload</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        <TouchableOpacity style={styles.closeButton} onPress={goBack}>
-          <Ionicons name="close" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
-  // Camera UI
   return (
-    <View style={styles.container}>
-      <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
-        <View style={styles.cameraOverlay}>
-          <View style={styles.cameraHeader}>
-            <TouchableOpacity style={styles.closeButton} onPress={goBack}>
-              <Ionicons name="close" size={28} color="white" />
-            </TouchableOpacity>
-            <View style={styles.placeholder} />
-          </View>
-          <View style={styles.cameraGuide}>
-            <View style={styles.cameraGuideFrame} />
-            <Text style={styles.cameraGuideText}>Position your product in the frame</Text>
-          </View>
+    <GestureHandlerRootView style={styles.container}>
+      <View style={styles.container}>
+        <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
+          <View style={styles.cameraOverlay}>
+            <View style={styles.cameraHeader}>
+              <TouchableOpacity style={styles.closeButton} onPress={goBack}>
+                <Ionicons name="close" size={28} color="white" />
+              </TouchableOpacity>
+              <View style={styles.placeholder} />
+            </View>
 
-          <View style={styles.cameraControls}>
-            <TouchableOpacity style={styles.controlButton} onPress={toggleCameraFacing}>
-              <MaterialIcons name="flip-camera-ios" size={28} color="white" />
-            </TouchableOpacity>
+            {/* Camera guide with frame */}
+            <View style={styles.cameraGuide}>
+              <View style={[styles.cameraGuideFrame, { width: frameSize, height: frameSize }]} />
+              <Text style={styles.cameraGuideText}>Position your product in the frame</Text>
+            </View>
 
-            <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-              <View style={styles.captureButtonInner} />
-            </TouchableOpacity>
+            {/* Frame size controls */}
+            <View style={styles.frameControls}>
+              <TouchableOpacity style={styles.frameButton} onPress={() => adjustFrameSize(false)}>
+                <MaterialIcons name="remove" size={24} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.frameButton} onPress={() => adjustFrameSize(true)}>
+                <MaterialIcons name="add" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
 
-            <View style={styles.placeholder} />
+            {/* Processing indicator */}
+            {isProcessing && (
+              <View style={styles.processingOverlay}>
+                <View style={styles.processingContent}>
+                  <Animated.View
+                    style={[
+                      styles.processingSpinner,
+                      {
+                        transform: [{ rotate: spin }],
+                      },
+                    ]}
+                  >
+                    <LinearGradient
+                      colors={["#ff8a8a", "#ff5e5e"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.processingSpinnerGradient}
+                    />
+                  </Animated.View>
+                  <Text style={styles.processingText}>Processing...</Text>
+                </View>
+              </View>
+            )}
+
+            <View style={styles.cameraControls}>
+              <TouchableOpacity style={styles.controlButton} onPress={toggleCameraFacing}>
+                <MaterialIcons name="flip-camera-ios" size={28} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.captureButton, isProcessing && styles.captureButtonDisabled]}
+                onPress={takePicture}
+                disabled={isProcessing}
+              >
+                <View style={styles.captureButtonInner} />
+              </TouchableOpacity>
+              <View style={styles.placeholder} />
+            </View>
           </View>
-        </View>
-      </CameraView>
-    </View>
+        </CameraView>
+      </View>
+    </GestureHandlerRootView>
   )
 }
 
@@ -450,10 +509,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cameraGuideFrame: {
-    width: width * 0.7,
-    height: width * 0.7,
     borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderColor: "white",
     borderRadius: 10,
     marginBottom: 15,
   },
@@ -491,6 +548,9 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "white",
   },
+  captureButtonDisabled: {
+    opacity: 0.5,
+  },
   captureButtonInner: {
     width: 54,
     height: 54,
@@ -506,7 +566,7 @@ const styles = StyleSheet.create({
   },
   preview: {
     flex: 1,
-    resizeMode: "cover",
+    resizeMode: "contain",
   },
   previewGradient: {
     position: "absolute",
@@ -555,56 +615,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  uploadingBar: {
-    position: "absolute",
-    top: height * 0.65,
-    left: 38,
-    width: width - 76,
-    height: 52,
-  },
-  uploadingBarBg: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#ffccd4",
-    borderRadius: 100,
-  },
-  uploadingBarFill: {
-    position: "absolute",
-    top: 3,
-    left: 3,
-    bottom: 3,
-    backgroundColor: "#f97c7c",
-    borderRadius: 100,
-  },
-  fileIcon: {
-    position: "absolute",
-    top: 11,
-    left: 12,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-  },
-  uploadingText: {
-    position: "absolute",
-    top: 15,
-    left: 97,
-    fontSize: 12,
-    lineHeight: 15,
-    fontFamily: "Inter-SemiBold",
-    color: "#321919",
-  },
-  percentageText: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    fontSize: 12,
-    lineHeight: 15,
-    fontFamily: "Inter-Medium",
-    color: "#321919",
-  },
   permissionButton: {
     backgroundColor: "white",
     paddingVertical: 15,
@@ -621,33 +631,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  // Crop styles
-  cropContainer: {
-    flex: 1,
-    backgroundColor: "#000",
-    justifyContent: "space-between",
-    padding: 20,
+  frameControls: {
+    position: "absolute",
+    right: 20,
+    top: "50%",
+    transform: [{ translateY: -50 }],
+    flexDirection: "column",
+    gap: 15,
   },
-  cropTitle: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 40,
-  },
-  cropImageContainer: {
-    flex: 1,
+  frameButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     justifyContent: "center",
     alignItems: "center",
-    position: "relative",
-    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.5)",
   },
-  cropImage: {
-    width: width,
-    height: height,
-    resizeMode: "contain",
-  },
-  cropOverlay: {
+  // Beautiful loader styles
+  loaderContainer: {
     position: "absolute",
     top: 0,
     left: 0,
@@ -655,50 +658,107 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  cropFrame: {
-    width: width * 0.8,
-    height: width * 0.8,
+  loaderBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  loaderContent: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  loaderImageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+  },
+  loaderImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     borderWidth: 2,
     borderColor: "white",
-    backgroundColor: "transparent",
   },
-  cropInstructions: {
-    marginBottom: 20,
-    alignItems: "center",
+  loaderSpinner: {
+    position: "absolute",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    top: 0,
+    left: 0,
   },
-  cropInstructionsText: {
+  loaderSpinnerGradient: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: "transparent",
+    borderTopColor: "#ff8a8a",
+    borderRightColor: "rgba(255, 138, 138, 0.5)",
+    borderBottomColor: "transparent",
+    borderLeftColor: "rgba(255, 138, 138, 0.8)",
+  },
+  loaderTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
     color: "white",
-    fontSize: 14,
+    marginBottom: 10,
     textAlign: "center",
   },
-  cropButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 30,
+  loaderSubtitle: {
+    fontSize: 16,
+    color: "rgba(255, 255, 255, 0.8)",
+    textAlign: "center",
+    marginBottom: 20,
   },
-  cropButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    minWidth: 120,
+  // Processing overlay
+  processingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
     alignItems: "center",
   },
-  cropButtonText: {
-    color: "white",
+  processingContent: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  processingSpinner: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 15,
+  },
+  processingSpinnerGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 3,
+    borderColor: "transparent",
+    borderTopColor: "#ff8a8a",
+    borderRightColor: "rgba(255, 138, 138, 0.5)",
+    borderBottomColor: "transparent",
+    borderLeftColor: "rgba(255, 138, 138, 0.8)",
+  },
+  processingText: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  confirmCropButton: {
-    backgroundColor: "#ff8a8a",
-  },
-  confirmCropButtonText: {
     color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    textAlign: "center",
   },
 })
 
 export default CameraScreen
+
