@@ -102,8 +102,6 @@ export default function MyStack() {
       <Stack.Screen name="OrdersPage" component={OrdersPage}/>
       <Stack.Screen name="OrderSettingsPage" component={OrderSettings}/>
       <Stack.Screen name="Camera" component={CameraScreen} />
-      
-
       {/*  Main Tab Navigator */}
       <Stack.Screen name="Main" component={BottomTabs} />
     </Stack.Navigator>

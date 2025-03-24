@@ -20,7 +20,7 @@ import { useCartStore } from "../shopPage/cartState"
 
 const { width } = Dimensions.get("window")
 
-const API_BASE_URL = "https://2a1a-124-43-246-34.ngrok-free.app"
+const API_BASE_URL = "https://93ba-112-134-239-177.ngrok-free.app"
 const AUTH_TOKEN = "usertoken" // Replace with secure token retrieval logic
 
 type RootStackParamList = {
@@ -73,7 +73,6 @@ const ProductDetailPage: React.FC<Props> = ({ route, navigation }) => {
 
   const colors = ["black", "white", "gray"]
   const sizes = product.sizes?.length > 0 ? product.sizes : ["XS", "S", "M", "L", "XL", "XXL"]
-
   useEffect(() => {
     const fetchRetailerDetails = async () => {
       if (!product.retailerId) {

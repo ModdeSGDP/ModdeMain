@@ -86,7 +86,7 @@ const SignupPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/user/register", {
+      const response = await fetch("https://93ba-112-134-239-177.ngrok-free.app/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

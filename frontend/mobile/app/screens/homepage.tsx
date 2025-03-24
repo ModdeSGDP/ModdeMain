@@ -390,7 +390,7 @@ const HomePage = () => {
     } as any)
     try {
       setUploadProgress(10)
-      const response = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/product/search-similar", {
+      const response = await fetch("https://93ba-112-134-239-177.ngrok-free.app/product/search-similar", {
         method: "POST",
         body: formData,
       })
