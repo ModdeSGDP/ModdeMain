@@ -54,7 +54,7 @@ const LoginPage: React.FC = () => {
     }
 
     try {
-      const loginResponse = await fetch("https://2a1a-124-43-246-34.ngrok-free.app/auth/login", {
+      const loginResponse = await fetch("https://93ba-112-134-239-177.ngrok-free.app/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

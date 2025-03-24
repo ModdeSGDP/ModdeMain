@@ -19,7 +19,7 @@ import { Ionicons } from "@expo/vector-icons"
 
 const { width } = Dimensions.get("window")
 
-const API_BASE_URL = "https://2a1a-124-43-246-34.ngrok-free.app"
+const API_BASE_URL = "https://93ba-112-134-239-177.ngrok-free.app"
 const AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2M3ZmJiOWYxMTg3ZmVkMDZmY2Q4YjQiLCJlbWFpbCI6ImFkbWluN0BnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJyZXRhaWxlcklkIjoiNjdjN2ZiYjhmMTE4N2ZlZDA2ZmNkOGIyIiwiaWF0IjoxNzQyNDg3MzM2LCJleHAiOjE3NDI5MTkzMzZ9.2AXnmkQIpTXRRuyQE9Q_d7VQEwBGgPU0HKgD3H2PVFk" // Replace with secure token retrieval logic
 
 type RootStackParamList = {
